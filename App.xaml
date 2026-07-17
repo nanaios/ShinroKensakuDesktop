@@ -4,6 +4,10 @@
              xmlns:local="clr-namespace:ShinroKensakuDesktop"
              StartupUri="Windows/MainWindow/MainWindow.xaml">
     <Application.Resources>
-         
-    </Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Resources/Images/Images.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>

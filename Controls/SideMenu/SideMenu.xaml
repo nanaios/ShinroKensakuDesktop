@@ -1,0 +1,12 @@
+﻿<UserControl x:Name="Root" x:Class="ShinroKensakuDesktop.Controls.SideMenu.SideMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
+             mc:Ignorable="d" 
+             d:DesignHeight="1024" d:DesignWidth="480">
+	<Grid DataContext="{Binding ElementName=Root}" ClipToBounds="True">
+		<Rectangle Fill="Black" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
+	</Grid>
+</UserControl>
