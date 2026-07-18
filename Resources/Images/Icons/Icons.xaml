@@ -3,6 +3,7 @@
 
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="Close.xaml"/>
+		<ResourceDictionary Source="Close2.xaml"/>
 		<ResourceDictionary Source="Menu.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

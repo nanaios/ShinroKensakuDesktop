@@ -14,7 +14,11 @@
 			/>
 	</UserControl.Resources>
 	<Grid x:Name="MainGrid" ClipToBounds="True">
-		<Rectangle x:Name="BackGround" Fill="Black" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
-		<Path Data="{Binding IsOpen,ElementName=Root,Converter={StaticResource BooleanToMenuButtonPathGeometryConverter}}" Width="80" Height="80" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,60,0,0" />
+		<Rectangle x:Name="BackGround" Fill="{DynamicResource MainColor2}" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
+		<Path 
+			Fill="{DynamicResource MainColor2}"
+			Data="{Binding IsOpen,ElementName=Root,Converter={StaticResource BooleanToMenuButtonPathGeometryConverter}}" 
+			Width="60" Height="60" HorizontalAlignment="Right" VerticalAlignment="Top" 
+			 Stretch="Fill" Margin="0,60,0,0" />
 	</Grid>
 </UserControl>
