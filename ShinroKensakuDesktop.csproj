@@ -16,8 +16,4 @@
     <None Include="C:\Users\nanai\kaken\ShinroKensakuDesktop\.editorconfig" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controls\VariableColorImage\" />
-  </ItemGroup>
-
 </Project>
