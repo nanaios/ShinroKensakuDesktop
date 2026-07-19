@@ -6,7 +6,7 @@ namespace ShinroKensakuDesktop.Controls.SideMenu;
 
 public partial class SideMenu : UserControl
 {
-	public static readonly DependencyProperty IsOpenProperty = DependencyPropertyFactory.Create(nameof(IsOpen), false);
+	public static readonly DependencyProperty IsOpenProperty = DependencyPropertyFactory.Create(nameof(IsOpen), true);
 
 	public bool IsOpen
 	{

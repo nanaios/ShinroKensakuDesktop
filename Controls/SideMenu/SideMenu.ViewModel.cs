@@ -8,7 +8,7 @@ public class ViewModel : ViewModelBase
 {
 	public bool IsOpen
 	{
-		get; set => SetProperty(ref field, value);
+		get => field; set => SetProperty(ref field, value);
 	}
 
 	public ICommand ButtonClickCommand { get; }
@@ -20,6 +20,7 @@ public class ViewModel : ViewModelBase
 
 	private void OnButtonClick()
 	{
-		Debug.WriteLine("Button clicked!");
+		IsOpen = !IsOpen;
+		Debug.WriteLine($"Side menu is now {(IsOpen ? "open" : "closed")}");
 	}
 }

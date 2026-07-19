@@ -26,7 +26,7 @@
 		>
 			<Path 
 			Fill="{DynamicResource MainColor2}"
-			Data="{Binding IsOpen,ElementName=Root,Converter={StaticResource BooleanToMenuButtonPathGeometryConverter}}" 
+			Data="{Binding IsOpen,Converter={StaticResource BooleanToMenuButtonPathGeometryConverter}}" 
 			 Stretch="Fill" />
 		</Button>
 	</Grid>
