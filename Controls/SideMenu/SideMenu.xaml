@@ -6,16 +6,12 @@
              xmlns:local="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
              mc:Ignorable="d" 
              d:DesignHeight="1024" d:DesignWidth="480" Foreground="{x:Null}">
-	<UserControl.Resources>
-		<local:BooleanToMenuButtonPathGeometryConverter
-			x:Key="BooleanToMenuButtonPathGeometryConverter" 
-			CloseIconGeometry="{StaticResource CloseIconPath}"
-			OpenIconGeometry="{StaticResource MenuIconPath}"
-			/>
-	</UserControl.Resources>
-	<Grid x:Name="MainGrid" ClipToBounds="True">
+	<Grid x:Name="MainGrid" ClipToBounds="True" >
 		<Grid.DataContext>
-			<local:ViewModel/>
+			<local:ViewModel 
+				CloseIconGeometry="{StaticResource CloseIconPath}"
+				OpenIconGeometry="{StaticResource MenuIconPath}"
+				/>
 		</Grid.DataContext>
 		<Rectangle x:Name="BackGround" Fill="{DynamicResource MainColor2}" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
 		<Button 
@@ -26,7 +22,7 @@
 		>
 			<Path 
 			Fill="{DynamicResource MainColor2}"
-			Data="{Binding IsOpen,Converter={StaticResource BooleanToMenuButtonPathGeometryConverter}}" 
+			Data="{Binding IconGeometry}" 
 			 Stretch="Fill" />
 		</Button>
 	</Grid>
