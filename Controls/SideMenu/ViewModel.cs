@@ -6,9 +6,16 @@ namespace ShinroKensakuDesktop.Controls.SideMenu;
 
 public class ViewModel : ViewModelBase
 {
+	public PropertyBridge<bool> IsOpenBridge = new();
+
 	public bool IsOpen
 	{
-		get; set => SetProperty ( ref field, value );
+		get; set
+		{
+			field = value;
+			IsOpenBridge.SyncToOther ( value );
+			IconGeometry = IsOpen ? CloseIconGeometry : OpenIconGeometry;
+		}
 	} = false;
 
 	public required PathGeometry OpenIconGeometry
@@ -29,12 +36,7 @@ public class ViewModel : ViewModelBase
 
 	public ViewModel ( )
 	{
-		ButtonClickCommand = new RelayCommand ( _ => OnButtonClick ( ) );
-	}
-
-	private void OnButtonClick ( )
-	{
-		IsOpen = !IsOpen;
-		IconGeometry = IsOpen ? CloseIconGeometry : OpenIconGeometry;
+		ButtonClickCommand = new RelayCommand ( _ => IsOpen = !IsOpen );
+		IsOpenBridge.OnValueChanged = value => IsOpen = value;
 	}
 }
