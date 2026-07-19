@@ -14,8 +14,12 @@
 			/>
 	</UserControl.Resources>
 	<Grid x:Name="MainGrid" ClipToBounds="True">
+		<Grid.DataContext>
+			<local:ViewModel/>
+		</Grid.DataContext>
 		<Rectangle x:Name="BackGround" Fill="{DynamicResource MainColor2}" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
 		<Button 
+			Command="{Binding ButtonClickCommand}"
 			Width="60" Height="60" HorizontalAlignment="Right" VerticalAlignment="Top" 
 			Margin="0,60,0,0" Padding="0,0,0,0" 
 			BorderBrush="{x:Null}" Background="{x:Null}" Foreground="{x:Null}" 	

@@ -1,16 +1,25 @@
-﻿using System.ComponentModel;
+﻿using ShinroKensakuDesktop.Utils;
+using System.Diagnostics;
+using System.Windows.Input;
 
 namespace ShinroKensakuDesktop.Controls.SideMenu;
 
-public partial class SideMenu
+public class ViewModel : ViewModelBase
 {
-	public class ViewModel : INotifyPropertyChanged
+	public bool IsOpen
 	{
-		public event PropertyChangedEventHandler? PropertyChanged;
+		get; set => SetProperty(ref field, value);
+	}
 
-		private void OnButtonClick()
-		{
+	public ICommand ButtonClickCommand { get; }
 
-		}
+	public ViewModel()
+	{
+		ButtonClickCommand = new RelayCommand(_ => OnButtonClick());
+	}
+
+	private void OnButtonClick()
+	{
+		Debug.WriteLine("Button clicked!");
 	}
 }

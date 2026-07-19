@@ -8,8 +8,6 @@ public partial class SideMenu : UserControl
 {
 	public static readonly DependencyProperty IsOpenProperty = DependencyPropertyFactory.Create(nameof(IsOpen), false);
 
-	private ViewModel vm = new();
-
 	public bool IsOpen
 	{
 		get => (bool)GetValue(IsOpenProperty);
@@ -19,6 +17,5 @@ public partial class SideMenu : UserControl
 	public SideMenu()
 	{
 		InitializeComponent();
-		this.MainGrid.DataContext = this.vm;
 	}
 }
