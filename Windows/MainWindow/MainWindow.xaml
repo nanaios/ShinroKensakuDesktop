@@ -6,16 +6,15 @@
         xmlns:local="clr-namespace:ShinroKensakuDesktop"
         xmlns:SideMenu="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu" xmlns:local1="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow" x:Name="window" x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1024" Width="1440">
+        Title="KST-Decs" Height="1024" Width="1440">
 	<Window.Resources>
 		<local1:SideMenuMarginConverter x:Key="SideMenuMarginConverter"/>
 		<local1:OverlayWidthConverter x:Key="OverlayWidthConverter"/>
 	</Window.Resources>
-	<Grid x:Name="MainGrid">
-		<Grid.DataContext>
-			<local1:ViewModel/>
-		</Grid.DataContext>
-
+	<Window.DataContext>
+		<local1:ViewModel/>
+	</Window.DataContext>
+	<Grid x:Name="RootGrid">
 		<SideMenu:SideMenu x:Name="SideMenu" HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Panel.ZIndex="168">
 			<SideMenu:SideMenu.Margin>
 				<MultiBinding Converter="{StaticResource SideMenuMarginConverter}">
@@ -32,5 +31,22 @@
 				</MultiBinding>
 			</Rectangle.Width>
 		</Rectangle>
+		<Grid x:Name="MainGrid" >
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="200"/>
+				<RowDefinition Height="9*"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="6*"/>
+					<RowDefinition Height="4"/>
+					<RowDefinition Height="4*"/>
+				</Grid.RowDefinitions>
+				<TextBlock Text="KST-DeCS" FontFamily="Noto Sans JP Light" FontSize="96" TextAlignment="Center" VerticalAlignment="Center" FontWeight="Light"/>
+				<Rectangle Grid.Row="1" Width="600" Fill="{DynamicResource MainColor1}" />
+				<TextBlock Grid.Row="2" Text="総合科学進路検索システム" FontFamily="Noto Sans JP" FontSize="40" TextAlignment="Center" VerticalAlignment="Top" FontWeight="Light"/>
+			</Grid>
+		</Grid>
 	</Grid>
 </Window>
