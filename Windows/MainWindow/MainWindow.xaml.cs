@@ -1,8 +1,8 @@
-﻿using System.Windows;
+﻿using System.Windows.Navigation;
 
 namespace ShinroKensakuDesktop.Windows.MainWindow;
 
-public partial class MainWindow : Window
+public partial class MainWindow : NavigationWindow
 {
 	public MainWindow ( )
 	{
