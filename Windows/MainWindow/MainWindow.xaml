@@ -5,10 +5,35 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:SideMenu="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow" 
-		x:Name="window" x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
+		x:Name="Window" x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
 		mc:Ignorable="d"
 		Title="KST-Decs" Height="1024" Width="1440"
 >
-	<Frame Source="/Pages/MainPage/MainPage.xaml" NavigationUIVisibility="Hidden"></Frame>
+	<Window.Resources>
+		<local:SideMenuMarginConverter x:Key="SideMenuMarginConverter"/>
+		<local:OverlayWidthConverter x:Key="OverlayWidthConverter"/>
+	</Window.Resources>
+	<Window.DataContext>
+		<local:ViewModel/>
+	</Window.DataContext>
+	<Grid x:Name="RootGrid">
+		<SideMenu:SideMenu x:Name="SideMenu" HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Panel.ZIndex="168">
+			<SideMenu:SideMenu.Margin>
+				<MultiBinding Converter="{StaticResource SideMenuMarginConverter}">
+					<Binding Path="SideMenuWidth"/>
+					<Binding Path="IsOpen"/>
+				</MultiBinding>
+			</SideMenu:SideMenu.Margin>
+		</SideMenu:SideMenu>
+		<Rectangle x:Name="SideMenuOverlay" HorizontalAlignment="Left" Panel.ZIndex="167" Fill="#7F000000">
+			<Rectangle.Width>
+				<MultiBinding Converter="{StaticResource OverlayWidthConverter}">
+					<Binding Path="ActualWidth" ElementName="Window"/>
+					<Binding Path="IsOpen"/>
+				</MultiBinding>
+			</Rectangle.Width>
+		</Rectangle>
+		<Frame Source="/Pages/MainPage/MainPage.xaml" NavigationUIVisibility="Hidden"></Frame>
+	</Grid>
 </Window>
 
