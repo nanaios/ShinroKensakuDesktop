@@ -7,11 +7,21 @@
         xmlns:SideMenu="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu" xmlns:local1="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow" x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="1024" Width="1440">
+	<Window.Resources>
+		<local1:SideMenuMarginConverter x:Key="SideMenuMarginConverter"/>
+	</Window.Resources>
 	<Grid>
 		<Grid.DataContext>
 			<local1:ViewModel/>
 		</Grid.DataContext>
 
-		<SideMenu:SideMenu HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Margin="-320,10,0,0"/>
+		<SideMenu:SideMenu HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}">
+			<SideMenu:SideMenu.Margin>
+				<MultiBinding Converter="{StaticResource SideMenuMarginConverter}">
+					<Binding Path="SideMenuWidth"/>
+					<Binding Path="IsOpen"/>
+				</MultiBinding>
+			</SideMenu:SideMenu.Margin>
+		</SideMenu:SideMenu>
 	</Grid>
 </Window>

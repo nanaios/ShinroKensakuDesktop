@@ -4,8 +4,8 @@ namespace ShinroKensakuDesktop.Windows.MainWindow;
 
 public partial class MainWindow : Window
 {
-	public MainWindow()
+	public MainWindow ( )
 	{
-		InitializeComponent();
+		InitializeComponent ( );
 	}
 }
