@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
              mc:Ignorable="d" 
-             d:DesignHeight="1024" d:DesignWidth="480" Foreground="{x:Null}">
+             d:DesignHeight="1024" d:DesignWidth="400" Foreground="{x:Null}">
 	<Grid x:Name="MainGrid" ClipToBounds="True" >
 		<Grid.DataContext>
 			<local:ViewModel 

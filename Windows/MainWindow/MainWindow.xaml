@@ -12,6 +12,6 @@
 			<local1:ViewModel/>
 		</Grid.DataContext>
 
-		<SideMenu:SideMenu HorizontalAlignment="Left" Width="400" IsOpen="{Binding IsOpen}"/>
+		<SideMenu:SideMenu HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Margin="-320,10,0,0"/>
 	</Grid>
 </Window>
