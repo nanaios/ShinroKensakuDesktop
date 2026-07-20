@@ -6,20 +6,25 @@ namespace ShinroKensakuDesktop.Controls.SearchButton;
 
 public partial class SearchButton : UserControl
 {
-	public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register (
+	public static readonly DependencyProperty OnClickProperty = DependencyProperty.Register (
 		nameof ( OnClick ),
 		typeof ( ICommand ),
 		typeof ( SearchButton ),
-		new FrameworkPropertyMetadata(null,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+		new PropertyMetadata(null));
 
 	public ICommand OnClick
 	{
-		get => ( ICommand ) GetValue ( IsOpenProperty );
-		set => SetValue ( IsOpenProperty, value );
+		get => ( ICommand ) GetValue ( OnClickProperty );
+		set => SetValue ( OnClickProperty, value );
 	}
 
 	public SearchButton ( )
 	{
 		InitializeComponent ( );
+	}
+
+	private void Button_Click ( object sender, RoutedEventArgs e )
+	{
+		OnClick.Execute ( null );
 	}
 }

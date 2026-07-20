@@ -9,8 +9,11 @@
 			 VerticalContentAlignment="Stretch"
 			 d:DesignHeight="130" d:DesignWidth="430">
 	<Grid>
-		<Rectangle RadiusX="40" RadiusY="40" Fill="{DynamicResource MainColor1}" />
+		<Rectangle x:Name="BackGround" RadiusX="40" RadiusY="40" Fill="{DynamicResource MainColor1}" />
 		<Path Data="{StaticResource SearchIconPath}" Width="80" Height="80" Fill="White" Stretch="Fill" HorizontalAlignment="Left" Margin="40,0,0,0" ></Path>
 		<TextBlock Text="検索開始" Foreground="White" FontFamily="Noto Sans JP" FontSize="64" FontWeight="Light" VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Right" Margin="0,0,40,0" />
+		<Button Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0,0,0,0" Click="Button_Click" >
+			<Rectangle Width="{Binding ActualWidth, ElementName=BackGround, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=BackGround, Mode=OneWay}"  RadiusX="40" RadiusY="40" Fill="Transparent"/>
+		</Button>
 	</Grid>
 </UserControl>

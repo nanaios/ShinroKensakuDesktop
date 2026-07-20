@@ -5,16 +5,20 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:SideMenu="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Pages.MainPage" 
-		xmlns:SearchButton="clr-namespace:ShinroKensakuDesktop.Controls.SearchButton" x:Name="Page" x:Class="ShinroKensakuDesktop.Pages.MainPage.MainPage" 
+		xmlns:SearchButton="clr-namespace:ShinroKensakuDesktop.Controls.SearchButton" xmlns:InputField="clr-namespace:ShinroKensakuDesktop.Controls.InputField" x:Name="Page" x:Class="ShinroKensakuDesktop.Pages.MainPage.MainPage" 
 		mc:Ignorable="d" 
 		d:DesignHeight="1080" d:DesignWidth="1440"
 		Background="White"
 		Title="KST-DeCS">
 	<Grid x:Name="MainGrid" >
+		<Grid.DataContext>
+			<local:ViewModel/>
+		</Grid.DataContext>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="1*"/>
 			<RowDefinition Height="200"/>
-			<RowDefinition Height="9*"/>
+			<RowDefinition Height="7*"/>
+			<RowDefinition Height="10*"/>
 		</Grid.RowDefinitions>
 		<Grid Grid.Row="1">
 			<Grid.RowDefinitions>
@@ -26,6 +30,7 @@
 			<Rectangle Grid.Row="1" Width="600" Fill="{DynamicResource MainColor1}" />
 			<TextBlock Grid.Row="2" Text="総合科学進路検索システム" FontFamily="Noto Sans JP" FontSize="40" TextAlignment="Center" VerticalAlignment="Top" FontWeight="Light"/>
 		</Grid>
-		<SearchButton:SearchButton HorizontalAlignment="Center" Margin="0,300,0,0" Grid.Row="2" VerticalAlignment="Top" Height="130" Width="430"/>
+		<SearchButton:SearchButton OnClick="{Binding OnSearchButtonClickCommand}" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Top" Height="130" Width="430"/>
+		<InputField:InputField HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Width="800" Height="120"/>
 	</Grid>
 </Page>
