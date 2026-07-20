@@ -2,4 +2,5 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 	<PathGeometry x:Key="MenuIconPath" Figures="M120-240v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/>
 	<PathGeometry x:Key="CloseIconPath" Figures="m249-207-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/>
+	<PathGeometry x:Key="SearchIconPath" Figures="M796-121 533-384q-30 26-70 40.5T378-329q-108 0-183-75t-75-181q0-106 75-181t182-75q106 0 180.5 75T632-585q0 43-14 83t-42 75l264 262-44 44ZM377-389q81 0 138-57.5T572-585q0-81-57-138.5T377-781q-82 0-139.5 57.5T180-585q0 81 57.5 138.5T377-389Z"/>
 </ResourceDictionary>

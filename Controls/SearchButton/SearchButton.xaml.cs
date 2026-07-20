@@ -1,26 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace ShinroKensakuDesktop.Controls.SearchButton
+namespace ShinroKensakuDesktop.Controls.SearchButton;
+
+public partial class SearchButton : UserControl
 {
-	/// <summary>
-	/// SearchButton.xaml の相互作用ロジック
-	/// </summary>
-	public partial class SearchButton : UserControl
+	public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register (
+		nameof ( OnClick ),
+		typeof ( ICommand ),
+		typeof ( SearchButton ),
+		new FrameworkPropertyMetadata(null,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+	public ICommand OnClick
 	{
-		public SearchButton ( )
-		{
-			InitializeComponent ( );
-		}
+		get => ( ICommand ) GetValue ( IsOpenProperty );
+		set => SetValue ( IsOpenProperty, value );
+	}
+
+	public SearchButton ( )
+	{
+		InitializeComponent ( );
 	}
 }

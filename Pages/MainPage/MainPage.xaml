@@ -1,10 +1,11 @@
-﻿<Page x:Name="Page" x:Class="ShinroKensakuDesktop.Pages.MainPage.MainPage"
+﻿<Page
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:SideMenu="clr-namespace:ShinroKensakuDesktop.Controls.SideMenu"
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Pages.MainPage" 
+		xmlns:SearchButton="clr-namespace:ShinroKensakuDesktop.Controls.SearchButton" x:Name="Page" x:Class="ShinroKensakuDesktop.Pages.MainPage.MainPage" 
 		mc:Ignorable="d" 
 		d:DesignHeight="1080" d:DesignWidth="1440"
 		Background="White"
@@ -25,5 +26,6 @@
 			<Rectangle Grid.Row="1" Width="600" Fill="{DynamicResource MainColor1}" />
 			<TextBlock Grid.Row="2" Text="総合科学進路検索システム" FontFamily="Noto Sans JP" FontSize="40" TextAlignment="Center" VerticalAlignment="Top" FontWeight="Light"/>
 		</Grid>
+		<SearchButton:SearchButton HorizontalAlignment="Center" Margin="0,300,0,0" Grid.Row="2" VerticalAlignment="Top" Height="130" Width="430"/>
 	</Grid>
 </Page>
