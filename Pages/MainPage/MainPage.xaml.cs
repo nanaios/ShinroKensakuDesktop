@@ -1,4 +1,5 @@
 ﻿using ShinroKensakuDesktop.Utils;
+using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -14,7 +15,8 @@ public partial class MainPage : Page
 
 public class ViewModel
 {
-	public ICommand? OnSearchButtonClickCommand { get; private set; }
+	public ICommand OnSearchButtonClickCommand { get; private set; }
+	public string SearchText { get; set; } = "";
 
 	public ViewModel ( )
 	{
@@ -23,5 +25,6 @@ public class ViewModel
 
 	private void OnSearchButtonClick ( object? obj )
 	{
+		Debug.WriteLine ( $"Search button clicked with text: {SearchText}" );
 	}
 }

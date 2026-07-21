@@ -31,6 +31,6 @@
 			<TextBlock Grid.Row="2" Text="総合科学進路検索システム" FontFamily="Noto Sans JP" FontSize="40" TextAlignment="Center" VerticalAlignment="Top" FontWeight="Light"/>
 		</Grid>
 		<SearchButton:SearchButton OnClick="{Binding OnSearchButtonClickCommand}" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Top" Height="130" Width="430"/>
-		<InputField:InputField HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Width="800" Height="120"/>
+		<InputField:InputField  HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center" Width="800" Height="120" PlaceholderText="進路先を入力..." FieldText="{Binding SearchText,Mode=OneWayToSource}"/>
 	</Grid>
 </Page>
