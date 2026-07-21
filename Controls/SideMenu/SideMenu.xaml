@@ -11,18 +11,22 @@
 	</UserControl.Resources>
 	<Grid x:Name="MainGrid" ClipToBounds="True">
 		<Rectangle x:Name="BackGround" Fill="{DynamicResource MainColor2}" Margin="-80,0,80,0" RadiusX="30" RadiusY="30"/>
-		<Grid  Margin="15,100,80,100">
+		<Grid x:Name="ListGrid"  Margin="15,100,80,100">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="{Binding MenuContentMarginWidth, ElementName=Root}"/>
 				<RowDefinition Height="{Binding MenuContentWidth, ElementName=Root}"/>
 				<RowDefinition Height="{Binding MenuContentMarginWidth, ElementName=Root}"/>
 				<RowDefinition Height="{Binding MenuContentWidth, ElementName=Root}"/>
 				<RowDefinition Height="{Binding MenuContentMarginWidth, ElementName=Root}"/>
 				<RowDefinition Height="{Binding MenuContentWidth, ElementName=Root}"/>
 			</Grid.RowDefinitions>
-			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="1" Text="ホーム" IconPath="{DynamicResource HomeIconPath}"/>
-			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="3" Text="詳細検索" IconPath="{DynamicResource ArticleIconPath}"/>
-			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="5" Text="ヘルプ" IconPath="{DynamicResource HelpIconPath}"/>
+			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="0" Text="ホーム" IconPath="{DynamicResource HomeIconPath}"/>
+			<Button Tag="{x:Static local:SideMenuContentType.Home}" Panel.ZIndex="1" Grid.Row="0" BorderBrush="{x:Null}" Foreground="{x:Null}"></Button>
+			
+			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="2" Text="詳細検索" IconPath="{DynamicResource ArticleIconPath}"/>
+			<Button Tag="{x:Static local:SideMenuContentType.Details}" Panel.ZIndex="1" Grid.Row="2" BorderBrush="{x:Null}" Foreground="{x:Null}"></Button>
+			
+			<IconTextBlock:IconTextBlock Foreground="White" Grid.Row="4" Text="ヘルプ" IconPath="{DynamicResource HelpIconPath}"/>
+			<Button Tag="{x:Static local:SideMenuContentType.Help}" Panel.ZIndex="1" Grid.Row="4" BorderBrush="{x:Null}" Foreground="{x:Null}"></Button>
 		</Grid>
 		<Button
 			Width="60" Height="60" HorizontalAlignment="Right" VerticalAlignment="Top" 

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -47,6 +48,17 @@ public partial class SideMenu : UserControl
 	public SideMenu ( )
 	{
 		InitializeComponent ( );
+		this.ListGrid.AddHandler ( Button.ClickEvent, new RoutedEventHandler ( Grid_Click ), true );
+	}
+
+	private void Grid_Click ( object sender, RoutedEventArgs e )
+	{
+		Debug.WriteLine ( $"Grid_Click: {e.OriginalSource}" );
+		if ( e.OriginalSource is Button button )
+		{
+			SideMenuContentType type = (SideMenuContentType)button.Tag;
+			Debug.WriteLine ( $"Grid_Click: {type}" );
+		}
 	}
 
 	private void Button_Click ( object sender, RoutedEventArgs e )
@@ -65,4 +77,11 @@ public class PathGeometryConverter : IValueConverter
 		return ( bool ) value ? CloseIconGeometry : OpenIconGeometry;
 	}
 	public object ConvertBack ( object value, Type targetType, object parameter, CultureInfo culture ) => throw new NotImplementedException ( );
+}
+
+public enum SideMenuContentType
+{
+	Home,
+	Details,
+	Help,
 }
