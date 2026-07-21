@@ -14,10 +14,34 @@ public partial class SideMenu : UserControl
 		typeof ( SideMenu ),
 		new FrameworkPropertyMetadata(false,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
+	public static readonly DependencyProperty MenuContentMarginWidthProperty = DependencyProperty.Register (
+		nameof ( MenuContentMarginWidth ),
+		typeof ( double ),
+		typeof ( SideMenu ),
+		new FrameworkPropertyMetadata(35.0,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+	public static readonly DependencyProperty MenuContentWidthProperty = DependencyProperty.Register (
+		nameof ( MenuContentWidth ),
+		typeof ( double ),
+		typeof ( SideMenu ),
+		new FrameworkPropertyMetadata(60.0,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
 	public bool IsOpen
 	{
 		get => ( bool ) GetValue ( IsOpenProperty );
 		set => SetValue ( IsOpenProperty, value );
+	}
+
+	public double MenuContentMarginWidth
+	{
+		get => ( double ) GetValue ( MenuContentMarginWidthProperty );
+		set => SetValue ( MenuContentMarginWidthProperty, value );
+	}
+
+	public double MenuContentWidth
+	{
+		get => ( double ) GetValue ( MenuContentWidthProperty );
+		set => SetValue ( MenuContentWidthProperty, value );
 	}
 
 	public SideMenu ( )
