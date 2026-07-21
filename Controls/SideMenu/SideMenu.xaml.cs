@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ShinroKensakuDesktop.Controls.SideMenu;
@@ -27,6 +27,18 @@ public partial class SideMenu : UserControl
 		typeof ( SideMenu ),
 		new FrameworkPropertyMetadata(60.0,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
+	public static readonly DependencyProperty OnListContentClickProperty = DependencyProperty.Register (
+		nameof ( OnListContentClick ),
+		typeof ( ICommand ),
+		typeof ( SideMenu ),
+		new FrameworkPropertyMetadata(null,FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+	public ICommand OnListContentClick
+	{
+		get => ( ICommand ) GetValue ( OnListContentClickProperty );
+		set => SetValue ( OnListContentClickProperty, value );
+	}
+
 	public bool IsOpen
 	{
 		get => ( bool ) GetValue ( IsOpenProperty );
@@ -48,17 +60,14 @@ public partial class SideMenu : UserControl
 	public SideMenu ( )
 	{
 		InitializeComponent ( );
-		this.ListGrid.AddHandler ( Button.ClickEvent, new RoutedEventHandler ( Grid_Click ), true );
+		this.ListGrid.AddHandler ( Button.ClickEvent, new RoutedEventHandler ( List_Content_Click ), true );
 	}
 
-	private void Grid_Click ( object sender, RoutedEventArgs e )
+	private void List_Content_Click ( object sender, RoutedEventArgs e )
 	{
-		Debug.WriteLine ( $"Grid_Click: {e.OriginalSource}" );
-		if ( e.OriginalSource is Button button )
-		{
-			SideMenuContentType type = (SideMenuContentType)button.Tag;
-			Debug.WriteLine ( $"Grid_Click: {type}" );
-		}
+		Button button = (Button)e.OriginalSource;
+		SideMenuContentType type = (SideMenuContentType)button.Tag;
+		OnListContentClick?.Execute ( type );
 	}
 
 	private void Button_Click ( object sender, RoutedEventArgs e )

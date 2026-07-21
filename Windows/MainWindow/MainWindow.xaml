@@ -17,7 +17,7 @@
 		<local:ViewModel/>
 	</Window.DataContext>
 	<Grid x:Name="RootGrid">
-		<SideMenu:SideMenu x:Name="SideMenu" HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Panel.ZIndex="168">
+		<SideMenu:SideMenu x:Name="SideMenu" HorizontalAlignment="Left" Width="{Binding SideMenuWidth}" IsOpen="{Binding IsOpen}" Panel.ZIndex="168" OnListContentClick="{Binding OnSideMenuContentClickCommand,Mode=OneWay}">
 			<SideMenu:SideMenu.Margin>
 				<MultiBinding Converter="{StaticResource SideMenuMarginConverter}">
 					<Binding Path="SideMenuWidth"/>
