@@ -12,6 +12,7 @@
 	<Window.Resources>
 		<local:SideMenuMarginConverter x:Key="SideMenuMarginConverter"/>
 		<local:OverlayWidthConverter x:Key="OverlayWidthConverter"/>
+		<local:SideMenuAnimation x:Key="SideMenuAnimation"/>
 	</Window.Resources>
 	<Window.DataContext>
 		<local:ViewModel/>
@@ -26,6 +27,11 @@
 			</SideMenu:SideMenu.Margin>
 		</SideMenu:SideMenu>
 		<Rectangle x:Name="SideMenuOverlay" HorizontalAlignment="Left" Panel.ZIndex="167" Fill="#7F000000">
+			<Rectangle.Triggers>
+				<EventTrigger RoutedEvent="Rectangle.MouseLeftButtonDown">
+					
+				</EventTrigger>
+			</Rectangle.Triggers>
 			<Rectangle.Width>
 				<MultiBinding Converter="{StaticResource OverlayWidthConverter}">
 					<Binding Path="ActualWidth" ElementName="Window"/>
@@ -33,7 +39,7 @@
 				</MultiBinding>
 			</Rectangle.Width>
 		</Rectangle>
-		<Frame Source="/Pages/MainPage/MainPage.xaml" NavigationUIVisibility="Hidden"></Frame>
+		<Frame x:Name="PageFrame" Source="{Binding PageSource}" NavigationUIVisibility="Hidden"></Frame>
 	</Grid>
 </Window>
 
