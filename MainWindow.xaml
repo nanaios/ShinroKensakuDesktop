@@ -10,15 +10,22 @@
 			<Setter Property="Margin" Value="0"/>
 		</Style>
 		<Style x:Key="SideMenuItemTextStyle" TargetType="{x:Type TextBlock}">
-			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemSize}"/>
+			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemFontSize}"/>
+			<Setter Property="FontWeight" Value="Light"/>
+			<Setter Property="Margin" Value="10"/>
 		</Style>
 		<Style x:Key="SideMenuItemIconStyle" TargetType="{x:Type wpfui:SymbolIcon}">
-			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemSize}"/>
+			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemIconSize}"/>
 		</Style>
 	</wpfui:FluentWindow.Resources>
 	<Grid x:Name="Root">
 		<wpfui:TitleBar x:Name="WindowTitle" Title="{Binding ViewModel.Title}" Padding="60,4,16,4" Panel.ZIndex="1"/>
-		<wpfui:NavigationView x:Name="MainView" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False" CompactPaneLength="80" xmlns:Page="clr-namespace:ShinroKensakuDesktop.Pages">
+		<wpfui:NavigationView 
+			IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False"
+			IsPaneToggleVisible="True" IsTopSeparatorVisible="False"
+			x:Name="MainView" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False"
+			CompactPaneLength="100" xmlns:Page="clr-namespace:ShinroKensakuDesktop.Pages" PaneDisplayMode="Left"	
+		>
 			<wpfui:NavigationView.MenuItems>
 				<wpfui:NavigationViewItem Tag="HomePage" TargetPageType="Page:HomePage">
 					<wpfui:NavigationViewItem.Icon>
@@ -29,7 +36,7 @@
 					</wpfui:NavigationViewItem.Content>
 				</wpfui:NavigationViewItem>
 				
-				<wpfui:NavigationViewItem Tag="SearchPage" TargetPageType="Page:SearchPage">
+				<wpfui:NavigationViewItem Tag="SearchPage" TargetPageType="Page:SearchPage" Foreground="{DynamicResource {x:Static SystemColors.AccentColorLight2BrushKey}}">
 					<wpfui:NavigationViewItem.Icon>
 						<wpfui:SymbolIcon Symbol="SearchInfo24" Style="{StaticResource SideMenuItemIconStyle}" />
 					</wpfui:NavigationViewItem.Icon>
