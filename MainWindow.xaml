@@ -21,9 +21,9 @@
 	</wpfui:FluentWindow.Resources>
 	<Grid x:Name="Root">
 		<wpfui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Padding="60,4,16,4" Panel.ZIndex="1"/>
-		<wpfui:NavigationView IsFooterSeparatorVisible="False" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False">
+		<wpfui:NavigationView x:Name="MainView" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False" CompactPaneLength="80">
 			<wpfui:NavigationView.MenuItems>
-				<wpfui:NavigationViewItem Tag="TopPage">
+				<wpfui:NavigationViewItem Tag="HomePage">
 					<wpfui:NavigationViewItem.Icon>
 						<wpfui:SymbolIcon Symbol="Home24" Style="{StaticResource SideMenuItemIconStyle}" />
 					</wpfui:NavigationViewItem.Icon>

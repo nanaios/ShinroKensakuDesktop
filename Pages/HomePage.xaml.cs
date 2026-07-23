@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ShinroKensakuDesktop.Controls
+namespace ShinroKensakuDesktop.Pages
 {
 	/// <summary>
-	/// TopPageContent.xaml の相互作用ロジック
+	/// HomePage.xaml の相互作用ロジック
 	/// </summary>
-	public partial class TopPageContent : UserControl
+	public partial class HomePage : Page
 	{
-		public TopPageContent ( )
+		public HomePage ( )
 		{
 			InitializeComponent ( );
 		}

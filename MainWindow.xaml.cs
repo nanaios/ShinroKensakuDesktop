@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using ShinroKensakuDesktop.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui;
+using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
 
 namespace ShinroKensakuDesktop;
@@ -9,22 +11,28 @@ namespace ShinroKensakuDesktop;
 /// </summary>
 public partial class MainWindow : FluentWindow
 {
-	public MainWindow ( )
+	public MainWindow (
+		MainWindowViewModel viewModel,
+		INavigationService navigationService,
+		IServiceProvider serviceProvider )
 	{
-		// システムのテーマの変更を監視する
-		// SystemThemeWatcher.Watch ( this );
-
+		DataContext = this;
+		ViewModel = viewModel;
 		InitializeComponent ( );
+
+		var pageProvider = serviceProvider.GetRequiredService<INavigationViewPageProvider>();
+		MainView.SetPageProviderService ( pageProvider );
+
+		navigationService.SetNavigationControl ( MainView );
 	}
+
+	public MainWindowViewModel ViewModel { get; }
 }
 
 public partial class MainWindowViewModel : ObservableObject
 {
 	[ObservableProperty]
 	public partial string Title { get; set; } = "Test App";
-
-	[ObservableProperty]
-	public partial object ViewContent { get; set; } = new TopPageContent ( );
 
 	[ObservableProperty]
 	public partial double SideMenuItemSize { get; set; } = 24;
