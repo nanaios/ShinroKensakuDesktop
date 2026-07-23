@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using ShinroKensakuDesktop.Pages;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
@@ -16,14 +17,15 @@ public partial class MainWindow : FluentWindow
 		INavigationService navigationService,
 		IServiceProvider serviceProvider )
 	{
+		InitializeComponent ( );
 		DataContext = this;
 		ViewModel = viewModel;
-		InitializeComponent ( );
 
 		var pageProvider = serviceProvider.GetRequiredService<INavigationViewPageProvider>();
 		MainView.SetPageProviderService ( pageProvider );
-
 		navigationService.SetNavigationControl ( MainView );
+
+		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( HomePage ) );
 	}
 
 	public MainWindowViewModel ViewModel { get; }

@@ -5,25 +5,22 @@
 	xmlns:local="clr-namespace:ShinroKensakuDesktop" 
 	x:Class="ShinroKensakuDesktop.MainWindow"
 	Width="1440" Height="1080">
-	<wpfui:FluentWindow.DataContext>
-		<local:MainWindowViewModel/>
-	</wpfui:FluentWindow.DataContext>
 	<wpfui:FluentWindow.Resources>
 		<Style TargetType="{x:Type wpfui:NavigationViewItem}">
 			<Setter Property="Margin" Value="0"/>
 		</Style>
 		<Style x:Key="SideMenuItemTextStyle" TargetType="{x:Type TextBlock}">
-			<Setter Property="FontSize" Value="{Binding SideMenuItemSize}"/>
+			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemSize}"/>
 		</Style>
 		<Style x:Key="SideMenuItemIconStyle" TargetType="{x:Type wpfui:SymbolIcon}">
-			<Setter Property="FontSize" Value="{Binding SideMenuItemSize}"/>
+			<Setter Property="FontSize" Value="{Binding ViewModel.SideMenuItemSize}"/>
 		</Style>
 	</wpfui:FluentWindow.Resources>
 	<Grid x:Name="Root">
-		<wpfui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Padding="60,4,16,4" Panel.ZIndex="1"/>
-		<wpfui:NavigationView x:Name="MainView" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False" CompactPaneLength="80">
+		<wpfui:TitleBar x:Name="WindowTitle" Title="{Binding ViewModel.Title}" Padding="60,4,16,4" Panel.ZIndex="1"/>
+		<wpfui:NavigationView x:Name="MainView" FrameMargin="0,48,0,0" OpenPaneLength="400" IsPaneOpen="False" CompactPaneLength="80" xmlns:Page="clr-namespace:ShinroKensakuDesktop.Pages">
 			<wpfui:NavigationView.MenuItems>
-				<wpfui:NavigationViewItem Tag="HomePage">
+				<wpfui:NavigationViewItem Tag="HomePage" TargetPageType="Page:HomePage">
 					<wpfui:NavigationViewItem.Icon>
 						<wpfui:SymbolIcon Symbol="Home24" Style="{StaticResource SideMenuItemIconStyle}" />
 					</wpfui:NavigationViewItem.Icon>
@@ -32,7 +29,7 @@
 					</wpfui:NavigationViewItem.Content>
 				</wpfui:NavigationViewItem>
 				
-				<wpfui:NavigationViewItem Tag="SearchPage">
+				<wpfui:NavigationViewItem Tag="SearchPage" TargetPageType="Page:SearchPage">
 					<wpfui:NavigationViewItem.Icon>
 						<wpfui:SymbolIcon Symbol="SearchInfo24" Style="{StaticResource SideMenuItemIconStyle}" />
 					</wpfui:NavigationViewItem.Icon>
@@ -41,7 +38,7 @@
 					</wpfui:NavigationViewItem.Content>
 				</wpfui:NavigationViewItem>
 				
-				<wpfui:NavigationViewItem  Tag="SettingsPage">
+				<wpfui:NavigationViewItem  Tag="InfoPage" TargetPageType="Page:InfoPage">
 					<wpfui:NavigationViewItem.Icon>
 						<wpfui:SymbolIcon Symbol="Info24" Style="{StaticResource SideMenuItemIconStyle}" />
 					</wpfui:NavigationViewItem.Icon>

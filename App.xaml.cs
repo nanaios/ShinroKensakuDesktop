@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ShinroKensakuDesktop.Pages;
 using System.Windows;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
@@ -17,6 +18,10 @@ public partial class App : Application
 		services.AddSingleton<INavigationService, NavigationService> ( );
 		services.AddSingleton<MainWindow> ( );
 		services.AddSingleton<MainWindowViewModel> ( );
+
+		services.AddTransient<HomePage> ( );
+		services.AddTransient<SearchPage> ( );
+		services.AddTransient<InfoPage> ( );
 
 		_serviceProvider = services.BuildServiceProvider ( );
 
