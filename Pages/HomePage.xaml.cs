@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace ShinroKensakuDesktop.Pages
+namespace ShinroKensakuDesktop.Pages;
+
+public partial class HomePage : Page
 {
-	/// <summary>
-	/// HomePage.xaml の相互作用ロジック
-	/// </summary>
-	public partial class HomePage : Page
+	public HomePage ( )
 	{
-		public HomePage ( )
-		{
-			InitializeComponent ( );
-		}
+		InitializeComponent ( );
 	}
+}
+
+
+public partial class HomePageViewModel : ObservableObject
+{
+	[ObservableProperty]
+	public partial string SearchText { get; set; } = string.Empty;
+
+	[ObservableProperty]
+	public partial bool IsTypingSearchTextBox { get; set; } = false;
 }

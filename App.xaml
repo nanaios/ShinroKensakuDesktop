@@ -1,5 +1,5 @@
 ﻿<Application x:Class="ShinroKensakuDesktop.App"
-			 xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+			 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:local="clr-namespace:ShinroKensakuDesktop"
@@ -7,8 +7,8 @@
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<wpfui:ThemesDictionary Theme="Light" />
-				<wpfui:ControlsDictionary />
+				<ui:ThemesDictionary Theme="Light" />
+				<ui:ControlsDictionary />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>
