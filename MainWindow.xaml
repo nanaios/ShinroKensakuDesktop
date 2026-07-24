@@ -30,8 +30,8 @@
 			IsPaneOpen="False">
 			<ui:NavigationView.MenuItems>
 				<ui:NavigationViewItem
-					Tag="HomePage"
-					TargetPageType="Page:HomePage"
+					Tag="TopPage"
+					TargetPageType="Page:TopPage"
 					Icon="{ui:SymbolIcon Symbol=Home12}"
 					Content="ホーム" />
 				<ui:NavigationViewItem

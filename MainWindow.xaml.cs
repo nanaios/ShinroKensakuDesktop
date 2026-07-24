@@ -29,7 +29,7 @@ public partial class MainWindow : FluentWindow
 
 		Loaded += ( _, _ ) =>
 		{
-			navigationService.Navigate ( typeof ( HomePage ) );
+			navigationService.Navigate ( typeof ( TopPage ) );
 		};
 
 		ApplicationAccentColorManager.Apply (

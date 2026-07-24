@@ -19,7 +19,7 @@ public partial class App : Application
 		services.AddSingleton<MainWindow> ( );
 		services.AddSingleton<MainWindowViewModel> ( );
 
-		services.AddTransient<HomePage> ( );
+		services.AddTransient<TopPage> ( );
 		services.AddTransient<SearchPage> ( );
 		services.AddTransient<InfoPage> ( );
 		services.AddTransient<SettingPage> ( );

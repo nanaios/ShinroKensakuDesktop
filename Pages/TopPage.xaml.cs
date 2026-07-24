@@ -5,15 +5,15 @@ using System.Windows.Controls;
 
 namespace ShinroKensakuDesktop.Pages;
 
-public partial class HomePage : Page
+public partial class TopPage : Page
 {
-	public HomePage ( )
+	public TopPage ( )
 	{
 		InitializeComponent ( );
 	}
 }
 
-public partial class HomePageViewModel : ObservableObject
+public partial class TopPageViewModel : ObservableObject
 {
 	[ObservableProperty]
 	public partial string SearchText { get; set; } = string.Empty;
