@@ -1,4 +1,4 @@
-﻿using ShinroKensakuDesktop.Pages;
+﻿using ShinroKensakuDesktop.Pages.TopPage;
 using ShinroKensakuDesktop.Utils;
 using System.Windows.Media;
 using Wpf.Ui;

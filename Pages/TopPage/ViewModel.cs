@@ -3,17 +3,9 @@ using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ShinroKensakuDesktop.Pages;
+namespace ShinroKensakuDesktop.Pages.TopPage;
 
-public partial class TopPage : Page
-{
-	public TopPage ( )
-	{
-		InitializeComponent ( );
-	}
-}
-
-public partial class TopPageViewModel : ObservableObject
+public partial class ViewModel : ObservableObject
 {
 	[ObservableProperty]
 	public partial string SearchText { get; set; } = string.Empty;
