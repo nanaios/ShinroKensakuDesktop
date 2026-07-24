@@ -19,20 +19,24 @@
 
 	<Grid Margin="-6,0,0,0">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="6*"/>
-			<RowDefinition Height="2*"/>
-			<RowDefinition Height="2*"/>
-			<RowDefinition Height="2*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="200"/>
+			<RowDefinition Height="100"/>
+			<RowDefinition Height="100"/>
+			<RowDefinition Height="1*"/>
 		</Grid.RowDefinitions>
-		
+
+		<ui:TextBlock Grid.Row="1" FontSize="64" Text="KST-DeCS" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,80" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+		<ui:TextBlock Grid.Row="1" FontSize="24" Text="総合科学進路検索システム" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
 		<!-- Search Box -->
-		<Grid Grid.Row="1" Width="500" Height="50" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,30">
-			<ui:SymbolIcon HorizontalAlignment="Left" Symbol="Search12" Width="50" Height="50" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" FontSize="24" Margin="10,0,0,0" />
-			<Rectangle RadiusX="25" RadiusY="25" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" StrokeThickness="0.5" />
-			<TextBlock Margin="55,0,25,0" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Text="進路先を入力..." FontSize="24" FontWeight="Light" VerticalAlignment="Center" Visibility="{Binding SearchText, Converter={StaticResource PlaceHolderVisibleConverter}}" />
+		<Grid Grid.Row="2" Width="500" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<ui:SymbolIcon HorizontalAlignment="Left" Symbol="Search12" Width="50" Height="50" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontSize="24" Margin="10,0,0,0" />
+			<Rectangle RadiusX="25" RadiusY="25" Stroke="{DynamicResource TextFillColorSecondaryBrush}" StrokeThickness="0.5" />
+			<TextBlock Margin="55,0,25,0" Foreground="{DynamicResource TextControlPlaceholderForeground}" Text="進路先を入力..." FontSize="24" FontWeight="Light" VerticalAlignment="Center" Visibility="{Binding SearchText, Converter={StaticResource PlaceHolderVisibleConverter}}" />
 			<TextBox Margin="55,0,25,0" Style="{x:Null}" Background="{x:Null}" BorderBrush="{x:Null}" FontSize="24" BorderThickness="0,0,0,0" ClipToBounds="True" VerticalAlignment="Center" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" FontWeight="Light" />
 		</Grid>
 		
-		<ui:Button CornerRadius="25,25,25,25" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,30,0,0" Height="50" Width="500" Appearance="Primary" Icon="{ui:SymbolIcon Symbol=Search12}" Content="検索開始" FontSize="24" FontWeight="Light" />
+		<ui:Button CornerRadius="25,25,25,25" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="500" Appearance="Primary" Icon="{ui:SymbolIcon Symbol=Search12}" Content="検索開始" FontSize="24" FontWeight="Light" />
 	</Grid>
 </Page>
