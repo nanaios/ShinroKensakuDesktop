@@ -8,11 +8,14 @@
 	Height="1080">
 	<ui:FluentWindow.Resources>
 	</ui:FluentWindow.Resources>
+	<ui:FluentWindow.DataContext>
+		<local:MainWindowViewModel />
+	</ui:FluentWindow.DataContext>
 	<Grid
 		x:Name="Root">
 		<ui:TitleBar
 			x:Name="WindowTitle"
-			Title="{Binding ViewModel.Title}"
+			Title="{Binding Title}"
 			Padding="16,4,16,4"
 			Panel.ZIndex="1"
 			Margin="48,0,0,0" />
