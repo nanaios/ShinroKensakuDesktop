@@ -2,14 +2,14 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-	xmlns:local="clr-namespace:ShinroKensakuDesktop"
-	x:Class="ShinroKensakuDesktop.MainWindow"
+	xmlns:local="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow"
+	x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
 	Width="1440"
 	Height="1080">
 	<ui:FluentWindow.Resources>
 	</ui:FluentWindow.Resources>
 	<ui:FluentWindow.DataContext>
-		<local:MainWindowViewModel />
+		<local:ViewModel />
 	</ui:FluentWindow.DataContext>
 	<Grid
 		x:Name="Root">

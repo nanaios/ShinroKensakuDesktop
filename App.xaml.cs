@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ShinroKensakuDesktop.Windows.MainWindow;
+using System.Windows;
 
 namespace ShinroKensakuDesktop;
 

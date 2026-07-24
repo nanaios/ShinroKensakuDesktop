@@ -1,12 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using ShinroKensakuDesktop.Pages;
+﻿using ShinroKensakuDesktop.Pages;
 using ShinroKensakuDesktop.Utils;
 using System.Windows.Media;
 using Wpf.Ui;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
-namespace ShinroKensakuDesktop;
+namespace ShinroKensakuDesktop.Windows.MainWindow;
 
 /// <summary>
 /// MainWindow.xaml の相互作用ロジック
@@ -29,10 +28,4 @@ public partial class MainWindow : FluentWindow
 			ApplicationTheme.Light
 		);
 	}
-}
-
-public partial class MainWindowViewModel : ObservableObject
-{
-	[ObservableProperty]
-	public partial string Title { get; set; } = "総合科学進路検索システム";
 }
