@@ -22,6 +22,7 @@ public partial class App : Application
 		services.AddTransient<HomePage> ( );
 		services.AddTransient<SearchPage> ( );
 		services.AddTransient<InfoPage> ( );
+		services.AddTransient<SettingPage> ( );
 
 		_serviceProvider = services.BuildServiceProvider ( );
 
