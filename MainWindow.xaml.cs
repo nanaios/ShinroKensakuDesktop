@@ -44,7 +44,7 @@ public partial class MainWindow : FluentWindow
 public partial class MainWindowViewModel : ObservableObject
 {
 	[ObservableProperty]
-	public partial string Title { get; set; } = "Test App";
+	public partial string Title { get; set; } = "総合科学進路検索システム";
 
 	[ObservableProperty]
 	public partial double SideMenuItemIconSize { get; set; } = 32;
