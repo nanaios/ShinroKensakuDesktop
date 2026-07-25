@@ -1,54 +1,24 @@
-﻿<ui:FluentWindow
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-	xmlns:local="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow"
-	x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow"
-	Width="1440"
-	Height="1080">
+﻿<ui:FluentWindow xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+		xmlns:local="clr-namespace:ShinroKensakuDesktop.Windows.MainWindow"
+		x:Class="ShinroKensakuDesktop.Windows.MainWindow.MainWindow" Width="1440" Height="1080">
 	<ui:FluentWindow.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Windows/MainWindow/Style.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</ui:FluentWindow.Resources>
 	<ui:FluentWindow.DataContext>
 		<local:ViewModel />
 	</ui:FluentWindow.DataContext>
-	<Grid
-		x:Name="Root">
-		<ui:TitleBar
-			x:Name="WindowTitle"
-			Title="{Binding Title}"
-			Padding="16,4,16,4"
-			Panel.ZIndex="1"
-			Margin="48,0,0,0" />
-		<ui:NavigationView
-			IsBackButtonVisible="Visible"
-			IsFooterSeparatorVisible="False"
-			IsPaneToggleVisible="True"
-			IsTopSeparatorVisible="False"
-			x:Name="MainView"
-			FrameMargin="0,48,0,0"
-			OpenPaneLength="200"
-			CompactPaneLength="100"
-			xmlns:TopPage="clr-namespace:ShinroKensakuDesktop.Pages.TopPage"
-			xmlns:SearchPage="clr-namespace:ShinroKensakuDesktop.Pages.SearchPage"
-			xmlns:InfoPage="clr-namespace:ShinroKensakuDesktop.Pages.InfoPage"
-			PaneDisplayMode="Left"
-			IsPaneOpen="False">
+	<Grid x:Name="Root">
+		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" />
+		<ui:NavigationView x:Name="MainView">
 			<ui:NavigationView.MenuItems>
-				<ui:NavigationViewItem
-					Tag="TopPage"
-					TargetPageType="TopPage:TopPage"
-					Icon="{ui:SymbolIcon Symbol=Home12}"
-					Content="ホーム" />
-				<ui:NavigationViewItem
-					Tag="SearchPage"
-					TargetPageType="SearchPage:SearchPage"
-					Icon="{ui:SymbolIcon Symbol=Search12}"
-					Content="詳細検索" />
-				<ui:NavigationViewItem
-					Tag="InfoPage"
-					TargetPageType="InfoPage:InfoPage"
-					Icon="{ui:SymbolIcon Symbol=QuestionCircle12}"
-					Content="情報" />
+				<ui:NavigationViewItem Style="{StaticResource TopPageItem}" />
+				<ui:NavigationViewItem Style="{StaticResource SearchPageItem}" />
+				<ui:NavigationViewItem Style="{StaticResource InfoPageItem}" />
 			</ui:NavigationView.MenuItems>
 		</ui:NavigationView>
 	</Grid>
