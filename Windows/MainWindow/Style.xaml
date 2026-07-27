@@ -14,25 +14,11 @@
 		<Setter Property="Panel.ZIndex" Value="1" />
 		<Setter Property="Margin" Value="48,0,0,0" />
 	</Style>
-	<Style x:Key="TopPageItem" TargetType="ui:NavigationViewItem"
+	<Style x:Key="DashBoardPageItem" TargetType="ui:NavigationViewItem"
 			BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}"
-			xmlns:TopPage="clr-namespace:ShinroKensakuDesktop.Pages.TopPage">
-		<Setter Property="TargetPageType" Value="TopPage:TopPage" />
-		<Setter Property="Tag" Value="TopPage" />
+			xmlns:DashBoard="clr-namespace:ShinroKensakuDesktop.Pages.DashBoard">
+		<Setter Property="TargetPageType" Value="DashBoard:DashBoard" />
+		<Setter Property="Tag" Value="DashBoard" />
 		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=Home12}" />
-	</Style>
-	<Style x:Key="SearchPageItem" TargetType="ui:NavigationViewItem"
-			BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}"
-			xmlns:SearchPage="clr-namespace:ShinroKensakuDesktop.Pages.SearchPage">
-		<Setter Property="TargetPageType" Value="SearchPage:SearchPage" />
-		<Setter Property="Tag" Value="SearchPage" />
-		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=Search12}" />
-	</Style>
-	<Style x:Key="InfoPageItem" TargetType="ui:NavigationViewItem"
-			BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}"
-			xmlns:InfoPage="clr-namespace:ShinroKensakuDesktop.Pages.InfoPage">
-		<Setter Property="TargetPageType" Value="InfoPage:InfoPage" />
-		<Setter Property="Tag" Value="InfoPage" />
-		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=QuestionCircle12}" />
 	</Style>
 </ResourceDictionary>

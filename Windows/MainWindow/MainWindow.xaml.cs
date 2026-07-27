@@ -1,4 +1,4 @@
-﻿using ShinroKensakuDesktop.Pages.TopPage;
+﻿using ShinroKensakuDesktop.Pages.DashBoard;
 using ShinroKensakuDesktop.Utils;
 using System.Windows.Media;
 using Wpf.Ui;
@@ -12,7 +12,7 @@ namespace ShinroKensakuDesktop.Windows.MainWindow;
 /// </summary>
 public partial class MainWindow : FluentWindow
 {
-	private readonly INavigationService navigationService = new NavigationService(new SimplePageProvider());
+	private readonly NavigationService navigationService = new(new SimplePageProvider());
 
 	public MainWindow ( )
 	{
@@ -20,7 +20,7 @@ public partial class MainWindow : FluentWindow
 
 		// ナビゲーションサービスを設定
 		navigationService.SetNavigationControl ( MainView );
-		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( TopPage ) );
+		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( DashBoard ) );
 
 		// アプリケーションのアクセントカラーとテーマを設定。総合科学の校章の色に合わせる
 		ApplicationAccentColorManager.Apply (

@@ -16,9 +16,7 @@
 		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" />
 		<ui:NavigationView x:Name="MainView">
 			<ui:NavigationView.MenuItems>
-				<ui:NavigationViewItem Style="{StaticResource TopPageItem}">ホーム</ui:NavigationViewItem>
-				<ui:NavigationViewItem Style="{StaticResource SearchPageItem}">詳細検索</ui:NavigationViewItem>
-				<ui:NavigationViewItem Style="{StaticResource InfoPageItem}">情報</ui:NavigationViewItem>
+				<ui:NavigationViewItem Style="{StaticResource DashBoardPageItem}" />
 			</ui:NavigationView.MenuItems>
 		</ui:NavigationView>
 	</Grid>
