@@ -21,4 +21,11 @@
 		<Setter Property="Tag" Value="DashBoard" />
 		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=Home12}" />
 	</Style>
+	<Style x:Key="SettingsPageItem" TargetType="ui:NavigationViewItem"
+			BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}"
+			xmlns:Settings="clr-namespace:ShinroKensakuDesktop.Pages.Settings">
+		<Setter Property="TargetPageType" Value="Settings:Settings" />
+		<Setter Property="Tag" Value="Settings" />
+		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=Settings16}" />
+	</Style>
 </ResourceDictionary>

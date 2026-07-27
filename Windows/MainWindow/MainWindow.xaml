@@ -16,8 +16,11 @@
 		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" />
 		<ui:NavigationView x:Name="MainView">
 			<ui:NavigationView.MenuItems>
-				<ui:NavigationViewItem Style="{StaticResource DashBoardPageItem}" />
+				<ui:NavigationViewItem Style="{StaticResource DashBoardPageItem}">ダッシュボード</ui:NavigationViewItem>
 			</ui:NavigationView.MenuItems>
+			<ui:NavigationView.FooterMenuItems>
+				<ui:NavigationViewItem Style="{StaticResource SettingsPageItem}">設定</ui:NavigationViewItem>
+			</ui:NavigationView.FooterMenuItems>
 		</ui:NavigationView>
 	</Grid>
 </ui:FluentWindow>

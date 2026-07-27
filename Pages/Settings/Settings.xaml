@@ -1,0 +1,40 @@
+﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+		xmlns:i="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DesignHeight="1080"
+		d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Settings"
+		xmlns:local="clr-namespace:ShinroKensakuDesktop.Pages.Settings"
+		x:Class="ShinroKensakuDesktop.Pages.Settings.Settings">
+	<Page.Resources>
+		<local:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
+	</Page.Resources>
+	<Page.DataContext>
+		<local:ViewModel />
+	</Page.DataContext>
+	<Grid>
+		<StackPanel Margin="50,24,50,24">
+			<ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
+				<ui:CardControl.Header>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<ui:TextBlock Grid.Row="0" FontTypography="Body" Text="テーマ" FontFamily="Noto Sans JP" />
+						<ui:TextBlock Grid.Row="1" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+								Text="アプリケーションのテーマを選択" FontFamily="Noto Sans JP" />
+					</Grid>
+				</ui:CardControl.Header>
+				<ComboBox Grid.Column="1" MinWidth="200" SelectedIndex="{Binding CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter},Mode=TwoWay}">
+					<ComboBoxItem Content="ライト" />
+					<ComboBoxItem Content="ダーク" />
+					<ComboBoxItem Content="ハイコントラスト" />
+					<ComboBoxItem Content="システム" />
+				</ComboBox>
+			</ui:CardControl>
+		</StackPanel>
+	</Grid>
+</Page>

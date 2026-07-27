@@ -24,8 +24,7 @@ public partial class MainWindow : FluentWindow
 
 		// アプリケーションのアクセントカラーとテーマを設定。総合科学の校章の色に合わせる
 		ApplicationAccentColorManager.Apply (
-			Color.FromArgb ( 0xFF, 0x12, 0x2b, 0x89 ),
-			ApplicationTheme.Light
+			Color.FromArgb ( 0xFF, 0x12, 0x2b, 0x89 )
 		);
 	}
 }
