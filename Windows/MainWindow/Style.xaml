@@ -27,5 +27,6 @@
 		<Setter Property="TargetPageType" Value="Settings:Settings" />
 		<Setter Property="Tag" Value="Settings" />
 		<Setter Property="Icon" Value="{ui:SymbolIcon Symbol=Settings16}" />
+		<Setter Property="NavigationCacheMode" Value="Enabled" />
 	</Style>
 </ResourceDictionary>
