@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Wpf.Ui.Appearance;
 
-namespace ShinroKensakuDesktop.Pages.Settings;
+namespace ShinroKensakuDesktop.ViewModels.Pages;
 
-public partial class ViewModel : ObservableObject
+public partial class SettingsPageViewModel : ObservableObject
 {
 	[ObservableProperty]
 	public partial ApplicationTheme CurrentApplicationTheme { get; set; } = ApplicationTheme.Light;

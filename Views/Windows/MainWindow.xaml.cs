@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ShinroKensakuDesktop.Pages.DashBoard;
 using ShinroKensakuDesktop.Utils;
+using ShinroKensakuDesktop.ViewModels.Windows;
+using ShinroKensakuDesktop.Views.Pages;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
 
-namespace ShinroKensakuDesktop.Windows.MainWindow;
+namespace ShinroKensakuDesktop.Views.Windows;
 
 /// <summary>
 /// MainWindow.xaml の相互作用ロジック
@@ -15,7 +16,7 @@ public partial class MainWindow : FluentWindow
 	private readonly NavigationService navigationService = new(new SimplePageProvider());
 
 	public MainWindow (
-		ViewModel viewModel,
+		MainWindowViewModel viewModel,
 		INavigationService navigationService,
 		IServiceProvider serviceProvider )
 	{
@@ -27,8 +28,8 @@ public partial class MainWindow : FluentWindow
 		MainView.SetPageProviderService ( pageProvider );
 		navigationService.SetNavigationControl ( MainView );
 
-		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( DashBoard ) );
+		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( DashBoardPage ) );
 	}
 
-	public ViewModel ViewModel { get; }
+	public MainWindowViewModel ViewModel { get; }
 }

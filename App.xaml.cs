@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ShinroKensakuDesktop.Pages.DashBoard;
-using ShinroKensakuDesktop.Pages.Settings;
-using ShinroKensakuDesktop.Windows.MainWindow;
+using ShinroKensakuDesktop.ViewModels.Windows;
+using ShinroKensakuDesktop.Views.Pages;
+using ShinroKensakuDesktop.Views.Windows;
 using System.Windows;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
@@ -19,10 +19,10 @@ public partial class App : Application
 		services.AddNavigationViewPageProvider ( );
 		services.AddSingleton<INavigationService, NavigationService> ( );
 		services.AddSingleton<MainWindow> ( );
-		services.AddSingleton<Windows.MainWindow.ViewModel> ( );
+		services.AddSingleton<MainWindowViewModel> ( );
 
-		services.AddSingleton<DashBoard> ( );
-		services.AddSingleton<Settings> ( );
+		services.AddSingleton<DashBoardPage> ( );
+		services.AddSingleton<SettingsPage> ( );
 
 		_serviceProvider = services.BuildServiceProvider ( );
 

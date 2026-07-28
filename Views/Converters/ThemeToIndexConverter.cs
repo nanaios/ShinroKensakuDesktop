@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using Wpf.Ui.Appearance;
 
-namespace ShinroKensakuDesktop.Pages.Settings;
+namespace ShinroKensakuDesktop.Views.Converters;
 
 class ThemeToIndexConverter : IValueConverter
 {

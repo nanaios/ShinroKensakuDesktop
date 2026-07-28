@@ -6,13 +6,15 @@
 		d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
 		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
 		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Settings"
-		xmlns:local="clr-namespace:ShinroKensakuDesktop.Pages.Settings"
-		x:Class="ShinroKensakuDesktop.Pages.Settings.Settings">
+		xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
+		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
+		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
+		x:Class="ShinroKensakuDesktop.Views.Pages.SettingsPage">
 	<Page.Resources>
-		<local:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
+		<converters:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
 	</Page.Resources>
 	<Page.DataContext>
-		<local:ViewModel />
+		<vm:SettingsPageViewModel />
 	</Page.DataContext>
 	<Grid>
 		<StackPanel Margin="50,24,50,24">

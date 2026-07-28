@@ -6,8 +6,8 @@
 		d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
 		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
 		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="DashBoard"
-		xmlns:local="clr-namespace:ShinroKensakuDesktop.Pages.DashBoard"
-		x:Class="ShinroKensakuDesktop.Pages.DashBoard.DashBoard">
+		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
+		x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage">
 	<Page.Resources>
 	</Page.Resources>
 	<Grid>
