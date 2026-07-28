@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using ShinroKensakuDesktop.ViewModels.Pages;
+using System.Windows.Controls;
 
 namespace ShinroKensakuDesktop.Views.Pages;
 
@@ -7,8 +8,9 @@ namespace ShinroKensakuDesktop.Views.Pages;
 /// </summary>
 public partial class SettingsPage : Page
 {
-	public SettingsPage ( )
+	public SettingsPage ( SettingsPageViewModel viewModel )
 	{
+		DataContext = viewModel;
 		InitializeComponent ( );
 	}
 }

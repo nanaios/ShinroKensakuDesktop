@@ -6,21 +6,19 @@
 		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Windows"
 		d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
 		x:Class="ShinroKensakuDesktop.Views.Windows.MainWindow" Width="1440" Height="1080">
-	<ui:FluentWindow.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="/Views/Windows/MainWindowStyle.xaml" />
-			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
-	</ui:FluentWindow.Resources>
 	<Grid x:Name="Root">
-		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" />
-		<ui:NavigationView x:Name="MainView">
+		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Margin="48,0,0,0" Panel.ZIndex="1" />
+		<ui:NavigationView x:Name="MainView" xmlns:pages="clr-namespace:ShinroKensakuDesktop.Views.Pages"
+				IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False" IsPaneToggleVisible="True"
+				IsTopSeparatorVisible="False" FrameMargin="0,48,0,0" OpenPaneLength="200" PaneDisplayMode="Left"
+				IsPaneOpen="False">
 			<ui:NavigationView.MenuItems>
-				<ui:NavigationViewItem Style="{StaticResource DashBoardPageItem}">ダッシュボード</ui:NavigationViewItem>
+				<ui:NavigationViewItem TargetPageType="pages:DashBoardPage" Content="ダッシュボード" Tag="DashBoard"
+						Icon="{ui:SymbolIcon Symbol=Home12}" />
 			</ui:NavigationView.MenuItems>
 			<ui:NavigationView.FooterMenuItems>
-				<ui:NavigationViewItem Style="{StaticResource SettingsPageItem}">設定</ui:NavigationViewItem>
+				<ui:NavigationViewItem TargetPageType="pages:SettingsPage" Content="設定" Tag="Settings"
+						Icon="{ui:SymbolIcon Symbol=Settings16}" />
 			</ui:NavigationView.FooterMenuItems>
 		</ui:NavigationView>
 	</Grid>

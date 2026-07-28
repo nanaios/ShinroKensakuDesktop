@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ShinroKensakuDesktop.ViewModels.Pages;
 using ShinroKensakuDesktop.ViewModels.Windows;
 using ShinroKensakuDesktop.Views.Pages;
 using ShinroKensakuDesktop.Views.Windows;
@@ -22,7 +23,9 @@ public partial class App : Application
 		services.AddSingleton<MainWindowViewModel> ( );
 
 		services.AddSingleton<DashBoardPage> ( );
+
 		services.AddSingleton<SettingsPage> ( );
+		services.AddSingleton<SettingsPageViewModel> ( );
 
 		_serviceProvider = services.BuildServiceProvider ( );
 
