@@ -56,14 +56,14 @@
 	</Page.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="50" />
-			<RowDefinition Height="100" />
-			<RowDefinition Height="50" />
+			<RowDefinition Height="10" />
+			<RowDefinition Height="60" />
+			<RowDefinition Height="40" />
 			<RowDefinition />
 		</Grid.RowDefinitions>
 		<ui:TextBlock Grid.Row="1" Text="ダッシュボード" FontTypography="Title" Margin="48,0,0,0" VerticalAlignment="Center" />
 		<ui:TextBlock Grid.Row="2" Text="クイックショートカット" FontTypography="Subtitle" Margin="48,0,0,0" VerticalAlignment="Center" />
-		<WrapPanel Grid.Row="3" Margin="36,0,36,0">
+		<WrapPanel Grid.Row="3" Margin="36,0,0,0">
 			<ui:CardAction VerticalContentAlignment="Top">
 				<Grid Height="276">
 					<Grid.RowDefinitions>

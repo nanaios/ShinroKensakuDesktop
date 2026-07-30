@@ -8,12 +8,30 @@
 		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Search"
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
 		x:Class="ShinroKensakuDesktop.Views.Pages.SearchPage">
-	<Grid>
+	<Page.Resources>
+	</Page.Resources>
+	<Grid Margin="48,0,48,0">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="50" />
-			<RowDefinition Height="100" />
+			<RowDefinition Height="10" />
+			<RowDefinition Height="60" />
+			<RowDefinition Height="auto" />
 			<RowDefinition />
 		</Grid.RowDefinitions>
-		<ui:TextBlock Grid.Row="1" Text="検索・表示" FontTypography="Title" Margin="48,0,0,0" VerticalAlignment="Center" />
+		<ui:TextBlock Grid.Row="1" Text="検索・表示" FontTypography="Title" VerticalAlignment="Center" />
+		<ui:Card Grid.Row="2" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="150">
+			<Grid Margin="8,0,8,0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="0px" />
+				</Grid.RowDefinitions>
+				<ui:TextBlock Text="適用中の条件" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+						FontTypography="Body" />
+				<ui:Button Grid.Row="2" Icon="{ui:SymbolIcon Symbol=Add12,FontSize=24}" Content="条件を追加"
+						Appearance="Primary" Foreground="White" />
+
+			</Grid>
+		</ui:Card>
 	</Grid>
 </Page>
