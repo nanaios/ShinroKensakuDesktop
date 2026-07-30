@@ -9,7 +9,79 @@
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
 		x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage">
 	<Page.Resources>
+		<Style TargetType="ui:CardAction" BasedOn="{StaticResource {x:Type ui:CardAction}}">
+			<Setter Property="Width" Value="260" />
+			<Setter Property="Height" Value="300" />
+			<Setter Property="Margin" Value="12" />
+			<Setter Property="IsChevronVisible" Value="False" />
+		</Style>
+		<Style TargetType="ui:SymbolIcon" x:Key="CardIconStyle">
+			<Setter Property="Width" Value="50" />
+			<Setter Property="Height" Value="50" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="Margin" Value="12,0,0,0" />
+			<Setter Property="FontSize" Value="36" />
+			<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.AccentColorBrushKey}}" />
+		</Style>
+		<Style TargetType="Rectangle" x:Key="CardIconBackgroundStyle">
+			<Setter Property="Width" Value="50" />
+			<Setter Property="Height" Value="50" />
+			<Setter Property="HorizontalAlignment" Value="Left" />
+			<Setter Property="Margin" Value="12,0,0,0" />
+			<Setter Property="Fill" Value="{DynamicResource SystemAccentColorTertiary}" />
+			<Setter Property="StrokeThickness" Value="0" />
+			<Setter Property="RadiusX" Value="10" />
+			<Setter Property="RadiusY" Value="10" />
+			<Setter Property="Fill" Value="#FFC2F3FF" />
+		</Style>
 	</Page.Resources>
 	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50" />
+			<RowDefinition Height="100" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<ui:TextBlock Grid.Row="1" Text="ダッシュボード" FontTypography="Title" Margin="48,0,0,0" VerticalAlignment="Center" />
+		<WrapPanel Grid.Row="2" Margin="36,0,36,0">
+			<ui:CardAction VerticalContentAlignment="Stretch">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="50px" />
+						<RowDefinition Height="100px" />
+						<RowDefinition Height="10px" />
+						<RowDefinition Height="50px" />
+					</Grid.RowDefinitions>
+					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="CalendarRtl20" />
+					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
+				</Grid>
+			</ui:CardAction>
+			<ui:CardAction VerticalContentAlignment="Stretch">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="50px" />
+						<RowDefinition Height="100px" />
+						<RowDefinition Height="10px" />
+						<RowDefinition Height="50px" />
+					</Grid.RowDefinitions>
+					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="List20" />
+					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
+				</Grid>
+			</ui:CardAction>
+			<ui:CardAction VerticalContentAlignment="Stretch">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="auto" />
+						<RowDefinition Height="50px" />
+						<RowDefinition Height="100px" />
+						<RowDefinition Height="10px" />
+						<RowDefinition Height="50px" />
+					</Grid.RowDefinitions>
+					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="ArrowTrending20" />
+					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
+				</Grid>
+			</ui:CardAction>
+		</WrapPanel>
 	</Grid>
 </Page>
