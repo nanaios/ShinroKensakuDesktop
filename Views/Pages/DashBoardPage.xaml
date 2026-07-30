@@ -17,15 +17,15 @@
 			<Setter Property="Padding" Value="24,24,24,0" />
 		</Style>
 		<Style TargetType="ui:SymbolIcon" x:Key="CardIconStyle">
-			<Setter Property="Width" Value="50" />
-			<Setter Property="Height" Value="50" />
+			<Setter Property="Width" Value="45" />
+			<Setter Property="Height" Value="45" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
 			<Setter Property="FontSize" Value="36" />
 			<Setter Property="Foreground" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
 		</Style>
 		<Style TargetType="Rectangle" x:Key="CardIconBackgroundStyle">
-			<Setter Property="Width" Value="50" />
-			<Setter Property="Height" Value="50" />
+			<Setter Property="Width" Value="45" />
+			<Setter Property="Height" Value="45" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
 			<Setter Property="StrokeThickness" Value="2" />
 			<Setter Property="RadiusX" Value="5" />
@@ -58,10 +58,12 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="50" />
 			<RowDefinition Height="100" />
+			<RowDefinition Height="50" />
 			<RowDefinition />
 		</Grid.RowDefinitions>
 		<ui:TextBlock Grid.Row="1" Text="ダッシュボード" FontTypography="Title" Margin="48,0,0,0" VerticalAlignment="Center" />
-		<WrapPanel Grid.Row="2" Margin="36,0,36,0">
+		<ui:TextBlock Grid.Row="2" Text="クイックショートカット" FontTypography="Subtitle" Margin="48,0,0,0" VerticalAlignment="Center" />
+		<WrapPanel Grid.Row="3" Margin="36,0,36,0">
 			<ui:CardAction VerticalContentAlignment="Top">
 				<Grid Height="276">
 					<Grid.RowDefinitions>

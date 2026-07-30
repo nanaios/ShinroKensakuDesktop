@@ -15,6 +15,8 @@
 			<ui:NavigationView.MenuItems>
 				<ui:NavigationViewItem TargetPageType="pages:DashBoardPage" Content="ダッシュボード" Tag="DashBoard"
 						Icon="{ui:SymbolIcon Symbol=Home12}" />
+				<ui:NavigationViewItem TargetPageType="pages:SearchPage" Content="検索" Tag="Search"
+						Icon="{ui:SymbolIcon Symbol=Search12}" />
 			</ui:NavigationView.MenuItems>
 			<ui:NavigationView.FooterMenuItems>
 				<ui:NavigationViewItem TargetPageType="pages:SettingsPage" Content="設定" Tag="Settings"

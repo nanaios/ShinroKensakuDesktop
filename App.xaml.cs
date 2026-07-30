@@ -27,6 +27,8 @@ public partial class App : Application
 		services.AddSingleton<SettingsPage> ( );
 		services.AddSingleton<SettingsPageViewModel> ( );
 
+		services.AddTransient<SearchPage> ( );
+
 		_serviceProvider = services.BuildServiceProvider ( );
 
 		var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
