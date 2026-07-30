@@ -27,10 +27,10 @@
 			<Setter Property="Width" Value="50" />
 			<Setter Property="Height" Value="50" />
 			<Setter Property="HorizontalAlignment" Value="Left" />
-			<Setter Property="StrokeThickness" Value="0" />
+			<Setter Property="StrokeThickness" Value="2" />
 			<Setter Property="RadiusX" Value="5" />
 			<Setter Property="RadiusY" Value="5" />
-			<Setter Property="Fill" Value="#FFC2F3FF" />
+			<Setter Property="Stroke" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
 		</Style>
 		<Style TargetType="ui:TextBlock" x:Key="CardTitleStyle">
 			<Setter Property="Margin" Value="0,8,0,8" />
