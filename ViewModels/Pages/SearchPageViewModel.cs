@@ -17,7 +17,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ObservableProperty]
 		public partial string? SearchTargetName { get; set; } = null;
 		[ObservableProperty]
-		public partial int? SelectedYear { get; set; } = null;
+		public partial string? SelectedYear { get; set; } = null;
 
 		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
 		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
@@ -30,7 +30,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		{
 			UpdateSearchQuery ( );
 		}
-		partial void OnSelectedYearChanged ( int? oldValue, int? newValue )
+		partial void OnSelectedYearChanged ( string? oldValue, string? newValue )
 		{
 			UpdateSearchQuery ( );
 		}
@@ -89,4 +89,6 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			CurrentSearchQuery = string.IsNullOrWhiteSpace ( searchQuery ) ? "なし" : searchQuery.Trim ( );
 		}
 	}
+
+
 }

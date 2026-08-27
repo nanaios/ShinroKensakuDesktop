@@ -4,6 +4,8 @@
 		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
 		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
 		xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
+		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
+		xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
 		d:DataContext="{d:DesignInstance Type=vm:SearchPageViewModel, IsDesignTimeCreatable=True}"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 		mc:Ignorable="d" d:DesignHeight="1080" d:DesignWidth="1440"
@@ -66,7 +68,11 @@
 									Width="380" />
 							<Grid Grid.Row="1" ClipToBounds="True">
 								<TextBox Name="YearBox" Grid.Row="1" Text="{Binding SelectedYear, Mode=TwoWay}"
-										Margin="0,0,-5,0" />
+										Margin="0,0,-5,0">
+									<i:Interaction.Behaviors>
+										<behaviors:NumericOnlyBehavior />
+									</i:Interaction.Behaviors>
+								</TextBox>
 							</Grid>
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
 									Icon="{ui:SymbolIcon Dismiss24}">
