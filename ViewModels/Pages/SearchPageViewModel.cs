@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using ShinroKensakuDesktop.Models;
 using System.Collections.ObjectModel;
 
@@ -52,6 +53,22 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			}
 		}
 
+		[RelayCommand]
+		public void ClearExamMethodComboBoxSelectedItem ( )
+		{
+			ExamMethodComboBoxSelectedItem = null;
+		}
+		[RelayCommand]
+		public void ClearDepartmentComboBoxSelectedItem ( )
+		{
+			DepartmentComboBoxSelectedItem = null;
+		}
+		[RelayCommand]
+		public void ClearSelectedYear ( )
+		{
+			SelectedYear = null;
+		}
+
 		private void UpdateSearchQuery ( )
 		{
 			string searchQuery = string.Empty;
@@ -66,7 +83,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			}
 			if ( SelectedYear != null )
 			{
-				searchQuery += $" 年度: {SelectedYear}";
+				searchQuery += $" 年度: {SelectedYear}年";
 			}
 
 			CurrentSearchQuery = string.IsNullOrWhiteSpace ( searchQuery ) ? "なし" : searchQuery.Trim ( );

@@ -64,14 +64,18 @@
 							<ui:TextBlock Text="年度" Style="{StaticResource ConditionContentTextStyle}" Margin="0,0,0,5"
 									Width="380" />
 							<Grid Grid.Row="1" ClipToBounds="True">
-								<ui:NumberBox Name="YearBox" PlaceholderText="年度を入力" Grid.Row="1"
-										Value="{Binding SelectedYear, Mode=TwoWay}" Minimum="0" Maximum="9999"
-										MaxDecimalPlaces="4" Margin="0,0,-5,0" />
+								<TextBox Name="YearBox" Grid.Row="1"
+										Text="{Binding SelectedYear, Mode=TwoWay}" Margin="0,0,-5,0" />
 							</Grid>
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
 									Icon="{ui:SymbolIcon Dismiss24}">
-
-									</ui:Button>
+								<i:Interaction.Triggers>
+									<i:EventTrigger EventName="Click">
+										<i:InvokeCommandAction
+												Command="{Binding ClearSelectedYearCommand}" />
+									</i:EventTrigger>
+								</i:Interaction.Triggers>
+							</ui:Button>
 						</Grid>
 						<Grid Style="{StaticResource ConditionContentGridStyle}">
 							<Grid.RowDefinitions>
@@ -91,7 +95,13 @@
 								</ComboBox>
 							</Grid>
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
-									Icon="{ui:SymbolIcon Dismiss24}" />
+									Icon="{ui:SymbolIcon Dismiss24}">
+								<i:Interaction.Triggers>
+									<i:EventTrigger EventName="Click">
+										<i:InvokeCommandAction Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}" />
+									</i:EventTrigger>
+								</i:Interaction.Triggers>
+									</ui:Button>
 						</Grid>
 
 						<Grid Style="{StaticResource ConditionContentGridStyle}">
@@ -113,7 +123,14 @@
 							</Grid>
 
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
-									Icon="{ui:SymbolIcon Dismiss24}" />
+									Icon="{ui:SymbolIcon Dismiss24}">
+								<i:Interaction.Triggers>
+									<i:EventTrigger EventName="Click">
+										<i:InvokeCommandAction
+												Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}" />
+									</i:EventTrigger>
+								</i:Interaction.Triggers>
+							</ui:Button>
 						</Grid>
 					</WrapPanel>
 				</ui:CardExpander>
