@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShinroKensakuDesktop.Models;
+using ShinroKensakuDesktop.Models.Data;
 using System.Collections.ObjectModel;
 
 namespace ShinroKensakuDesktop.ViewModels.Pages
@@ -10,22 +11,22 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ObservableProperty]
 		public partial string? CurrentSearchQuery { get; set; } = null;
 		[ObservableProperty]
-		public partial string? ExamMethodComboBoxSelectedItem { get; set; } = null;
+		public partial ExamMethodData? ExamMethodComboBoxSelectedItem { get; set; } = null;
 		[ObservableProperty]
-		public partial string? DepartmentComboBoxSelectedItem { get; set; } = null;
+		public partial DepartmentData? DepartmentComboBoxSelectedItem { get; set; } = null;
 		[ObservableProperty]
 		public partial string? SearchTargetName { get; set; } = null;
 		[ObservableProperty]
 		public partial int? SelectedYear { get; set; } = null;
 
-		public ObservableCollection<string> ExamMethodComboBoxItems { get; } = [ ];
-		public ObservableCollection<string> DepartmentComboBoxItems { get; } = [ ];
+		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
+		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
 
-		partial void OnExamMethodComboBoxSelectedItemChanged ( string? oldValue, string? newValue )
+		partial void OnExamMethodComboBoxSelectedItemChanged ( ExamMethodData? oldValue, ExamMethodData? newValue )
 		{
 			UpdateSearchQuery ( );
 		}
-		partial void OnDepartmentComboBoxSelectedItemChanged ( string? oldValue, string? newValue )
+		partial void OnDepartmentComboBoxSelectedItemChanged ( DepartmentData? oldValue, DepartmentData? newValue )
 		{
 			UpdateSearchQuery ( );
 		}
@@ -39,7 +40,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			var items = await SearchPageComboBoxSourceProvider.GetExamMethodComboBoxSource();
 			foreach ( var item in items )
 			{
-				ExamMethodComboBoxItems.Add ( item.Name );
+				ExamMethodComboBoxItems.Add ( item );
 			}
 		}
 
@@ -48,8 +49,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			var items = await SearchPageComboBoxSourceProvider.GetDepartmentComboBoxSource();
 			foreach ( var item in items )
 			{
-				var formatName = $"{item.Name} ({item.LongName})";
-				DepartmentComboBoxItems.Add ( formatName );
+				DepartmentComboBoxItems.Add ( item );
 			}
 		}
 
@@ -75,11 +75,11 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 
 			if ( ExamMethodComboBoxSelectedItem != null )
 			{
-				searchQuery += $" 受験方法: {ExamMethodComboBoxSelectedItem}";
+				searchQuery += $" 受験方法: {ExamMethodComboBoxSelectedItem.Name}";
 			}
 			if ( DepartmentComboBoxSelectedItem != null )
 			{
-				searchQuery += $" 学科: {DepartmentComboBoxSelectedItem}";
+				searchQuery += $" 学科: {DepartmentComboBoxSelectedItem.Name} ( {DepartmentComboBoxSelectedItem.LongName} )";
 			}
 			if ( SelectedYear != null )
 			{

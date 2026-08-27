@@ -3,6 +3,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
 		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+		xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
 		d:DataContext="{d:DesignInstance Type=vm:SearchPageViewModel, IsDesignTimeCreatable=True}"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 		mc:Ignorable="d" d:DesignHeight="1080" d:DesignWidth="1440"
@@ -64,15 +65,14 @@
 							<ui:TextBlock Text="年度" Style="{StaticResource ConditionContentTextStyle}" Margin="0,0,0,5"
 									Width="380" />
 							<Grid Grid.Row="1" ClipToBounds="True">
-								<TextBox Name="YearBox" Grid.Row="1"
-										Text="{Binding SelectedYear, Mode=TwoWay}" Margin="0,0,-5,0" />
+								<TextBox Name="YearBox" Grid.Row="1" Text="{Binding SelectedYear, Mode=TwoWay}"
+										Margin="0,0,-5,0" />
 							</Grid>
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
 									Icon="{ui:SymbolIcon Dismiss24}">
 								<i:Interaction.Triggers>
 									<i:EventTrigger EventName="Click">
-										<i:InvokeCommandAction
-												Command="{Binding ClearSelectedYearCommand}" />
+										<i:InvokeCommandAction Command="{Binding ClearSelectedYearCommand}" />
 									</i:EventTrigger>
 								</i:Interaction.Triggers>
 							</ui:Button>
@@ -89,19 +89,21 @@
 							<ui:TextBlock Text="受験方法" Style="{StaticResource ConditionContentTextStyle}" />
 							<Grid Grid.Row="1" ClipToBounds="True">
 								<ComboBox Name="ExamMethodComboBox" Grid.Row="1"
-										ItemsSource="{Binding ExamMethodComboBoxItems}"
+										ItemsSource="{Binding ExamMethodComboBoxItems}" DisplayMemberPath="Name"
 										SelectedItem="{Binding ExamMethodComboBoxSelectedItem, Mode=TwoWay}"
 										Margin="0,0,-5,0">
 								</ComboBox>
+
 							</Grid>
 							<ui:Button Grid.Column="1" Grid.Row="1" Style="{StaticResource ConditionContentButtonStyle}"
 									Icon="{ui:SymbolIcon Dismiss24}">
 								<i:Interaction.Triggers>
 									<i:EventTrigger EventName="Click">
-										<i:InvokeCommandAction Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}" />
+										<i:InvokeCommandAction
+												Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}" />
 									</i:EventTrigger>
 								</i:Interaction.Triggers>
-									</ui:Button>
+							</ui:Button>
 						</Grid>
 
 						<Grid Style="{StaticResource ConditionContentGridStyle}">
@@ -119,6 +121,16 @@
 										ItemsSource="{Binding DepartmentComboBoxItems}"
 										SelectedItem="{Binding DepartmentComboBoxSelectedItem, Mode=TwoWay}"
 										Margin="0,0,-5,0">
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock>
+												<Run Text="{Binding Name}" />
+												<Run Text=" (" />
+												<Run Text="{Binding LongName}" />
+												<Run Text=")" />
+											</TextBlock>
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
 								</ComboBox>
 							</Grid>
 
