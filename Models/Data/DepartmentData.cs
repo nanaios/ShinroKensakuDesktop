@@ -1,9 +1,10 @@
 ﻿namespace ShinroKensakuDesktop.Models.Data
 {
-	public class DepartmentData
+	public record DepartmentData (
+		sbyte Id,
+		string Name,
+		string LongName
+	)
 	{
-		public required sbyte Id { get; set; }
-		public required string Name { get; set; }
-		public required string LongName { get; set; }
 	}
 }

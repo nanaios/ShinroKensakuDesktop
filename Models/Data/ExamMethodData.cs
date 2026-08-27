@@ -1,8 +1,9 @@
 ﻿namespace ShinroKensakuDesktop.Models.Data
 {
-	public class ExamMethodData
+	public record ExamMethodData (
+		string Id,
+		string Name
+	)
 	{
-		public required string Id { get; set; }
-		public required string Name { get; set; }
 	}
 }

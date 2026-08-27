@@ -12,11 +12,10 @@ namespace ShinroKensakuDesktop.Models
 			var datas = new List<ExamMethodData>();
 			foreach ( DataRow row in table.Rows )
 			{
-				var data = new ExamMethodData()
-				{
-					Id = ( string ) row["jyukenhouhou_code"],
-					Name = ( string )  row["jyukenhouhou_name"]
-				};
+				var data = new ExamMethodData(
+					( string ) row["jyukenhouhou_code"],
+					( string )  row["jyukenhouhou_name"]
+				);
 				datas.Add ( data );
 			}
 
@@ -30,12 +29,11 @@ namespace ShinroKensakuDesktop.Models
 			var datas = new List<DepartmentData>();
 			foreach ( DataRow row in table.Rows )
 			{
-				var data = new DepartmentData()
-				{
-					Id = ( sbyte ) row["cls_code"],
-					Name = ( string )  row["cls_name"],
-					LongName = ( string )  row["cls_lname"]
-				};
+				var data = new DepartmentData(
+					( sbyte ) row["cls_code"],
+					( string )  row["cls_name"],
+					( string )  row["cls_lname"]
+				);
 				datas.Add ( data );
 			}
 

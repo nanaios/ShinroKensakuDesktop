@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Folder Include="Resource\Image\" />
+    <Folder Include="Utility\" />
   </ItemGroup>
 
 </Project>
