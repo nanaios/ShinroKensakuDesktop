@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ShinroKensakuDesktop.ViewModels.Pages;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace ShinroKensakuDesktop.Views.Pages
+namespace ShinroKensakuDesktop.Views.Pages;
+
+public partial class SearchPage : Page
 {
-    /// <summary>
-    /// SearchPage.xaml の相互作用ロジック
-    /// </summary>
-    public partial class SearchPage : Page
-    {
-        public SearchPage()
-        {
-            InitializeComponent();
-        }
-    }
+	public SearchPage ( SearchPageViewModel viewModel )
+	{
+		DataContext = viewModel;
+		InitializeComponent ( );
+		Loaded += async ( object sender, RoutedEventArgs e ) =>
+		{
+			await viewModel.LoadExamMethodComboBoxItems ( );
+			await viewModel.LoadDepartmentComboBoxItems ( );
+		};
+	}
 }

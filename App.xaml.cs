@@ -28,6 +28,7 @@ public partial class App : Application
 		services.AddSingleton<SettingsPageViewModel> ( );
 
 		services.AddTransient<SearchPage> ( );
+		services.AddTransient<SearchPageViewModel> ( );
 
 		_serviceProvider = services.BuildServiceProvider ( );
 
