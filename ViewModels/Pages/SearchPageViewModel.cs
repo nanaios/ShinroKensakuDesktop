@@ -18,6 +18,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		public partial string? SearchTargetName { get; set; } = null;
 		[ObservableProperty]
 		public partial string? SelectedYear { get; set; } = null;
+		[ObservableProperty]
+		public partial ObservableCollection<SearchResultData> SearchResultList { get; set; } = new ( );
 
 		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
 		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
@@ -67,6 +69,17 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		public void ClearSelectedYear ( )
 		{
 			SelectedYear = null;
+		}
+		[RelayCommand]
+		public async Task ExecuteSearch ( )
+		{
+			SearchResultList.Clear ( );
+			var results = await SearchPageDataGridSourceProvider.GetDataGridSource(SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
+
+			foreach ( var result in results )
+			{
+				SearchResultList.Add ( result );
+			}
 		}
 
 		private void UpdateSearchQuery ( )
