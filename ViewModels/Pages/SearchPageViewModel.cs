@@ -87,48 +87,40 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			SearchResultList.Clear ( );
 			Debug.WriteLine ( $"SearchTargetName: {SearchTargetName}, SelectedYear: {SelectedYear}, ExamMethodComboBoxSelectedItem?.Id: {ExamMethodComboBoxSelectedItem?.Id}, DepartmentComboBoxSelectedItem?.Id: {DepartmentComboBoxSelectedItem?.Id}" );
 			searchResults = await SearchPageDataGridSourceProvider.GetDataGridSource ( SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
-
-			var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count );
-			pageIndex = 0;
-			pageCount = ( int ) Math.Ceiling ( ( double ) searchResults.Count / ResultVisibleCountLimit );
-
-			for ( int i = 0 ; i < count ; i++ )
-			{
-				SearchResultList.Add ( searchResults [ i ] );
-			}
-			SearchResultCountText = $"{count}/{searchResults.Count}件を表示中";
-			SearchResultPageIndexText = $"ページ {pageIndex + 1}/{pageCount}";
+			FirstPage ( );
 		}
 		[RelayCommand]
 		public void NextPage ( )
 		{
-			if ( searchResults == null || searchResults.Count == 0 ) return;
 			if ( pageIndex + 1 >= pageCount ) return;
 			pageIndex++;
-
-			SearchResultList.Clear ( );
-			var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
-			for ( int i = 0 ; i < count ; i++ )
-			{
-				SearchResultList.Add ( searchResults [ pageIndex * ResultVisibleCountLimit + i ] );
-			}
-			SearchResultCountText = $"{count}/{searchResults.Count}件を表示中";
-			SearchResultPageIndexText = $"ページ {pageIndex + 1}/{pageCount}";
+			ShowPage ( );
 		}
 		[RelayCommand]
 		public void PreviousPage ( )
 		{
-			if ( searchResults == null || searchResults.Count == 0 ) return;
 			if ( pageIndex - 1 < 0 ) return;
 			pageIndex--;
-
+			ShowPage ( );
+		}
+		[RelayCommand]
+		public void FirstPage ( )
+		{
+			pageIndex = 0;
+			ShowPage ( );
+		}
+		private void ShowPage ( )
+		{
+			if ( searchResults == null || searchResults.Count == 0 ) return;
 			SearchResultList.Clear ( );
+			pageCount = ( int ) Math.Ceiling ( ( double ) searchResults.Count / ResultVisibleCountLimit );
 			var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
+			int start = pageIndex * ResultVisibleCountLimit;
 			for ( int i = 0 ; i < count ; i++ )
 			{
-				SearchResultList.Add ( searchResults [ pageIndex * ResultVisibleCountLimit + i ] );
+				SearchResultList.Add ( searchResults [ start + i ] );
 			}
-			SearchResultCountText = $"{count}/{searchResults.Count}件を表示中";
+			SearchResultCountText = $"{start + 1}-{start + count}件目を表示中";
 			SearchResultPageIndexText = $"ページ {pageIndex + 1}/{pageCount}";
 		}
 		private void UpdateSearchQuery ( )

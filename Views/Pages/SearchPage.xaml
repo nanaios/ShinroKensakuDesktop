@@ -11,7 +11,7 @@
 		mc:Ignorable="d" d:DesignHeight="1080" d:DesignWidth="1440"
 		ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
 		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Search"
-		x:Class="ShinroKensakuDesktop.Views.Pages.SearchPage">
+		ScrollViewer.CanContentScroll="False" x:Class="ShinroKensakuDesktop.Views.Pages.SearchPage">
 	<Page.Resources>
 		<Style TargetType="Grid" x:Key="ConditionContentGridStyle">
 			<Setter Property="Margin" Value="10,10,10,10" />
@@ -166,18 +166,27 @@
 		</ui:Card>
 		<StackPanel Grid.Row="1" Margin="0,5,0,5" Orientation="Horizontal" HorizontalAlignment="Right">
 			<ui:TextBlock Text="表示件数：" VerticalAlignment="Center" FontTypography="BodyStrong" />
-			<TextBox Text="{Binding ResultVisibleCountLimit, Mode=TwoWay}" MinWidth="60" VerticalAlignment="Center"
-					TextAlignment="Right">
+			<TextBox Text="{Binding ResultVisibleCountLimit, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+					MinWidth="60" VerticalAlignment="Center" TextAlignment="Right">
 				<i:Interaction.Behaviors>
 					<behaviors:NumericOnlyBehavior />
 				</i:Interaction.Behaviors>
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="LostFocus">
+						<i:InvokeCommandAction Command="{Binding FirstPageCommand}" />
+					</i:EventTrigger>
+					<i:KeyTrigger Key="Enter">
+						<i:InvokeCommandAction Command="{Binding FirstPageCommand}" />
+					</i:KeyTrigger>
+				</i:Interaction.Triggers>
 			</TextBox>
 			<ui:TextBlock Text=" 件" VerticalAlignment="Center" FontTypography="BodyStrong" />
 		</StackPanel>
 		<ui:Card Grid.Row="2" Margin="0,0,0,0" ClipToBounds="True" VerticalContentAlignment="Stretch"
 				VerticalAlignment="Stretch">
 			<ui:DataGrid Grid.Row="0" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
-					IsReadOnly="True" AutoGenerateColumns="False">
+					IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Visible"
+					VerticalAlignment="Top">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="卒業年度" Binding="{Binding Year}" />
 					<DataGridTextColumn Header="受験日" Binding="{Binding Jyukenbi, StringFormat='yyyy/MM/dd'}" />
