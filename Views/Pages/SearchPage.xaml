@@ -29,8 +29,7 @@
 				x:Key="ConditionContentNumberBoxStyle">
 		</Style>
 	</Page.Resources>
-	<Grid Margin="48,0,48,0"
-			MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}">
+	<Grid Margin="48,0,48,0" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Page}}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition />

@@ -2,11 +2,15 @@
 {
 	public record SearchResultData (
 		short Year,
-		string Shingakusaki_code,
-		string G_code,
-		string ExamCode,
-		bool Gouhi,
-		DateTime Jyukenbi
+		DateTime Jyukenbi,
+		string? Gakubu,
+		string? Gakka,
+		string? Course,
+		string? Jyukenhouhou_name,
+		string? G_name,
+		string? Sei,
+		string? Cls_name,
+		string? Result
 	)
 	{
 	}

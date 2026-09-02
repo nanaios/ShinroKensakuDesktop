@@ -4,12 +4,13 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
 		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Windows"
+		SizeToContent="Manual"
 		d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
 		x:Class="ShinroKensakuDesktop.Views.Windows.MainWindow" Width="1440" Height="1080">
 	<Grid x:Name="Root">
 		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Margin="48,0,0,0" Panel.ZIndex="1" />
 		<ui:NavigationView
-				MaxHeight="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource AncestorType=Grid}}"
+				Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource AncestorType=Grid}}"
 				x:Name="MainView" xmlns:pages="clr-namespace:ShinroKensakuDesktop.Views.Pages"
 				IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False" IsPaneToggleVisible="True"
 				IsTopSeparatorVisible="False" OpenPaneLength="200" PaneDisplayMode="Left"
