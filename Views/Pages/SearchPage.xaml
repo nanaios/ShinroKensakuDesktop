@@ -32,6 +32,7 @@
 	<Grid Margin="48,0,48,0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
 			<RowDefinition />
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
@@ -43,7 +44,7 @@
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 				<ui:AutoSuggestBox PlaceholderText="進路先を入力" Text="{Binding SearchTargetName, Mode=TwoWay}" />
-				<ui:CardExpander Margin="0,0,0,12" Grid.Row="1" IsExpanded="False">
+				<ui:CardExpander Margin="0,5,0,5" Grid.Row="1" IsExpanded="False">
 					<ui:CardExpander.Header>
 						<Grid>
 							<Grid.ColumnDefinitions>
@@ -163,7 +164,17 @@
 				</ui:Button>
 			</Grid>
 		</ui:Card>
-		<ui:Card Grid.Row="1" Margin="0,20,0,0" ClipToBounds="True" VerticalContentAlignment="Stretch"
+		<StackPanel Grid.Row="1" Margin="0,5,0,5" Orientation="Horizontal" HorizontalAlignment="Right">
+			<ui:TextBlock Text="表示件数：" VerticalAlignment="Center" FontTypography="BodyStrong" />
+			<TextBox Text="{Binding ResultVisibleCountLimit, Mode=TwoWay}" MinWidth="60" VerticalAlignment="Center"
+					TextAlignment="Right">
+				<i:Interaction.Behaviors>
+					<behaviors:NumericOnlyBehavior />
+				</i:Interaction.Behaviors>
+			</TextBox>
+			<ui:TextBlock Text=" 件" VerticalAlignment="Center" FontTypography="BodyStrong" />
+		</StackPanel>
+		<ui:Card Grid.Row="2" Margin="0,0,0,0" ClipToBounds="True" VerticalContentAlignment="Stretch"
 				VerticalAlignment="Stretch">
 			<ui:DataGrid Grid.Row="0" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
 					IsReadOnly="True" AutoGenerateColumns="False">
@@ -188,8 +199,24 @@
 				</ui:DataGrid.ColumnHeaderStyle>
 			</ui:DataGrid>
 		</ui:Card>
-		<Grid Grid.Row="2" Height="40" Margin="0,5,0,0">
-			<ui:TextBlock HorizontalAlignment="Right" Text="{Binding SearchResultCountText}" />
-		</Grid>
+		<StackPanel Grid.Row="3" Height="40" Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+			<ui:TextBlock HorizontalAlignment="Right" Text="{Binding SearchResultCountText}" VerticalAlignment="Center" />
+			<ui:Button Grid.Column="1" VerticalAlignment="Stretch" Margin="5,5,5,5" Icon="{ui:SymbolIcon ArrowLeft24}">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<i:InvokeCommandAction Command="{Binding PreviousPageCommand}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</ui:Button>
+			<ui:TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="{Binding SearchResultPageIndexText}"
+					VerticalAlignment="Center" />
+			<ui:Button Grid.Column="2" VerticalAlignment="Stretch" Margin="5,5,0,5" Icon="{ui:SymbolIcon ArrowRight24}">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<i:InvokeCommandAction Command="{Binding NextPageCommand}" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</ui:Button>
+		</StackPanel>
 	</Grid>
 </Page>
