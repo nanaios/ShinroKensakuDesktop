@@ -3,11 +3,14 @@ using CommunityToolkit.Mvvm.Input;
 using ShinroKensakuDesktop.Models;
 using ShinroKensakuDesktop.Models.Data;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace ShinroKensakuDesktop.ViewModels.Pages
 {
 	public partial class SearchPageViewModel : ObservableObject
 	{
+		private List<SearchResultData>? searchResults;
+
 		[ObservableProperty]
 		public partial string? CurrentSearchQuery { get; set; } = null;
 		[ObservableProperty]
@@ -20,6 +23,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		public partial string? SelectedYear { get; set; } = null;
 		[ObservableProperty]
 		public partial ObservableCollection<SearchResultData> SearchResultList { get; set; } = new ( );
+		[ObservableProperty]
+		public partial string? SearchResultCountText { get; set; } = null;
 
 		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
 		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
@@ -74,12 +79,17 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		public async Task ExecuteSearch ( )
 		{
 			SearchResultList.Clear ( );
-			var results = await SearchPageDataGridSourceProvider.GetDataGridSource(SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
+			Debug.WriteLine ( $"SearchTargetName: {SearchTargetName}, SelectedYear: {SelectedYear}, ExamMethodComboBoxSelectedItem?.Id: {ExamMethodComboBoxSelectedItem?.Id}, DepartmentComboBoxSelectedItem?.Id: {DepartmentComboBoxSelectedItem?.Id}" );
+			searchResults = await SearchPageDataGridSourceProvider.GetDataGridSource ( SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
 
-			foreach ( var result in results )
+			var limitCount = 50;
+			var count = Math.Min ( limitCount, searchResults.Count );
+
+			for ( int i = 0 ; i < count ; i++ )
 			{
-				SearchResultList.Add ( result );
+				SearchResultList.Add ( searchResults [ i ] );
 			}
+			SearchResultCountText = $"{count}/{searchResults.Count}件を表示中";
 		}
 
 		private void UpdateSearchQuery ( )
@@ -102,6 +112,4 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			CurrentSearchQuery = string.IsNullOrWhiteSpace ( searchQuery ) ? "なし" : searchQuery.Trim ( );
 		}
 	}
-
-
 }

@@ -4,6 +4,7 @@
 	{
 		public short Year { get; init; }
 		public DateTime Jyukenbi { get; init; }
+		public string? Gakkou_name { get; init; }
 		public string? Gakubu { get; init; }
 		public string? Gakka { get; init; }
 		public string? Course { get; init; }

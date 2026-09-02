@@ -10,7 +10,6 @@
 	<Grid x:Name="Root">
 		<ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Margin="48,0,0,0" Panel.ZIndex="1" />
 		<ui:NavigationView
-				Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource AncestorType=Grid}}"
 				x:Name="MainView" xmlns:pages="clr-namespace:ShinroKensakuDesktop.Views.Pages"
 				IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False" IsPaneToggleVisible="True"
 				IsTopSeparatorVisible="False" OpenPaneLength="200" PaneDisplayMode="Left"
