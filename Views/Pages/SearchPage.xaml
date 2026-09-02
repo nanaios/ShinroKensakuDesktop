@@ -174,10 +174,23 @@
 		<ui:Card Grid.Row="1" Margin="0,20,0,0" ClipToBounds="True" VerticalContentAlignment="Stretch"
 				VerticalAlignment="Stretch">
 			<ui:DataGrid Grid.Row="0" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
-					IsReadOnly="True">
+					IsReadOnly="True" AutoGenerateColumns="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="年" Binding="{Binding Year}" />
+					<DataGridTextColumn Header="受験日" Binding="{Binding Jyukenbi, StringFormat='yyyy/MM/dd'}" />
+					<DataGridTextColumn Header="学部" Binding="{Binding Gakubu}" />
+					<DataGridTextColumn Header="学科" Binding="{Binding Gakka}" />
+					<DataGridTextColumn Header="コース" Binding="{Binding Course}" />
+					<DataGridTextColumn Header="受験方法" Binding="{Binding Jyukenhouhou_name}" />
+					<DataGridTextColumn Header="氏名" Binding="{Binding G_name}" />
+					<DataGridTextColumn Header="性別" Binding="{Binding Sei}" />
+					<DataGridTextColumn Header="クラス" Binding="{Binding Cls_name}" />
+					<DataGridTextColumn Header="合否" Binding="{Binding Result}" />
+				</DataGrid.Columns>
 				<ui:DataGrid.ColumnHeaderStyle>
 					<Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
 						<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+						<Setter Property="MinWidth" Value="100" />
 					</Style>
 				</ui:DataGrid.ColumnHeaderStyle>
 			</ui:DataGrid>

@@ -24,18 +24,19 @@ namespace ShinroKensakuDesktop.Models
 			var datas = new List<SearchResultData>();
 			foreach ( DataRow row in table.Rows )
 			{
-				var data = new SearchResultData(
-					(short)row["year"],
-					(DateTime)row["jyukenbi"],
-					row["gakubu"] as string,
-					row["gakka"] as string,
-					row["course"] as string,
-					row["jyukenhouhou_name"] as string,
-					row["g_name"] as string,
-					row["sei"] as string,
-					row["cls_name"] as string,
-					row["result"] as string
-				);
+				var data = new SearchResultData
+				{
+					Year = (short)row["year"],
+					Jyukenbi = (DateTime)row["jyukenbi"],
+					Gakubu = row["gakubu"] as string,
+					Gakka = row["gakka"] as string,
+					Course = row["course"] as string,
+					Jyukenhouhou_name = row["jyukenhouhou_name"] as string,
+					G_name = row["g_name"] as string,
+					Sei = row["sei"] as string,
+					Cls_name = row["cls_name"] as string,
+					Result = row["result"] as string
+				};
 				datas.Add ( data );
 			}
 
