@@ -1,5 +1,6 @@
 ﻿using ShinroKensakuDesktop.Models.Data;
 using System.Data;
+using System.Diagnostics;
 
 namespace ShinroKensakuDesktop.Models
 {
@@ -7,8 +8,8 @@ namespace ShinroKensakuDesktop.Models
 	{
 		public static async Task<List<SearchResultData>> GetDataGridSource ( string? target, string? year, string? examMethod, sbyte? department )
 		{
-			string query = """
-				select year,jyukenbi,gakkou_name,gakubu,gakka,course,jyukenhouhou_name,g_name,sei, cls_name, IF(gouhi = 1, '合格', '不合格') AS result
+			string queryShingaku = """
+				select year,jyukenbi,gakkou_name AS shinro_name,gakubu,gakka,course,NULL AS syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
 				from shingakukekkaTbl
 				inner join jyukenhouhouTbl
 				on shingakukekkaTbl.jyukenhouhou_code = jyukenhouhouTbl.jyukenhouhou_code
@@ -19,31 +20,61 @@ namespace ShinroKensakuDesktop.Models
 				inner join clsTbl
 				on seitoTbl.cls_code = clsTbl.cls_code
 				inner join gakkoumeiTbl
-				on  shingakusakiTbl.gakkou_code = gakkoumeiTbl.gakkou_code
+				on shingakusakiTbl.gakkou_code = gakkoumeiTbl.gakkou_code
 				""";
+			string querySyuusyoku = """
+			                        select year,jyukenbi,houjin_name,NULL,NULL,NULL,syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
+			                        from syuusyokukekkaTbl
+			                        inner join jyukenhouhouTbl
+			                        on syuusyokukekkaTbl.jyukenhouhou_code = jyukenhouhouTbl.jyukenhouhou_code
+			                        inner join syuusyokusakiTbl
+			                        on syuusyokukekkaTbl.syuusyokusaki_code = syuusyokusakiTbl.syuusyokusaki_code
+			                        inner join seitoTbl
+			                        on syuusyokukekkaTbl.g_code = seitoTbl.g_code
+			                        inner join clsTbl
+			                        on seitoTbl.cls_code = clsTbl.cls_code
+			                        inner join houjinmeiTbl
+			                        on syuusyokusakiTbl.houjin_code = houjinmeiTbl.houjin_code
+			                        """;
+			string query = string.Empty;
 
-			List<string> conditions = [];
+			List<string> conditionsShingaku = [];
+			List<string> conditionsSyuusyoku = [];
+			
 			if ( string.IsNullOrEmpty ( target ) == false )
 			{
-				conditions.Add ( $"gakkou_name like '%{target}%'" );
+				conditionsShingaku.Add ( $"gakkou_name like '%{target}%'" );
+				conditionsSyuusyoku.Add ( $"houjin_name like '%{target}%'" );
 			}
 			if ( string.IsNullOrEmpty ( year ) == false )
 			{
-				conditions.Add ( $"year = '{year}'" );
+				conditionsShingaku.Add ( $"year = '{year}'" );
+				conditionsSyuusyoku.Add ( $"year = '{year}'" );
 			}
 			if ( string.IsNullOrEmpty ( examMethod ) == false )
 			{
-				conditions.Add ( $"shingakukekkaTbl.jyukenhouhou_code = '{examMethod}'" );
+				conditionsShingaku.Add ( $"shingakukekkaTbl.jyukenhouhou_code = '{examMethod}'" );
+				conditionsSyuusyoku.Add ( $"syuusyokukekkaTbl.jyukenhouhou_code = '{examMethod}'" );
+				
 			}
 			if ( department.HasValue )
 			{
-				conditions.Add ( $"seitoTbl.cls_code = '{department}'" );
+				conditionsShingaku.Add ( $"seitoTbl.cls_code = '{department}'" );
+				conditionsSyuusyoku.Add ( $"seitoTbl.cls_code = '{department}'" );
+				
 			}
 
-			if ( conditions.Count != 0 )
+			if ( conditionsShingaku.Count != 0 )
 			{
-				query += $"\nwhere {string.Join ( " and ", conditions )}";
+				querySyuusyoku += $"\nwhere {string.Join ( " and ", conditionsSyuusyoku)}";
+				queryShingaku += $"\nwhere {string.Join ( " and ", conditionsShingaku )}";
 			}
+			
+			query += queryShingaku;
+			query += "\nunion all\n";
+			query += querySyuusyoku;
+			
+			Console.WriteLine (  query );
 
 			var table = await MySQLCommand.Query(query);
 			var datas = new List<SearchResultData>();
@@ -53,15 +84,16 @@ namespace ShinroKensakuDesktop.Models
 				{
 					Year = (short)row["year"],
 					Jyukenbi = (DateTime)row["jyukenbi"],
-					Gakkou_name = row["gakkou_name"] as string,
+					Shinro_name = row["shinro_name"] as string,
 					Gakubu = row["gakubu"] as string,
 					Gakka = row["gakka"] as string,
 					Course = row["course"] as string,
+					Syuusyokusakinai_kubun = row["syuusyokusakinai_kubun"] as string,
 					Jyukenhouhou_name = row["jyukenhouhou_name"] as string,
 					G_name = row["g_name"] as string,
 					Sei = row["sei"] as string,
 					Cls_name = row["cls_name"] as string,
-					Result = row["result"] as string
+					Result = row["gouhi"] as string
 				};
 				datas.Add ( data );
 			}
