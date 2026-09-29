@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShinroKensakuDesktop.Models;
 using ShinroKensakuDesktop.Models.Data;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.IO;
+using System.Text;
+using Microsoft.Win32;
 
 namespace ShinroKensakuDesktop.ViewModels.Pages
 {
@@ -12,9 +14,12 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		private List<SearchResultData>? searchResults;
 		private int pageIndex;
 		private int pageCount;
+        [ObservableProperty] public partial string StatusText { get; set; } = "条件を指定して検索してください。";
+        [ObservableProperty] public partial bool IsBusy { get; set; }
+        partial void OnIsBusyChanged(bool value) => ExportCsvCommand.NotifyCanExecuteChanged();
 
 		[ObservableProperty]
-		public partial string? CurrentSearchQuery { get; set; } = null;
+		public partial string? CurrentSearchQuery { get; set; } = "なし";
 		[ObservableProperty]
 		public partial ExamMethodData? ExamMethodComboBoxSelectedItem { get; set; } = null;
 		[ObservableProperty]
@@ -50,7 +55,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 
 		public async Task LoadExamMethodComboBoxItems ( )
 		{
-			var items = await SearchPageComboBoxSourceProvider.GetExamMethodComboBoxSource();
+			if (ExamMethodComboBoxItems.Count > 0) return;
+            var items = await SearchPageComboBoxSourceProvider.GetExamMethodComboBoxSource();
 			foreach ( var item in items )
 			{
 				ExamMethodComboBoxItems.Add ( item );
@@ -59,7 +65,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 
 		public async Task LoadDepartmentComboBoxItems ( )
 		{
-			var items = await SearchPageComboBoxSourceProvider.GetDepartmentComboBoxSource();
+			if (DepartmentComboBoxItems.Count > 0) return;
+            var items = await SearchPageComboBoxSourceProvider.GetDepartmentComboBoxSource();
 			foreach ( var item in items )
 			{
 				DepartmentComboBoxItems.Add ( item );
@@ -81,14 +88,54 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		{
 			SelectedYear = null;
 		}
-		[RelayCommand]
-		public async Task ExecuteSearch ( )
-		{
-			SearchResultList.Clear ( );
-			Debug.WriteLine ( $"SearchTargetName: {SearchTargetName}, SelectedYear: {SelectedYear}, ExamMethodComboBoxSelectedItem?.Id: {ExamMethodComboBoxSelectedItem?.Id}, DepartmentComboBoxSelectedItem?.Id: {DepartmentComboBoxSelectedItem?.Id}" );
-			searchResults = await SearchPageDataGridSourceProvider.GetDataGridSource ( SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
-			FirstPage ( );
-		}
+        [RelayCommand]
+        public async Task ExecuteSearch()
+        {
+            IsBusy = true;
+            searchResults = null;
+            ShowPage();
+            StatusText = "検索しています…";
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(SelectedYear) && (!int.TryParse(SelectedYear, out var year) || year < 1901 || year > 2155))
+                {
+                    StatusText = "年度は1901～2155の数字で入力してください。";
+                    return;
+                }
+                searchResults = await SearchPageDataGridSourceProvider.GetDataGridSource(SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id);
+                FirstPage();
+                StatusText = searchResults.Count == 0 ? "条件に一致する受験記録はありません。" : $"検索結果：{searchResults.Count:N0}件。CSV保存は全ページが対象です。";
+            }
+            catch (Exception)
+            {
+                StatusText = "検索できませんでした。データベースの接続を確認して再検索してください。";
+            }
+            finally { IsBusy = false; }
+        }
+
+        private bool CanExportCsv() => !IsBusy && searchResults is { Count: > 0 };
+
+        [RelayCommand(CanExecute = nameof(CanExportCsv))]
+        private async Task ExportCsvAsync()
+        {
+            var snapshot = searchResults?.ToArray();
+            if (snapshot is not { Length: > 0 }) return;
+            var dialog = new SaveFileDialog
+            {
+                Filter = "CSVファイル (*.csv)|*.csv", DefaultExt = ".csv", AddExtension = true,
+                FileName = $"進路検索結果_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+            };
+            if (dialog.ShowDialog() != true) return;
+            try
+            {
+                await File.WriteAllTextAsync(dialog.FileName, SearchResultCsv.Create(snapshot), new UTF8Encoding(true));
+                StatusText = $"検索結果{snapshot.Length:N0}件をCSVに保存しました。";
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                StatusText = "CSVを保存できませんでした。ファイルが開かれていないか、保存先を確認してください。";
+            }
+        }
 		[RelayCommand]
 		public void NextPage ( )
 		{
@@ -109,12 +156,22 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			pageIndex = 0;
 			ShowPage ( );
 		}
-		private void ShowPage ( )
+		partial void OnResultVisibleCountLimitChanged(int value) => FirstPage();
+        private void ShowPage ( )
 		{
-			if ( searchResults == null || searchResults.Count == 0 ) return;
+			SearchResultList.Clear();
+            if (searchResults == null || searchResults.Count == 0)
+            {
+                pageIndex = pageCount = 0;
+                SearchResultCountText = "0件";
+                SearchResultPageIndexText = "ページ 0/0";
+                return;
+            }
+            ResultVisibleCountLimit = Math.Clamp(ResultVisibleCountLimit, 1, 1000);
 			SearchResultList.Clear ( );
 			pageCount = ( int ) Math.Ceiling ( ( double ) searchResults.Count / ResultVisibleCountLimit );
-			var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
+			pageIndex = Math.Clamp(pageIndex, 0, pageCount - 1);
+            var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
 			int start = pageIndex * ResultVisibleCountLimit;
 			for ( int i = 0 ; i < count ; i++ )
 			{

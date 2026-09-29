@@ -1,123 +1,42 @@
-﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-		xmlns:i="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DesignHeight="1080"
-		d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="DashBoard"
-		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
-		x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage">
-	<Page.Resources>
-		<Style TargetType="ui:CardAction" BasedOn="{StaticResource {x:Type ui:CardAction}}">
-			<Setter Property="Width" Value="260" />
-			<Setter Property="Height" Value="300" />
-			<Setter Property="Margin" Value="12" />
-			<Setter Property="IsChevronVisible" Value="False" />
-			<Setter Property="Padding" Value="24,24,24,0" />
-		</Style>
-		<Style TargetType="ui:SymbolIcon" x:Key="CardIconStyle">
-			<Setter Property="Width" Value="45" />
-			<Setter Property="Height" Value="45" />
-			<Setter Property="HorizontalAlignment" Value="Left" />
-			<Setter Property="FontSize" Value="36" />
-			<Setter Property="Foreground" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
-		</Style>
-		<Style TargetType="Rectangle" x:Key="CardIconBackgroundStyle">
-			<Setter Property="Width" Value="45" />
-			<Setter Property="Height" Value="45" />
-			<Setter Property="HorizontalAlignment" Value="Left" />
-			<Setter Property="StrokeThickness" Value="2" />
-			<Setter Property="RadiusX" Value="5" />
-			<Setter Property="RadiusY" Value="5" />
-			<Setter Property="Stroke" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
-		</Style>
-		<Style TargetType="ui:TextBlock" x:Key="CardTitleStyle">
-			<Setter Property="Margin" Value="0,8,0,8" />
-			<Setter Property="VerticalAlignment" Value="Center" />
-			<Setter Property="FontTypography" Value="Subtitle" />
-		</Style>
-		<Style TargetType="Rectangle" x:Key="CardSeparatorStyle">
-			<Setter Property="Stroke" Value="{DynamicResource TextFillColorSecondaryBrush}" />
-			<Setter Property="StrokeThickness" Value="1" />
-		</Style>
-		<Style TargetType="ui:TextBlock" x:Key="CardFooterTextStyle">
-			<Setter Property="Foreground" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
-			<Setter Property="FontTypography" Value="BodyStrong" />
-			<Setter Property="VerticalAlignment" Value="Center" />
-		</Style>
-		<Style TargetType="ui:SymbolIcon" x:Key="CardFooterIconStyle">
-			<Setter Property="Width" Value="40" />
-			<Setter Property="Height" Value="50" />
-			<Setter Property="HorizontalAlignment" Value="Right" />
-			<Setter Property="FontSize" Value="24" />
-			<Setter Property="Foreground" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
-		</Style>
-	</Page.Resources>
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="10" />
-			<RowDefinition Height="60" />
-			<RowDefinition Height="40" />
-			<RowDefinition />
-		</Grid.RowDefinitions>
-		<ui:TextBlock Grid.Row="1" Text="ダッシュボード" FontTypography="Title" Margin="48,0,0,0" VerticalAlignment="Center" />
-		<ui:TextBlock Grid.Row="2" Text="クイックショートカット" FontTypography="Subtitle" Margin="48,0,0,0" VerticalAlignment="Center" />
-		<WrapPanel Grid.Row="3" Margin="36,0,0,0">
-			<ui:CardAction VerticalContentAlignment="Top">
-				<Grid Height="276">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="1*" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-					</Grid.RowDefinitions>
-					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="CalendarRtl20" />
-					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
-					<ui:TextBlock Style="{StaticResource CardTitleStyle}" Grid.Row="1" Text="今年度の進路先一覧" />
-					<Rectangle Style="{StaticResource CardSeparatorStyle}" Grid.Row="3" />
-					<ui:TextBlock Style="{StaticResource CardFooterTextStyle}" Grid.Row="4" Text="検索・明細を開く"
-							VerticalAlignment="Center" />
-					<ui:SymbolIcon Style="{StaticResource CardFooterIconStyle}" Grid.Row="4" Symbol="ChevronRight20" />
-				</Grid>
-			</ui:CardAction>
-			<ui:CardAction>
-				<Grid Height="276">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="1*" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-					</Grid.RowDefinitions>
-					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="List20" />
-					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
-					<ui:TextBlock Style="{StaticResource CardTitleStyle}" Grid.Row="1" Text="受験方法別サマリー" />
-					<Rectangle Style="{StaticResource CardSeparatorStyle}" Grid.Row="3" />
-					<ui:TextBlock Style="{StaticResource CardFooterTextStyle}" Grid.Row="4" Text="検索・明細を開く"
-							VerticalAlignment="Center" />
-					<ui:SymbolIcon Style="{StaticResource CardFooterIconStyle}" Grid.Row="4" Symbol="ChevronRight20" />
-				</Grid>
-			</ui:CardAction>
-			<ui:CardAction>
-				<Grid Height="276">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="1*" />
-						<RowDefinition Height="auto" />
-						<RowDefinition Height="auto" />
-					</Grid.RowDefinitions>
-					<ui:SymbolIcon Style="{StaticResource CardIconStyle}" Symbol="ArrowTrending20" />
-					<Rectangle Style="{StaticResource CardIconBackgroundStyle}" Panel.ZIndex="-1" />
-					<ui:TextBlock Style="{StaticResource CardTitleStyle}" Grid.Row="1" Text="年度別推移" />
-					<Rectangle Style="{StaticResource CardSeparatorStyle}" Grid.Row="3" />
-					<ui:TextBlock Style="{StaticResource CardFooterTextStyle}" Grid.Row="4" Text="検索・明細を開く"
-							VerticalAlignment="Center" />
-					<ui:SymbolIcon Style="{StaticResource CardFooterIconStyle}" Grid.Row="4" Symbol="ChevronRight20" />
-				</Grid>
-			</ui:CardAction>
-		</WrapPanel>
-	</Grid>
+<Page x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      Title="ダッシュボード" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVisibility" />
+        <DataTemplate x:Key="SummaryRow">
+            <Grid Margin="0,8">
+                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Margin="0,0,16,0" />
+                <TextBlock Grid.Column="1" Text="{Binding Count, StringFormat={}{0:N0} 件}" FontWeight="SemiBold" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
+        <StackPanel Margin="36,20,36,32">
+            <ui:TextBlock Text="ダッシュボード" FontTypography="Title" />
+            <TextBlock Text="進路の受験状況を、年度と受験方法から確認できます。" Margin="0,8,0,20" TextWrapping="Wrap" />
+            <WrapPanel Margin="0,0,0,16">
+                <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,0" />
+                <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="140" Margin="0,0,12,8" AutomationProperties.Name="集計対象年度" />
+                <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
+                <ui:Button Content="この年度の検索・明細を開く" Appearance="Primary" Command="{Binding OpenSearchCommand}" Margin="0,0,0,8" />
+            </WrapPanel>
+            <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12" />
+            <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,16" />
+            <WrapPanel>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="受験記録の総数"/><TextBlock Text="{Binding TotalText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="進学の受験記録"/><TextBlock Text="{Binding StudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="就職の受験記録"/><TextBlock Text="{Binding WorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
+            </WrapPanel>
+            <TextBlock Text="単位は受験記録の件数です。同じ生徒の複数回の受験を含み、人数や進路決定者数とは異なります。" TextWrapping="Wrap" Margin="0,0,0,24" />
+            <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
+                <StackPanel><ui:TextBlock Text="受験方法別サマリー（選択年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding Methods}" ItemTemplate="{StaticResource SummaryRow}" /></StackPanel>
+            </ui:Card>
+            <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
+                <StackPanel><ui:TextBlock Text="年度別推移（全登録年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding Trends}" ItemTemplate="{StaticResource SummaryRow}" /></StackPanel>
+            </ui:Card>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

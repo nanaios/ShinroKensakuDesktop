@@ -1,4 +1,4 @@
-﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
@@ -165,7 +165,8 @@
 			</Grid>
 		</ui:Card>
 		<StackPanel Grid.Row="1" Margin="0,5,0,5" Orientation="Horizontal" HorizontalAlignment="Right">
-			<ui:TextBlock Text="表示件数：" VerticalAlignment="Center" FontTypography="BodyStrong" />
+			<ui:Button Content="検索結果をCSV保存" Command="{Binding ExportCsvCommand}" Margin="0,0,16,0" />
+            <ui:TextBlock Text="表示件数：" VerticalAlignment="Center" FontTypography="BodyStrong" />
 			<TextBox Text="{Binding ResultVisibleCountLimit, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
 					MinWidth="60" VerticalAlignment="Center" TextAlignment="Right">
 				<i:Interaction.Behaviors>
@@ -209,8 +210,9 @@
 				</ui:DataGrid.ColumnHeaderStyle>
 			</ui:DataGrid>
 		</ui:Card>
-		<StackPanel Grid.Row="3" Height="40" Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
-			<ui:TextBlock HorizontalAlignment="Right" Text="{Binding SearchResultCountText}" VerticalAlignment="Center" />
+		<WrapPanel Grid.Row="3" Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+			<ui:TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Margin="0,0,16,0" TextWrapping="Wrap" />
+            <ui:TextBlock HorizontalAlignment="Right" Text="{Binding SearchResultCountText}" VerticalAlignment="Center" />
 			<ui:Button Grid.Column="1" VerticalAlignment="Stretch" Margin="5,5,5,5" Icon="{ui:SymbolIcon ArrowLeft24}">
 				<i:Interaction.Triggers>
 					<i:EventTrigger EventName="Click">
@@ -227,6 +229,6 @@
 					</i:EventTrigger>
 				</i:Interaction.Triggers>
 			</ui:Button>
-		</StackPanel>
+		</WrapPanel>
 	</Grid>
 </Page>

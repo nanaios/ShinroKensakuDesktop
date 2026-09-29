@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+using MySql.Data.MySqlClient;
 using System.Data;
 
 namespace ShinroKensakuDesktop.Models
@@ -13,13 +13,14 @@ namespace ShinroKensakuDesktop.Models
 
 		private static string ConnectionString => $"server={server};port={port};database={database};uid={username};password={password};";
 
-		public static async Task<DataTable> Query ( string sql )
+		public static async Task<DataTable> Query ( string sql, params MySqlParameter[] parameters )
 		{
 			using var connection = new MySqlConnection(ConnectionString);
 			await connection.OpenAsync ( );
 
 			using var command = new MySqlCommand(sql, connection);
-			using var reader = await command.ExecuteReaderAsync();
+			command.Parameters.AddRange(parameters);
+            using var reader = await command.ExecuteReaderAsync();
 
 			var table = new DataTable();
 			table.Load ( reader );

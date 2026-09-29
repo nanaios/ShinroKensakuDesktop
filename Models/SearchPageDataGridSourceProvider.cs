@@ -1,4 +1,5 @@
-﻿using ShinroKensakuDesktop.Models.Data;
+using MySql.Data.MySqlClient;
+using ShinroKensakuDesktop.Models.Data;
 using System.Data;
 using System.Diagnostics;
 
@@ -6,7 +7,14 @@ namespace ShinroKensakuDesktop.Models
 {
 	public static class SearchPageDataGridSourceProvider
 	{
-		public static async Task<List<SearchResultData>> GetDataGridSource ( string? target, string? year, string? examMethod, sbyte? department )
+		public static string FormatResult(object value) => value == DBNull.Value ? "未確定" : value.ToString() switch
+        {
+            "True" or "1" => "合格",
+            "False" or "0" => "不合格",
+            var text => text ?? "未確定"
+        };
+
+        public static async Task<List<SearchResultData>> GetDataGridSource ( string? target, string? year, string? examMethod, sbyte? department )
 		{
 			string queryShingaku = """
 				select year,jyukenbi,gakkou_name AS shinro_name,gakubu,gakka,course,NULL AS syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
@@ -38,29 +46,34 @@ namespace ShinroKensakuDesktop.Models
 			                        """;
 			string query = string.Empty;
 
-			List<string> conditionsShingaku = [];
+			List<MySqlParameter> parameters = [];
+            List<string> conditionsShingaku = [];
 			List<string> conditionsSyuusyoku = [];
 			
 			if ( string.IsNullOrEmpty ( target ) == false )
 			{
-				conditionsShingaku.Add ( $"gakkou_name like '%{target}%'" );
-				conditionsSyuusyoku.Add ( $"houjin_name like '%{target}%'" );
+				parameters.Add(new MySqlParameter("@target", $"%{target}%"));
+                conditionsShingaku.Add ( "gakkou_name like @target" );
+				conditionsSyuusyoku.Add ( "houjin_name like @target" );
 			}
 			if ( string.IsNullOrEmpty ( year ) == false )
 			{
-				conditionsShingaku.Add ( $"year = '{year}'" );
-				conditionsSyuusyoku.Add ( $"year = '{year}'" );
+				parameters.Add(new MySqlParameter("@year", year));
+                conditionsShingaku.Add ( "year = @year" );
+				conditionsSyuusyoku.Add ( "year = @year" );
 			}
 			if ( string.IsNullOrEmpty ( examMethod ) == false )
 			{
-				conditionsShingaku.Add ( $"shingakukekkaTbl.jyukenhouhou_code = '{examMethod}'" );
-				conditionsSyuusyoku.Add ( $"syuusyokukekkaTbl.jyukenhouhou_code = '{examMethod}'" );
+				parameters.Add(new MySqlParameter("@method", examMethod));
+                conditionsShingaku.Add ( "shingakukekkaTbl.jyukenhouhou_code = @method" );
+				conditionsSyuusyoku.Add ( "syuusyokukekkaTbl.jyukenhouhou_code = @method" );
 				
 			}
 			if ( department.HasValue )
 			{
-				conditionsShingaku.Add ( $"seitoTbl.cls_code = '{department}'" );
-				conditionsSyuusyoku.Add ( $"seitoTbl.cls_code = '{department}'" );
+				parameters.Add(new MySqlParameter("@department", department.Value));
+                conditionsShingaku.Add ( "seitoTbl.cls_code = @department" );
+				conditionsSyuusyoku.Add ( "seitoTbl.cls_code = @department" );
 				
 			}
 
@@ -74,9 +87,9 @@ namespace ShinroKensakuDesktop.Models
 			query += "\nunion all\n";
 			query += querySyuusyoku;
 			
-			Console.WriteLine (  query );
+			query += "\nORDER BY year DESC, jyukenbi DESC, shinro_name, g_name, jyukenhouhou_name, gakubu, gakka, course, syuusyokusakinai_kubun, cls_name, gouhi";
 
-			var table = await MySQLCommand.Query(query);
+			var table = await MySQLCommand.Query(query, parameters.ToArray());
 			var datas = new List<SearchResultData>();
 			foreach ( DataRow row in table.Rows )
 			{
@@ -93,7 +106,7 @@ namespace ShinroKensakuDesktop.Models
 					G_name = row["g_name"] as string,
 					Sei = row["sei"] as string,
 					Cls_name = row["cls_name"] as string,
-					Result = row["gouhi"] as string
+					Result = FormatResult(row["gouhi"])
 				};
 				datas.Add ( data );
 			}
