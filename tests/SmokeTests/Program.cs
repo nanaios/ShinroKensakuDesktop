@@ -60,6 +60,33 @@ internal static class Program
         var navigation = new NavigationService(provider);
         var dashboard = new DashboardPageViewModel(navigation, search);
         var dashboardPage = new DashBoardPage(dashboard);
+        List<DashboardGroup> fixture = [new(2024, "進学", "推薦", 10), new(2026, "進学", "推薦", 15), new(2026, "就職", "一般", 5)];
+        bool failLoad = false;
+        var analytics = new AnalyticsPageViewModel(navigation, search, () => failLoad
+            ? Task.FromException<List<DashboardGroup>>(new InvalidOperationException()) : Task.FromResult(fixture));
+        var analyticsPage = new AnalyticsPage(analytics);
+        var comparisonPage = new ComparisonPage(analytics);
+        Check(analyticsPage.Content != null && comparisonPage.Content != null, "new WPF pages load");
+        await analytics.RefreshCommand.ExecuteAsync(null);
+        Check(analytics.SelectedYear == 2026 && analytics.TotalText == "20", "charts default to latest registered year");
+        Check(analytics.KindBars.Sum(x => x.Count) == 20 && analytics.MethodBars.Sum(x => x.Count) == 20, "chart totals agree");
+        Check(analytics.TrendBars.Select(x => x.Count).SequenceEqual(new[] { 10, 20 }), "trend ordered chronologically with missing year");
+        Check(analytics.KindBars.All(x => x.Maximum == 15), "bars share a zero-based scale");
+        Check(analytics.Comparisons[0].Difference == 10 && analytics.Comparisons[2].RateText.Contains("0件"), "comparison handles increases and zero baseline");
+        analytics.SelectedYear = 2024;
+        Check(analytics.TotalText == "10" && analytics.KindBars[1].Count == 0, "year switch updates graphs including absent kind");
+        await analytics.RefreshCommand.ExecuteAsync(null);
+        Check(analytics.SelectedYear == 2024, "analytics preserves selected year on refresh");
+        Check(analytics.Comparisons.All(x => x.Difference == 0), "same year comparison");
+        analytics.BaselineYear = 2026;
+        Check(analytics.Comparisons[0].Difference == -10, "comparison handles decreases");
+        failLoad = true;
+        await analytics.RefreshCommand.ExecuteAsync(null);
+        Check(analytics.KindBars.Count == 0 && analytics.TrendBars.Count == 0 && analytics.Comparisons.Count == 0 && analytics.TotalText == "—" && !analytics.OpenSearchCommand.CanExecute(null), "failed refresh clears stale charts and comparisons");
+        failLoad = false;
+        fixture = [];
+        await analytics.RefreshCommand.ExecuteAsync(null);
+        Check(analytics.SelectedYear == null && analytics.KindBars.Count == 0 && analytics.Comparisons.Count == 0, "empty database handled");
         var searchPage = new SearchPage(search);
         provider.Page = searchPage;
         var control = new Wpf.Ui.Controls.NavigationView();
@@ -103,24 +130,37 @@ internal static class Program
             Check(search.SearchTargetName == null && search.SearchResultList.Count > 0 && search.SelectedYear == dashboard.SelectedYear.ToString(), "dashboard navigates and searches selected year");
             Console.WriteLine($"Verified {groups.Sum(x => x.Count)} records across {dashboard.Years.Count} years (no personal data logged).");
         }
-                if (args.Contains("--render"))
+        fixture = [new(2024, "進学", "推薦", 10), new(2026, "進学", "推薦", 15), new(2026, "就職", "一般", 5)];
+        await analytics.RefreshCommand.ExecuteAsync(null);
+        provider.Pages[typeof(AnalyticsPage)] = analyticsPage;
+        provider.Pages[typeof(ComparisonPage)] = comparisonPage;
+        control.MenuItems.Add(new Wpf.Ui.Controls.NavigationViewItem { Content = "進路グラフ", TargetPageType = typeof(AnalyticsPage) });
+        control.MenuItems.Add(new Wpf.Ui.Controls.NavigationViewItem { Content = "年度比較", TargetPageType = typeof(ComparisonPage) });
+        dashboard.OpenAnalyticsCommand.Execute(null);
+        Check(control.SelectedItem?.TargetPageType == typeof(AnalyticsPage), "dashboard opens analytics");
+        dashboard.OpenComparisonCommand.Execute(null);
+        Check(control.SelectedItem?.TargetPageType == typeof(ComparisonPage), "dashboard opens comparison");
+        navigation.Navigate(typeof(SearchPage));
+        if (args.Contains("--render"))
         {
-            var body = (FrameworkElement)dashboardPage.Content!;
-            dashboardPage.Content = null;
-            body.DataContext = dashboard;
-            var previewHost = new System.Windows.Controls.Border { Background = System.Windows.Media.Brushes.White, Child = body };
-            var content = (FrameworkElement)previewHost;
-            content.Measure(new Size(1100, 950));
-            content.Arrange(new Rect(0, 0, 1100, 950));
-            content.UpdateLayout();
-            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(1100, 950, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
-            await Task.Delay(300);
-            bitmap.Render(content);
-            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
-            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
-            using var file = System.IO.File.Create(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "kaken-dashboard-preview.png"));
-            encoder.Save(file);
-            Console.WriteLine("Dashboard preview rendered.");
+            foreach (var (page, name) in new[] { (dashboardPage as System.Windows.Controls.Page, "dashboard"), (analyticsPage, "analytics"), (comparisonPage, "comparison") })
+            {
+                var body = (FrameworkElement)page.Content!;
+                page.Content = null;
+                body.DataContext = page.DataContext;
+                var content = new System.Windows.Controls.Border { Background = System.Windows.Media.Brushes.White, Child = body };
+                content.Measure(new Size(1100, 1400));
+                content.Arrange(new Rect(0, 0, 1100, 1400));
+                content.UpdateLayout();
+                await Task.Delay(300);
+                var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(1100, 1400, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                bitmap.Render(content);
+                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+                using var file = System.IO.File.Create(System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"kaken-{name}-preview.png"));
+                encoder.Save(file);
+                Console.WriteLine($"{name} preview rendered.");
+            }
         }
         host.Close();
         Console.WriteLine($"Passed {checks} checks.");
@@ -129,8 +169,7 @@ internal static class Program
 
 internal sealed class TestPageProvider : Wpf.Ui.Abstractions.INavigationViewPageProvider
 {
+    public Dictionary<Type, object> Pages { get; } = [];
     public SearchPage? Page { get; set; }
-    public object? GetPage(Type pageType) => pageType == typeof(SearchPage) ? Page : null;
+    public object? GetPage(Type pageType) => pageType == typeof(SearchPage) ? Page : Pages.GetValueOrDefault(pageType);
 }
-
-

@@ -24,6 +24,9 @@ public partial class App : Application
 
 		services.AddSingleton<DashBoardPage> ( );
         services.AddSingleton<DashboardPageViewModel>();
+        services.AddSingleton<AnalyticsPageViewModel>();
+        services.AddSingleton<AnalyticsPage>();
+        services.AddSingleton<ComparisonPage>();
 
 		services.AddSingleton<SettingsPage> ( );
 		services.AddSingleton<SettingsPageViewModel> ( );

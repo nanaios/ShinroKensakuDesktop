@@ -1,0 +1,53 @@
+<Page x:Class="ShinroKensakuDesktop.Views.Pages.ComparisonPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+ Title="年度比較" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+ <Page.Resources><BooleanToVisibilityConverter x:Key="BoolVisibility"/></Page.Resources>
+ <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
+  <StackPanel Margin="36,20,36,32">
+   <ui:TextBlock Text="年度比較" FontTypography="Title"/>
+   <TextBlock Text="2つの登録年度の受験記録数と増減を比較します。" Margin="0,8,0,24" TextWrapping="Wrap"/>
+   <WrapPanel>
+    <TextBlock Text="比較元年度" VerticalAlignment="Center" Margin="0,0,12,8"/>
+    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding BaselineYear}" MinWidth="130" Margin="0,0,24,8" AutomationProperties.Name="比較元年度"/>
+    <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,8"/>
+    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="130" Margin="0,0,24,8" AutomationProperties.Name="比較対象年度"/>
+    <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,0,8"/>
+   </WrapPanel>
+   <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}"/>
+   <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,12,0,24"/>
+   <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+     <StackPanel MinWidth="640">
+      <Grid Margin="0,0,0,16">
+       <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+       <TextBlock Text="区分" FontWeight="SemiBold"/>
+       <TextBlock Grid.Column="1" Text="比較元（件）" FontWeight="SemiBold"/>
+       <TextBlock Grid.Column="2" Text="対象（件）" FontWeight="SemiBold"/>
+       <TextBlock Grid.Column="3" Text="増減" FontWeight="SemiBold"/>
+       <TextBlock Grid.Column="4" Text="増減率" FontWeight="SemiBold"/>
+      </Grid>
+      <ItemsControl ItemsSource="{Binding Comparisons}">
+       <ItemsControl.ItemTemplate>
+        <DataTemplate>
+         <Grid Margin="0,12">
+          <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+          <TextBlock Text="{Binding Label}"/>
+          <TextBlock Grid.Column="1" Text="{Binding Baseline, StringFormat=N0}"/>
+          <TextBlock Grid.Column="2" Text="{Binding Current, StringFormat=N0}"/>
+          <TextBlock Grid.Column="3" Text="{Binding DifferenceText}"/>
+          <TextBlock Grid.Column="4" Text="{Binding RateText}" TextWrapping="Wrap"/>
+         </Grid>
+        </DataTemplate>
+       </ItemsControl.ItemTemplate>
+      </ItemsControl>
+     </StackPanel>
+    </ScrollViewer>
+   </ui:Card>
+   <TextBlock Text="増減 = 対象年度 − 比較元年度。増減率は比較元年度の件数を基準に計算します。比較元が0件の場合は算出しません。同じ年度を選ぶと増減は0件になります。" TextWrapping="Wrap" Margin="0,16,0,12"/>
+   <TextBlock Text="単位は受験記録数です。同じ生徒の複数回受験を含み、人数・進路決定者数・合格者数ではありません。登録途中の年度と過年度を比較する場合は、収録期間の違いに注意してください。" TextWrapping="Wrap"/>
+   <ui:Button Content="対象年度の検索・明細を開く" Command="{Binding OpenSearchCommand}" Margin="0,24,0,0"/>
+  </StackPanel>
+ </ScrollViewer>
+</Page>

@@ -1,4 +1,4 @@
-﻿<ui:FluentWindow xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ui:FluentWindow xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
 		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Windows"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,7 +18,9 @@
 			<ui:NavigationView.MenuItems>
 				<ui:NavigationViewItem TargetPageType="pages:DashBoardPage" Content="ダッシュボード" Tag="DashBoard"
 						Icon="{ui:SymbolIcon Symbol=Home12}" />
-				<ui:NavigationViewItem TargetPageType="pages:SearchPage" Content="検索" Tag="Search"
+				<ui:NavigationViewItem TargetPageType="pages:AnalyticsPage" Content="進路グラフ" Tag="Analytics" />
+                <ui:NavigationViewItem TargetPageType="pages:ComparisonPage" Content="年度比較" Tag="Comparison" />
+                <ui:NavigationViewItem TargetPageType="pages:SearchPage" Content="検索" Tag="Search"
 						Icon="{ui:SymbolIcon Symbol=Search12}" />
 			</ui:NavigationView.MenuItems>
 			<ui:NavigationView.FooterMenuItems>
