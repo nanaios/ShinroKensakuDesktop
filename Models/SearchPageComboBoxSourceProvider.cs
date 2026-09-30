@@ -7,14 +7,14 @@ namespace ShinroKensakuDesktop.Models
 	{
 		public static async Task<List<ExamMethodData>> GetExamMethodComboBoxSource ( )
 		{
-			var query = """select * from jyukenhouhouTbl""";
-			var table = await MySQLCommand.Query(query);
-			var datas = new List<ExamMethodData>();
+			string query = """select * from jyukenhouhouTbl""";
+			DataTable table = await MySQLCommand.Query ( query );
+			List<ExamMethodData> datas = new( );
 			foreach ( DataRow row in table.Rows )
 			{
-				var data = new ExamMethodData(
-					( string ) row["jyukenhouhou_code"],
-					( string )  row["jyukenhouhou_name"]
+				ExamMethodData data = new(
+					( string ) row [ "jyukenhouhou_code" ],
+					( string ) row [ "jyukenhouhou_name" ]
 				);
 				datas.Add ( data );
 			}
@@ -24,15 +24,15 @@ namespace ShinroKensakuDesktop.Models
 
 		public static async Task<List<DepartmentData>> GetDepartmentComboBoxSource ( )
 		{
-			var query = """select * from clsTbl""";
-			var table = await MySQLCommand.Query(query);
-			var datas = new List<DepartmentData>();
+			string query = """select * from clsTbl""";
+			DataTable table = await MySQLCommand.Query ( query );
+			List<DepartmentData> datas = new( );
 			foreach ( DataRow row in table.Rows )
 			{
-				var data = new DepartmentData(
-					( sbyte ) row["cls_code"],
-					( string )  row["cls_name"],
-					( string )  row["cls_lname"]
+				DepartmentData data = new(
+					( sbyte ) row [ "cls_code" ],
+					( string ) row [ "cls_name" ],
+					( string ) row [ "cls_lname" ]
 				);
 				datas.Add ( data );
 			}

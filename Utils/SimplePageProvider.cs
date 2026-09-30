@@ -1,11 +1,9 @@
 ﻿using Wpf.Ui.Abstractions;
 
-namespace ShinroKensakuDesktop.Utils;
-
-internal class SimplePageProvider : INavigationViewPageProvider
+namespace ShinroKensakuDesktop.Utils
 {
-	public object? GetPage ( Type pageType )
+	internal class SimplePageProvider : INavigationViewPageProvider
 	{
-		return Activator.CreateInstance ( pageType );
+		public object? GetPage ( Type pageType ) => Activator.CreateInstance ( pageType );
 	}
 }

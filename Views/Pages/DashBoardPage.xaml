@@ -1,4 +1,5 @@
-<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors" x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage"
+<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
+      x:Class="ShinroKensakuDesktop.Views.Pages.DashBoardPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -7,32 +8,59 @@
         <BooleanToVisibilityConverter x:Key="BoolVisibility" />
         <DataTemplate x:Key="SummaryRow">
             <Grid Margin="0,8">
-                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition /><ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Margin="0,0,16,0" />
                 <TextBlock Grid.Column="1" Text="{Binding Count, StringFormat={}{0:N0} 件}" FontWeight="SemiBold" />
             </Grid>
         </DataTemplate>
     </Page.Resources>
-    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
+    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource ApplicationBackgroundBrush}">
         <StackPanel Margin="36,20,36,32">
             <ui:TextBlock Text="ダッシュボード" FontTypography="Title" Margin="0,0,0,24" />
             <WrapPanel Margin="0,0,0,16">
                 <TextBlock Text="{Binding YearCaption}" VerticalAlignment="Center" Margin="0,0,12,0" />
                 <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
-                <ui:Button Content="進路グラフを開く" Appearance="Primary" Command="{Binding OpenAnalyticsCommand}" Margin="0,0,0,8" />
-            <ui:Button Content="年度比較を開く" Command="{Binding OpenComparisonCommand}" Margin="12,0,0,8" /></WrapPanel>
-            <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12" />
+                <ui:Button Content="進路グラフを開く" Appearance="Primary" Command="{Binding OpenAnalyticsCommand}"
+                           Margin="0,0,0,8" />
+                <ui:Button Content="年度比較を開く" Command="{Binding OpenComparisonCommand}" Margin="12,0,0,8" />
+            </WrapPanel>
+            <ProgressBar IsIndeterminate="True" Height="3"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12" />
             <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,16" />
             <WrapPanel>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="受験記録の総数"/><TextBlock Text="{Binding TotalText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="進学の受験記録"/><TextBlock Text="{Binding StudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="就職の受験記録"/><TextBlock Text="{Binding WorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                    <StackPanel>
+                        <TextBlock Text="受験記録の総数" />
+                        <TextBlock Text="{Binding TotalText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                    </StackPanel>
+                </ui:Card>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                    <StackPanel>
+                        <TextBlock Text="進学の受験記録" />
+                        <TextBlock Text="{Binding StudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                    </StackPanel>
+                </ui:Card>
+                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                    <StackPanel>
+                        <TextBlock Text="就職の受験記録" />
+                        <TextBlock Text="{Binding WorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                    </StackPanel>
+                </ui:Card>
             </WrapPanel>
             <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
-                <StackPanel><ui:TextBlock Text="受験方法別サマリー（最新年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding Methods}" ItemTemplate="{StaticResource SummaryRow}" /></StackPanel>
+                <StackPanel>
+                    <ui:TextBlock Text="受験方法別サマリー（最新年度）" FontTypography="Subtitle" Margin="0,0,0,12" />
+                    <ItemsControl ItemsSource="{Binding Methods}" ItemTemplate="{StaticResource SummaryRow}" />
+                </StackPanel>
             </ui:Card>
             <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
-                <StackPanel><ui:TextBlock Text="年度別推移（全登録年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding Trends}" ItemTemplate="{StaticResource SummaryRow}" /></StackPanel>
+                <StackPanel>
+                    <ui:TextBlock Text="年度別推移（全登録年度）" FontTypography="Subtitle" Margin="0,0,0,12" />
+                    <ItemsControl ItemsSource="{Binding Trends}" ItemTemplate="{StaticResource SummaryRow}" />
+                </StackPanel>
             </ui:Card>
         </StackPanel>
     </ScrollViewer>

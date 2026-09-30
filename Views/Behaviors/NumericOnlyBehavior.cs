@@ -23,10 +23,8 @@ namespace ShinroKensakuDesktop.Views.Behaviors
 			base.OnDetaching ( );
 		}
 
-		private void OnPreviewTextInput ( object sender, TextCompositionEventArgs e )
-		{
+		private void OnPreviewTextInput ( object sender, TextCompositionEventArgs e ) =>
 			e.Handled = e.Text.Any ( c => c is < '0' or > '9' );
-		}
 
 		private void OnPasting ( object sender, DataObjectPastingEventArgs e )
 		{
@@ -36,10 +34,12 @@ namespace ShinroKensakuDesktop.Views.Behaviors
 				return;
 			}
 
-			var text = e.DataObject.GetData(DataFormats.Text) as string;
+			string? text = e.DataObject.GetData ( DataFormats.Text ) as string;
 
 			if ( text == null || text.Any ( c => c is < '0' or > '9' ) )
+			{
 				e.CancelCommand ( );
+			}
 		}
 	}
 }

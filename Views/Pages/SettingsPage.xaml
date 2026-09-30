@@ -1,67 +1,68 @@
-<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-		xmlns:i="http://schemas.microsoft.com/xaml/behaviors" mc:Ignorable="d" d:DesignHeight="1080"
-		d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-		d:DataContext="{d:DesignInstance Type=vm:SettingsPageViewModel, IsDesignTimeCreatable=True}"
-		Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Settings"
-		xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
-		xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
-		xmlns:local="clr-namespace:ShinroKensakuDesktop.Views.Pages"
-		x:Class="ShinroKensakuDesktop.Views.Pages.SettingsPage">
-	<Page.Resources>
-		<converters:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
-	</Page.Resources>
-	<ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto">
-		<StackPanel Margin="50,24,50,24">
-			<ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
-				<ui:CardControl.Header>
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto" />
-							<RowDefinition Height="Auto" />
-						</Grid.RowDefinitions>
-						<ui:TextBlock Grid.Row="0" FontTypography="Body" Text="テーマ" />
-						<ui:TextBlock Grid.Row="1" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-								Text="アプリケーションのテーマを選択" />
-					</Grid>
-				</ui:CardControl.Header>
-				<ComboBox Grid.Column="1" MinWidth="200"
-						SelectedIndex="{Binding CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter},Mode=TwoWay}">
-					<ComboBoxItem Content="ライト" />
-					<ComboBoxItem Content="ダーク" />
-					<ComboBoxItem Content="ハイコントラスト" />
-					<ComboBoxItem Content="システム" />
-				</ComboBox>
-			</ui:CardControl>
-			<ui:CardExpander Margin="0,0,0,12" Icon="{ui:SymbolIcon Info16}">
-				<ui:CardExpander.Header>
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto" />
-							<RowDefinition Height="Auto" />
-						</Grid.RowDefinitions>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-						<ui:TextBlock Grid.Row="0" Grid.Column="0" FontTypography="Body" Text="KST-DeCS" />
-						<ui:TextBlock Grid.Row="1" Grid.Column="0"
-								Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-								Text="© 2026 KST J3-20 Ryodai Nagano" />
-						<TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="0,0,16,0"
-								VerticalAlignment="Center" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-								Text="{Binding ApplicationVersion}" />
-					</Grid>
-				</ui:CardExpander.Header>
-				<ui:CardExpander.Content>
-					<StackPanel>
-						<ui:TextBlock FontFamily="Noto Sans JP" Text="Test" />
-					</StackPanel>
-				</ui:CardExpander.Content>
-			</ui:CardExpander>
-		</StackPanel>
-	</ScrollViewer>
+<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d" d:DesignHeight="1080"
+      d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+      ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+      d:DataContext="{d:DesignInstance Type=vm:SettingsPageViewModel, IsDesignTimeCreatable=True}"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Settings"
+      xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
+      xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
+      x:Class="ShinroKensakuDesktop.Views.Pages.SettingsPage">
+    <Page.Resources>
+        <converters:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
+    </Page.Resources>
+    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="50,24,50,24">
+            <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
+                <ui:CardControl.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="テーマ" />
+                        <ui:TextBlock Grid.Row="1" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                                      Text="アプリケーションのテーマを選択" />
+                    </Grid>
+                </ui:CardControl.Header>
+                <ComboBox MinWidth="200"
+                          SelectedIndex="{Binding CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter},Mode=TwoWay}">
+                    <ComboBoxItem Content="ライト" />
+                    <ComboBoxItem Content="ダーク" />
+                    <ComboBoxItem Content="ハイコントラスト" />
+                    <ComboBoxItem Content="システム" />
+                </ComboBox>
+            </ui:CardControl>
+            <ui:CardExpander Margin="0,0,0,12" Icon="{ui:SymbolIcon Info16}">
+                <ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBlock Grid.Row="0" Grid.Column="0" FontTypography="Body" Text="KST-DeCS" />
+                        <ui:TextBlock Grid.Row="1" Grid.Column="0"
+                                      Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                                      Text="© 2026 KST J3-20 Ryodai Nagano" />
+                        <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="0,0,16,0"
+                                   VerticalAlignment="Center"
+                                   Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding ApplicationVersion}" />
+                    </Grid>
+                </ui:CardExpander.Header>
+                <ui:CardExpander.Content>
+                    <StackPanel>
+                        <ui:TextBlock FontFamily="Noto Sans JP" Text="Test" />
+                    </StackPanel>
+                </ui:CardExpander.Content>
+            </ui:CardExpander>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

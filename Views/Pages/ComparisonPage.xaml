@@ -1,50 +1,63 @@
-<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors" x:Class="ShinroKensakuDesktop.Views.Pages.ComparisonPage"
- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
- Title="年度比較" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
- <Page.Resources><BooleanToVisibilityConverter x:Key="BoolVisibility"/></Page.Resources>
- <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
-  <StackPanel Margin="36,20,36,32">
-   <ui:TextBlock Text="年度比較" FontTypography="Title" Margin="0,0,0,24"/>
-   <WrapPanel>
-    <TextBlock Text="比較元年度" VerticalAlignment="Center" Margin="0,0,12,8"/>
-    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding BaselineYear}" MinWidth="130" Margin="0,0,24,8" AutomationProperties.Name="比較元年度"/>
-    <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,8"/>
-    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="130" Margin="0,0,24,8" AutomationProperties.Name="比較対象年度"/>
-    <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,0,8"/>
-   </WrapPanel>
-   <ProgressBar IsIndeterminate="True" Height="3" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}"/>
-   <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,12,0,24"/>
-   <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-     <StackPanel MinWidth="640">
-      <Grid Margin="0,0,0,16">
-       <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-       <TextBlock Text="区分" FontWeight="SemiBold"/>
-       <TextBlock Grid.Column="1" Text="比較元（件）" FontWeight="SemiBold"/>
-       <TextBlock Grid.Column="2" Text="対象（件）" FontWeight="SemiBold"/>
-       <TextBlock Grid.Column="3" Text="増減" FontWeight="SemiBold"/>
-       <TextBlock Grid.Column="4" Text="増減率" FontWeight="SemiBold"/>
-      </Grid>
-      <ItemsControl ItemsSource="{Binding Comparisons}">
-       <ItemsControl.ItemTemplate>
-        <DataTemplate>
-         <Grid Margin="0,12">
-          <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
-          <TextBlock Text="{Binding Label}"/>
-          <TextBlock Grid.Column="1" Text="{Binding Baseline, StringFormat=N0}"/>
-          <TextBlock Grid.Column="2" Text="{Binding Current, StringFormat=N0}"/>
-          <TextBlock Grid.Column="3" Text="{Binding DifferenceText}"/>
-          <TextBlock Grid.Column="4" Text="{Binding RateText}" TextWrapping="Wrap"/>
-         </Grid>
-        </DataTemplate>
-       </ItemsControl.ItemTemplate>
-      </ItemsControl>
-     </StackPanel>
+<Page xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
+      x:Class="ShinroKensakuDesktop.Views.Pages.ComparisonPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      Title="年度比較" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolVisibility" />
+    </Page.Resources>
+    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource ApplicationBackgroundBrush}">
+        <StackPanel Margin="36,20,36,32">
+            <ui:TextBlock Text="年度比較" FontTypography="Title" Margin="0,0,0,24" />
+            <WrapPanel>
+                <TextBlock Text="比較元年度" VerticalAlignment="Center" Margin="0,0,12,8" />
+                <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding BaselineYear}" MinWidth="130"
+                          Margin="0,0,24,8" AutomationProperties.Name="比較元年度" />
+                <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,8" />
+                <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="130"
+                          Margin="0,0,24,8" AutomationProperties.Name="比較対象年度" />
+                <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,0,8" />
+            </WrapPanel>
+            <ProgressBar IsIndeterminate="True" Height="3"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" />
+            <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,12,0,24" />
+            <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel MinWidth="640">
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="区分" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="比較元（件）" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="2" Text="対象（件）" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="3" Text="増減" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="4" Text="増減率" FontWeight="SemiBold" />
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Comparisons}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                                            <ColumnDefinition /><ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Label}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Baseline, StringFormat=N0}" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Current, StringFormat=N0}" />
+                                        <TextBlock Grid.Column="3" Text="{Binding DifferenceText}" />
+                                        <TextBlock Grid.Column="4" Text="{Binding RateText}" TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:Card>
+            <ui:Button Content="対象年度の検索・明細を開く" Command="{Binding OpenSearchCommand}" Margin="0,24,0,0" />
+        </StackPanel>
     </ScrollViewer>
-   </ui:Card>
-   <ui:Button Content="対象年度の検索・明細を開く" Command="{Binding OpenSearchCommand}" Margin="0,24,0,0"/>
-  </StackPanel>
- </ScrollViewer>
 </Page>

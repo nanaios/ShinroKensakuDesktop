@@ -7,38 +7,39 @@ using System.Windows;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
 
-namespace ShinroKensakuDesktop;
-
-public partial class App : Application
+namespace ShinroKensakuDesktop
 {
-	private IServiceProvider? _serviceProvider;
-
-	protected override void OnStartup ( StartupEventArgs e )
+	public partial class App : Application
 	{
-		var services = new ServiceCollection();
+		private IServiceProvider? _serviceProvider;
 
-		services.AddNavigationViewPageProvider ( );
-		services.AddSingleton<INavigationService, NavigationService> ( );
-		services.AddSingleton<MainWindow> ( );
-		services.AddSingleton<MainWindowViewModel> ( );
+		protected override void OnStartup ( StartupEventArgs e )
+		{
+			ServiceCollection services = new( );
 
-		services.AddSingleton<DashBoardPage> ( );
-        services.AddSingleton<DashboardPageViewModel>();
-        services.AddSingleton<AnalyticsPageViewModel>();
-        services.AddSingleton<AnalyticsPage>();
-        services.AddSingleton<ComparisonPage>();
+			services.AddNavigationViewPageProvider ( );
+			services.AddSingleton<INavigationService, NavigationService> ( );
+			services.AddSingleton<MainWindow> ( );
+			services.AddSingleton<MainWindowViewModel> ( );
 
-		services.AddSingleton<SettingsPage> ( );
-		services.AddSingleton<SettingsPageViewModel> ( );
+			services.AddSingleton<DashBoardPage> ( );
+			services.AddSingleton<DashboardPageViewModel> ( );
+			services.AddSingleton<AnalyticsPageViewModel> ( );
+			services.AddSingleton<AnalyticsPage> ( );
+			services.AddSingleton<ComparisonPage> ( );
 
-		services.AddSingleton<SearchPage> ( );
-		services.AddSingleton<SearchPageViewModel> ( );
+			services.AddSingleton<SettingsPage> ( );
+			services.AddSingleton<SettingsPageViewModel> ( );
 
-		_serviceProvider = services.BuildServiceProvider ( );
+			services.AddSingleton<SearchPage> ( );
+			services.AddSingleton<SearchPageViewModel> ( );
 
-		var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-		mainWindow.Show ( );
+			_serviceProvider = services.BuildServiceProvider ( );
 
-		base.OnStartup ( e );
+			MainWindow mainWindow = _serviceProvider.GetRequiredService<MainWindow> ( );
+			mainWindow.Show ( );
+
+			base.OnStartup ( e );
+		}
 	}
 }

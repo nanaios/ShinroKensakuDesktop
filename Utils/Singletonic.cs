@@ -1,6 +1,7 @@
-﻿namespace ShinroKensakuDesktop.Utils;
-
-interface ISingletonic<T>
+﻿namespace ShinroKensakuDesktop.Utils
 {
-	public static T? Instance { get; }
+	internal interface ISingletonic<T>
+	{
+		static T? Instance { get; }
+	}
 }

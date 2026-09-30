@@ -6,30 +6,32 @@ using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
 
-namespace ShinroKensakuDesktop.Views.Windows;
-
-/// <summary>
-/// MainWindow.xaml の相互作用ロジック
-/// </summary>
-public partial class MainWindow : FluentWindow
+namespace ShinroKensakuDesktop.Views.Windows
 {
-	private readonly NavigationService navigationService = new(new SimplePageProvider());
-
-	public MainWindow (
-		MainWindowViewModel viewModel,
-		INavigationService navigationService,
-		IServiceProvider serviceProvider )
+	/// <summary>
+	///     MainWindow.xaml の相互作用ロジック
+	/// </summary>
+	public partial class MainWindow : FluentWindow
 	{
-		ViewModel = viewModel;
-		DataContext = viewModel;
-		InitializeComponent ( );
+		private readonly NavigationService navigationService = new(new SimplePageProvider ( ));
 
-		var pageProvider = serviceProvider.GetRequiredService<INavigationViewPageProvider>();
-		MainView.SetPageProviderService ( pageProvider );
-		navigationService.SetNavigationControl ( MainView );
+		public MainWindow (
+			MainWindowViewModel viewModel,
+			INavigationService navigationService,
+			IServiceProvider serviceProvider )
+		{
+			ViewModel = viewModel;
+			DataContext = viewModel;
+			InitializeComponent ( );
 
-		Loaded += ( _, _ ) => navigationService.Navigate ( typeof ( DashBoardPage ) );
+			INavigationViewPageProvider pageProvider =
+				serviceProvider.GetRequiredService<INavigationViewPageProvider> ( );
+			MainView.SetPageProviderService ( pageProvider );
+			navigationService.SetNavigationControl ( MainView );
+
+			Loaded += ( _, _ ) => navigationService.Navigate ( typeof(DashBoardPage) );
+		}
+
+		public MainWindowViewModel ViewModel { get; }
 	}
-
-	public MainWindowViewModel ViewModel { get; }
 }

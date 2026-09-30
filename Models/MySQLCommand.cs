@@ -1,5 +1,6 @@
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Data.Common;
 
 namespace ShinroKensakuDesktop.Models
 {
@@ -11,18 +12,19 @@ namespace ShinroKensakuDesktop.Models
 		private static readonly string server = "localhost";
 		private static readonly string port = "3306";
 
-		private static string ConnectionString => $"server={server};port={port};database={database};uid={username};password={password};";
+		private static string ConnectionString =>
+			$"server={server};port={port};database={database};uid={username};password={password};";
 
-		public static async Task<DataTable> Query ( string sql, params MySqlParameter[] parameters )
+		public static async Task<DataTable> Query ( string sql, params MySqlParameter [ ] parameters )
 		{
-			using var connection = new MySqlConnection(ConnectionString);
+			using MySqlConnection connection = new(ConnectionString);
 			await connection.OpenAsync ( );
 
-			using var command = new MySqlCommand(sql, connection);
-			command.Parameters.AddRange(parameters);
-            using var reader = await command.ExecuteReaderAsync();
+			using MySqlCommand command = new(sql, connection);
+			command.Parameters.AddRange ( parameters );
+			using DbDataReader reader = await command.ExecuteReaderAsync ( );
 
-			var table = new DataTable();
+			DataTable table = new( );
 			table.Load ( reader );
 
 			return table;
