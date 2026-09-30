@@ -6,8 +6,7 @@
  <Page.Resources><BooleanToVisibilityConverter x:Key="BoolVisibility"/></Page.Resources>
  <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
   <StackPanel Margin="36,20,36,32">
-   <ui:TextBlock Text="年度比較" FontTypography="Title"/>
-   <TextBlock Text="2つの登録年度の受験記録数と増減を比較します。" Margin="0,8,0,24" TextWrapping="Wrap"/>
+   <ui:TextBlock Text="年度比較" FontTypography="Title" Margin="0,0,0,24"/>
    <WrapPanel>
     <TextBlock Text="比較元年度" VerticalAlignment="Center" Margin="0,0,12,8"/>
     <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding BaselineYear}" MinWidth="130" Margin="0,0,24,8" AutomationProperties.Name="比較元年度"/>
@@ -45,8 +44,6 @@
      </StackPanel>
     </ScrollViewer>
    </ui:Card>
-   <TextBlock Text="増減 = 対象年度 − 比較元年度。増減率は比較元年度の件数を基準に計算します。比較元が0件の場合は算出しません。同じ年度を選ぶと増減は0件になります。" TextWrapping="Wrap" Margin="0,16,0,12"/>
-   <TextBlock Text="単位は受験記録数です。同じ生徒の複数回受験を含み、人数・進路決定者数・合格者数ではありません。登録途中の年度と過年度を比較する場合は、収録期間の違いに注意してください。" TextWrapping="Wrap"/>
    <ui:Button Content="対象年度の検索・明細を開く" Command="{Binding OpenSearchCommand}" Margin="0,24,0,0"/>
   </StackPanel>
  </ScrollViewer>

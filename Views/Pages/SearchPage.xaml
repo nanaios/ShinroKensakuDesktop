@@ -11,7 +11,7 @@
 		mc:Ignorable="d" d:DesignHeight="1080" d:DesignWidth="1440"
 		ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
 		ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Search"
-		ScrollViewer.CanContentScroll="False" x:Class="ShinroKensakuDesktop.Views.Pages.SearchPage">
+		x:Class="ShinroKensakuDesktop.Views.Pages.SearchPage">
 	<Page.Resources>
 		<Style TargetType="Grid" x:Key="ConditionContentGridStyle">
 			<Setter Property="Margin" Value="10,10,10,10" />
@@ -29,7 +29,9 @@
 				x:Key="ConditionContentNumberBoxStyle">
 		</Style>
 	</Page.Resources>
-	<Grid Margin="48,0,48,0">
+	<ScrollViewer x:Name="PageScroll" Margin="24,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="False">
+    <!-- A finite layout height keeps the result grid virtualized inside the page scroller. -->
+    <Grid MinHeight="800" MinWidth="440" Width="{Binding ViewportWidth, ElementName=PageScroll}" Height="{Binding ViewportHeight, ElementName=PageScroll}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="auto" />
 			<RowDefinition Height="auto" />
@@ -186,12 +188,18 @@
 		<ui:Card Grid.Row="2" Margin="0,0,0,0" ClipToBounds="True" VerticalContentAlignment="Stretch"
 				VerticalAlignment="Stretch">
 			<ui:DataGrid Grid.Row="0" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
-					IsReadOnly="True" AutoGenerateColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Visible"
-					VerticalAlignment="Top">
+					IsReadOnly="True" AutoGenerateColumns="False"
+                    EnableRowVirtualization="True" EnableColumnVirtualization="True"
+                    VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    RowHeight="36" ColumnWidth="140" CanUserAddRows="False" CanUserResizeRows="False"
+                    PreviewMouseWheel="ResultGrid_PreviewMouseWheel"
+					VerticalAlignment="Stretch">
 				<DataGrid.Columns>
-					<DataGridTextColumn Header="卒業年度" Binding="{Binding Year}" />
+					<DataGridTextColumn Header="卒業年度" Width="100" Binding="{Binding Year}" />
 					<DataGridTextColumn Header="受験日" Binding="{Binding Jyukenbi, StringFormat='yyyy/MM/dd'}" />
-					<DataGridTextColumn Header="進路先" Binding="{Binding Shinro_name}" />
+					<DataGridTextColumn Header="進路先" Width="260" Binding="{Binding Shinro_name}" />
 					<DataGridTextColumn Header="学部" Binding="{Binding Gakubu}" />
 					<DataGridTextColumn Header="学科" Binding="{Binding Gakka}" />
 					<DataGridTextColumn Header="コース" Binding="{Binding Course}" />
@@ -231,4 +239,5 @@
 			</ui:Button>
 		</WrapPanel>
 	</Grid>
+    </ScrollViewer>
 </Page>

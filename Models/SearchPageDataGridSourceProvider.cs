@@ -89,7 +89,7 @@ namespace ShinroKensakuDesktop.Models
 			
 			query += "\nORDER BY year DESC, jyukenbi DESC, shinro_name, g_name, jyukenhouhou_name, gakubu, gakka, course, syuusyokusakinai_kubun, cls_name, gouhi";
 
-			var table = await MySQLCommand.Query(query, parameters.ToArray());
+			var table = await MySQLCommand.Query(query, parameters.ToArray()).ConfigureAwait(false);
 			var datas = new List<SearchResultData>();
 			foreach ( DataRow row in table.Rows )
 			{

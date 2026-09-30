@@ -21,8 +21,7 @@
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
         <StackPanel Margin="36,20,36,32">
-            <ui:TextBlock Text="進路グラフ" FontTypography="Title" />
-            <TextBlock Text="進路の受験状況を、年度と受験方法から確認できます。" Margin="0,8,0,20" TextWrapping="Wrap" />
+            <ui:TextBlock Text="進路グラフ" FontTypography="Title" Margin="0,0,0,24" />
             <WrapPanel Margin="0,0,0,16">
                 <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,0" />
                 <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="140" Margin="0,0,12,8" AutomationProperties.Name="集計対象年度" />
@@ -36,9 +35,7 @@
                 <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="進学の受験記録"/><TextBlock Text="{Binding StudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
                 <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="就職の受験記録"/><TextBlock Text="{Binding WorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
             </WrapPanel>
-            <TextBlock Text="単位は受験記録の件数です。同じ生徒の複数回の受験を含み、人数や進路決定者数とは異なります。" TextWrapping="Wrap" Margin="0,0,0,24" />
             <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch"><StackPanel><ui:TextBlock Text="進学・就職の内訳" FontTypography="Subtitle"/><ItemsControl ItemsSource="{Binding KindBars}" ItemTemplate="{StaticResource BarRow}"/></StackPanel></ui:Card>
-            <TextBlock Text="棒は各グラフ内の最大件数を基準に、0件からの長さで表示します。" TextWrapping="Wrap" Margin="0,0,0,16"/>
             <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
                 <StackPanel><ui:TextBlock Text="受験方法別サマリー（選択年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding MethodBars}" ItemTemplate="{StaticResource BarRow}" /></StackPanel>
             </ui:Card>

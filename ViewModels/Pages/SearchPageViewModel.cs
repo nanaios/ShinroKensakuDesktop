@@ -159,24 +159,26 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		partial void OnResultVisibleCountLimitChanged(int value) => FirstPage();
         private void ShowPage ( )
 		{
-			SearchResultList.Clear();
             if (searchResults == null || searchResults.Count == 0)
             {
+                SearchResultList = new();
                 pageIndex = pageCount = 0;
                 SearchResultCountText = "0件";
                 SearchResultPageIndexText = "ページ 0/0";
                 return;
             }
-            ResultVisibleCountLimit = Math.Clamp(ResultVisibleCountLimit, 1, 1000);
-			SearchResultList.Clear ( );
+            var limit = Math.Clamp(ResultVisibleCountLimit, 1, 1000);
+            if (ResultVisibleCountLimit != limit)
+            {
+                ResultVisibleCountLimit = limit;
+                return; // The property change refreshes the page once with the normalized value.
+            }
+			// Replace the page in one notification instead of issuing one per record.
 			pageCount = ( int ) Math.Ceiling ( ( double ) searchResults.Count / ResultVisibleCountLimit );
 			pageIndex = Math.Clamp(pageIndex, 0, pageCount - 1);
             var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
 			int start = pageIndex * ResultVisibleCountLimit;
-			for ( int i = 0 ; i < count ; i++ )
-			{
-				SearchResultList.Add ( searchResults [ start + i ] );
-			}
+            SearchResultList = new(searchResults.GetRange(start, count));
 			SearchResultCountText = $"{start + 1}-{start + count}件目を表示中";
 			SearchResultPageIndexText = $"ページ {pageIndex + 1}/{pageCount}";
 		}

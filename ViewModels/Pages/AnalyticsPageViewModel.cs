@@ -48,7 +48,7 @@ public partial class AnalyticsPageViewModel(INavigationService navigation, Searc
             Trends = groups.GroupBy(x => x.Year).OrderByDescending(x => x.Key)
                 .Select(x => new DashboardSummary($"{x.Key}年度", x.Sum(y => y.Count))).ToList();
             TrendBars = ChartData.Bars(Trends.AsEnumerable().Reverse());
-            StatusText = groups.Count == 0 ? "登録されている受験記録はありません。" : $"最終更新 {DateTime.Now:yyyy/MM/dd HH:mm} ・ 初期表示は登録済みの最新年度です。";
+            StatusText = groups.Count == 0 ? "登録されている受験記録はありません。" : $"最終更新 {DateTime.Now:yyyy/MM/dd HH:mm}";
         }
         catch (Exception)
         {

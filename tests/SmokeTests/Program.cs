@@ -41,6 +41,16 @@ internal static class Program
         return exitCode;
     }
 
+    private static IEnumerable<T> VisualChildren<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+            if (child is T match) yield return match;
+            foreach (var nested in VisualChildren<T>(child)) yield return nested;
+        }
+    }
+
     private static async Task RunAsync(string[] args)
     {
         Check(SearchPageDataGridSourceProvider.FormatResult(true) == "合格", "boolean pass result");
@@ -89,7 +99,7 @@ internal static class Program
         Check(analytics.SelectedYear == null && analytics.KindBars.Count == 0 && analytics.Comparisons.Count == 0, "empty database handled");
         var searchPage = new SearchPage(search);
         provider.Page = searchPage;
-        var control = new Wpf.Ui.Controls.NavigationView();
+        var control = new Wpf.Ui.Controls.NavigationView { VerticalContentAlignment = VerticalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
         control.SetPageProviderService(provider);
         control.MenuItems.Add(new Wpf.Ui.Controls.NavigationViewItem { Content = "検索", TargetPageType = typeof(SearchPage) });
         var host = new Window { Content = control, Width = 1200, Height = 1000, ShowActivated = false, ShowInTaskbar = false, Opacity = 0 };
@@ -162,6 +172,35 @@ internal static class Program
                 Console.WriteLine($"{name} preview rendered.");
             }
         }
+        navigation.Navigate(typeof(SearchPage));
+        search.SearchResultList = new(Enumerable.Range(0, 1000).Select(i => new SearchResultData { Year = 2026, Shinro_name = $"Test {i}" }));
+        host.Width = 900;
+        host.Height = 600;
+        control.Measure(new Size(850, 500));
+        control.Arrange(new Rect(0, 0, 850, 500));
+        await Task.Delay(100);
+        host.UpdateLayout();
+        var resultGrid = (System.Windows.Controls.DataGrid)searchPage.FindName("ResultGrid");
+        var pageScroll = (System.Windows.Controls.ScrollViewer)searchPage.FindName("PageScroll");
+        await Task.Delay(300);
+        host.UpdateLayout();
+        var realized = VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count();
+        Check(realized > 0 && realized < 100, "1000 records realize fewer than 100 rows");
+        Check(pageScroll.ScrollableHeight > 0, "small window supports page scrolling");
+        var gridScroll = VisualChildren<System.Windows.Controls.ScrollViewer>(resultGrid).First();
+        Check(gridScroll.ScrollableHeight > 0 && gridScroll.ScrollableWidth > 0, "result grid scrolls vertically and horizontally");
+        gridScroll.ScrollToBottom();
+        await Task.Delay(100);
+        host.UpdateLayout();
+        Check(gridScroll.VerticalOffset > 0 && VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count() < 100, "scrolling recycles result rows");
+        resultGrid.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount, -120) { RoutedEvent = System.Windows.Input.Mouse.PreviewMouseWheelEvent });
+        host.UpdateLayout();
+        Check(pageScroll.VerticalOffset > 0, "wheel at table bottom scrolls the page");
+        var expander = VisualChildren<Wpf.Ui.Controls.CardExpander>(searchPage).First();
+        expander.IsExpanded = true;
+        host.UpdateLayout();
+        Check(resultGrid.ActualHeight > 100 && VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count() < 100, "expanded filters preserve bounded virtualized grid");
+        Console.WriteLine($"Realized {realized} rows for 1000 records.");
         host.Close();
         Console.WriteLine($"Passed {checks} checks.");
     }

@@ -15,8 +15,7 @@
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{DynamicResource ApplicationBackgroundBrush}">
         <StackPanel Margin="36,20,36,32">
-            <ui:TextBlock Text="ダッシュボード" FontTypography="Title" />
-            <TextBlock Text="登録済みの最新年度の状況をひと目で確認できます。年度の切り替えは「進路グラフ」で行えます。" Margin="0,8,0,20" TextWrapping="Wrap" />
+            <ui:TextBlock Text="ダッシュボード" FontTypography="Title" Margin="0,0,0,24" />
             <WrapPanel Margin="0,0,0,16">
                 <TextBlock Text="{Binding YearCaption}" VerticalAlignment="Center" Margin="0,0,12,0" />
                 <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
@@ -29,7 +28,6 @@
                 <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="進学の受験記録"/><TextBlock Text="{Binding StudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
                 <ui:Card Width="240" Margin="0,0,16,16" Padding="24"><StackPanel><TextBlock Text="就職の受験記録"/><TextBlock Text="{Binding WorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0"/></StackPanel></ui:Card>
             </WrapPanel>
-            <TextBlock Text="単位は受験記録の件数です。同じ生徒の複数回の受験を含み、人数や進路決定者数とは異なります。" TextWrapping="Wrap" Margin="0,0,0,24" />
             <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
                 <StackPanel><ui:TextBlock Text="受験方法別サマリー（最新年度）" FontTypography="Subtitle" Margin="0,0,0,12"/><ItemsControl ItemsSource="{Binding Methods}" ItemTemplate="{StaticResource SummaryRow}" /></StackPanel>
             </ui:Card>
