@@ -6,7 +6,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 {
 	internal class ThemeToIndexConverter : IValueConverter
 	{
-		public object Convert ( object value, Type targetType, object parameter, CultureInfo culture )
+		public object Convert ( object? value, Type targetType, object? parameter, CultureInfo culture )
 		{
 			if ( value is ApplicationTheme theme )
 			{
@@ -16,14 +16,14 @@ namespace ShinroKensakuDesktop.Views.Converters
 					ApplicationTheme.Dark => 1,
 					ApplicationTheme.HighContrast => 2,
 					ApplicationTheme.Unknown => 3,
-					_ => throw new NotImplementedException ( )
+					_ => throw new ArgumentException()
 				};
 			}
 
 			return 0;
 		}
 
-		public object ConvertBack ( object value, Type targetType, object parameter, CultureInfo culture )
+		public object ConvertBack ( object? value, Type targetType, object? parameter, CultureInfo culture )
 		{
 			if ( value is int index )
 			{
@@ -33,7 +33,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 					1 => ApplicationTheme.Dark,
 					2 => ApplicationTheme.HighContrast,
 					3 => ApplicationTheme.Unknown,
-					_ => throw new NotImplementedException ( )
+					_ => throw new ArgumentException()
 				};
 			}
 
