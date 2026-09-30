@@ -18,8 +18,10 @@
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem TargetPageType="pages:DashBoardPage" Content="ダッシュボード" Tag="DashBoard"
                                        Icon="{ui:SymbolIcon Symbol=Home12}" />
-                <ui:NavigationViewItem TargetPageType="pages:AnalyticsPage" Content="進路グラフ" Tag="Analytics" />
-                <ui:NavigationViewItem TargetPageType="pages:ComparisonPage" Content="年度比較" Tag="Comparison" />
+                <ui:NavigationViewItem TargetPageType="pages:AnalyticsPage" Content="進路グラフ" Tag="Analytics"
+                                       Icon="{ui:SymbolIcon Symbol=ArrowTrending12}" />
+                <ui:NavigationViewItem TargetPageType="pages:ComparisonPage" Content="年度比較" Tag="Comparison"
+                                       Icon="{ui:SymbolIcon Symbol=Clock12}" />
                 <ui:NavigationViewItem TargetPageType="pages:SearchPage" Content="検索" Tag="Search"
                                        Icon="{ui:SymbolIcon Symbol=Search12}" />
             </ui:NavigationView.MenuItems>
