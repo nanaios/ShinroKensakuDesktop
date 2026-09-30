@@ -11,7 +11,7 @@ namespace ShinroKensakuDesktop
 {
 	public partial class App : Application
 	{
-		private IServiceProvider? _serviceProvider;
+		private ServiceProvider? _serviceProvider;
 
 		protected override void OnStartup ( StartupEventArgs e )
 		{
@@ -40,6 +40,12 @@ namespace ShinroKensakuDesktop
 			mainWindow.Show ( );
 
 			base.OnStartup ( e );
+		}
+
+		protected override void OnExit ( ExitEventArgs e )
+		{
+			_serviceProvider?.Dispose ( );
+			base.OnExit ( e );
 		}
 	}
 }

@@ -36,7 +36,9 @@ namespace ShinroKensakuDesktop.Views.Behaviors
 
 			string? text = e.DataObject.GetData ( DataFormats.Text ) as string;
 
-			if ( text == null || text.Any ( c => c is < '0' or > '9' ) )
+			if ( text == null || text.Any ( c => c is < '0' or > '9' ) ||
+			     ( AssociatedObject.MaxLength > 0 &&
+			       AssociatedObject.Text.Length - AssociatedObject.SelectionLength + text.Length > AssociatedObject.MaxLength ) )
 			{
 				e.CancelCommand ( );
 			}

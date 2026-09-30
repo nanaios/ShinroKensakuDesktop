@@ -16,7 +16,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 					ApplicationTheme.Dark => 1,
 					ApplicationTheme.HighContrast => 2,
 					ApplicationTheme.Unknown => 3,
-					_ => throw new ArgumentException()
+					_ => System.Windows.DependencyProperty.UnsetValue
 				};
 			}
 
@@ -33,7 +33,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 					1 => ApplicationTheme.Dark,
 					2 => ApplicationTheme.HighContrast,
 					3 => ApplicationTheme.Unknown,
-					_ => throw new ArgumentException()
+					_ => System.Windows.Data.Binding.DoNothing
 				};
 			}
 

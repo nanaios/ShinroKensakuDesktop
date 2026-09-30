@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ShinroKensakuDesktop.Utils;
+using ShinroKensakuDesktop.ViewModels.Pages;
 using ShinroKensakuDesktop.ViewModels.Windows;
 using ShinroKensakuDesktop.Views.Pages;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
+using System.Windows;
 
 namespace ShinroKensakuDesktop.Views.Windows
 {
@@ -13,16 +14,18 @@ namespace ShinroKensakuDesktop.Views.Windows
 	/// </summary>
 	public partial class MainWindow : FluentWindow
 	{
-		private readonly NavigationService navigationService = new(new SimplePageProvider ( ));
-
 		public MainWindow (
 			MainWindowViewModel viewModel,
 			INavigationService navigationService,
-			IServiceProvider serviceProvider )
+			IServiceProvider serviceProvider,
+			SettingsPageViewModel settings )
 		{
 			ViewModel = viewModel;
 			DataContext = viewModel;
 			InitializeComponent ( );
+			Width = Math.Min ( Width, SystemParameters.WorkArea.Width );
+			Height = Math.Min ( Height, SystemParameters.WorkArea.Height );
+			settings.AttachWindow ( this );
 
 			INavigationViewPageProvider pageProvider =
 				serviceProvider.GetRequiredService<INavigationViewPageProvider> ( );

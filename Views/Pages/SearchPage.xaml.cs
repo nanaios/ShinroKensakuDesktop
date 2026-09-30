@@ -1,40 +1,26 @@
 using ShinroKensakuDesktop.ViewModels.Pages;
 using System.Windows.Controls;
+using Wpf.Ui.Controls;
 
 namespace ShinroKensakuDesktop.Views.Pages
 {
 	public partial class SearchPage : Page
 	{
-		private bool loading;
-
 		public SearchPage ( SearchPageViewModel viewModel )
 		{
 			DataContext = viewModel;
 			InitializeComponent ( );
 			Loaded += async ( _, _ ) =>
 			{
-				if ( loading )
-				{
-					return;
-				}
-
-				loading = true;
-				viewModel.IsLoadingConditions = true;
-				try
-				{
-					await viewModel.LoadExamMethodComboBoxItems ( );
-					await viewModel.LoadDepartmentComboBoxItems ( );
-				}
-				catch ( Exception )
-				{
-					viewModel.StatusText = "検索条件を取得できませんでした。接続を確認し、画面を開き直してください。";
-				}
-				finally
-				{
-					loading = false;
-					viewModel.IsLoadingConditions = false;
-				}
+				if ( viewModel.LoadConditionsCommand.CanExecute ( null ) )
+					await viewModel.LoadConditionsCommand.ExecuteAsync ( null );
 			};
+		}
+
+		private async void SearchNameBox_QuerySubmitted ( AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e )
+		{
+			if ( DataContext is SearchPageViewModel viewModel && viewModel.ExecuteSearchCommand.CanExecute ( null ) )
+				await viewModel.ExecuteSearchCommand.ExecuteAsync ( null );
 		}
 	}
 }

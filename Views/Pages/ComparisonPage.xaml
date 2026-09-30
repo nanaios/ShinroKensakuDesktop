@@ -14,15 +14,21 @@
             <WrapPanel>
                 <TextBlock Text="比較元年度" VerticalAlignment="Center" Margin="0,0,12,8" />
                 <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding BaselineYear}" MinWidth="130"
+                          Style="{StaticResource YearSelector}"
                           Margin="0,0,24,8" AutomationProperties.Name="比較元年度" />
                 <TextBlock Text="対象年度" VerticalAlignment="Center" Margin="0,0,12,8" />
                 <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="130"
+                          Style="{StaticResource YearSelector}"
                           Margin="0,0,24,8" AutomationProperties.Name="比較対象年度" />
-                <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,0,8" />
+                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="再読み込み" AutomationProperties.Name="再読み込み"
+                           Command="{Binding RefreshCommand}" Margin="0,0,0,8" />
             </WrapPanel>
             <ProgressBar IsIndeterminate="True" Height="3"
                          Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" />
             <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,12,0,24" />
+            <TextBlock Text="件数は受験記録単位です。同じ生徒の複数回受験を含みます。"
+                       TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
             <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <StackPanel MinWidth="640">
@@ -57,7 +63,9 @@
                     </StackPanel>
                 </ScrollViewer>
             </ui:Card>
-            <ui:Button Content="対象年度の検索・明細を開く" Command="{Binding OpenSearchCommand}" Margin="0,24,0,0" />
+            <ui:Button Icon="{ui:SymbolIcon Search20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                       ToolTip="対象年度の検索・明細を開く" AutomationProperties.Name="対象年度の検索・明細を開く"
+                       Command="{Binding OpenSearchCommand}" Margin="0,24,0,0" />
         </StackPanel>
     </ScrollViewer>
 </Page>

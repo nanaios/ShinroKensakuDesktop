@@ -22,14 +22,22 @@
             <ui:TextBlock Text="ダッシュボード" FontTypography="Title" Margin="0,0,0,24" />
             <WrapPanel Margin="0,0,0,16">
                 <TextBlock Text="{Binding YearCaption}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                <ui:Button Content="再読み込み" Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
-                <ui:Button Content="進路グラフを開く" Appearance="Primary" Command="{Binding OpenAnalyticsCommand}"
+                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="再読み込み" AutomationProperties.Name="再読み込み"
+                           Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
+                <ui:Button Icon="{ui:SymbolIcon ArrowTrending20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="進路グラフを開く" AutomationProperties.Name="進路グラフを開く"
+                           Appearance="Primary" Command="{Binding OpenAnalyticsCommand}"
                            Margin="0,0,0,8" />
-                <ui:Button Content="年度比較を開く" Command="{Binding OpenComparisonCommand}" Margin="12,0,0,8" />
+                <ui:Button Icon="{ui:SymbolIcon Clock20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="年度比較を開く" AutomationProperties.Name="年度比較を開く"
+                           Command="{Binding OpenComparisonCommand}" Margin="12,0,0,8" />
             </WrapPanel>
             <ProgressBar IsIndeterminate="True" Height="3"
                          Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12" />
             <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,16" />
+            <TextBlock Text="件数は受験記録単位です。同じ生徒の複数回受験を含みます。"
+                       TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
             <WrapPanel>
                 <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
                     <StackPanel>

@@ -2,8 +2,8 @@
 {
 	public class SearchResultData
 	{
-		public short Year { get; init; }
-		public DateTime Jyukenbi { get; init; }
+		public short? Year { get; init; }
+		public DateTime? Jyukenbi { get; init; }
 		public string? Shinro_name { get; init; }
 		public string? Gakubu { get; init; }
 		public string? Gakka { get; init; }

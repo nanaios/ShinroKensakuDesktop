@@ -37,19 +37,21 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ RelayCommand ]
 		public async Task RefreshAsync ( )
 		{
+			if ( IsBusy ) return;
+			int? previous = SelectedYear;
+			int? previousBaseline = BaselineYear;
 			IsBusy = true;
 			StatusText = "データを読み込んでいます…";
 			try
 			{
 				List<DashboardGroup> loaded = await ( load ?? DashboardDataProvider.LoadAsync ) ( );
-				int? previous = SelectedYear;
 				groups = loaded;
 				Years = groups.Select ( x => x.Year ).Distinct ( ).OrderDescending ( ).ToList ( );
 				SelectedYear = PreserveYear && previous.HasValue && Years.Contains ( previous.Value )
 					? previous
 					: Years.Cast<int?> ( ).FirstOrDefault ( );
-				BaselineYear = BaselineYear.HasValue && Years.Contains ( BaselineYear.Value )
-					? BaselineYear
+				BaselineYear = previousBaseline.HasValue && Years.Contains ( previousBaseline.Value )
+					? previousBaseline
 					: Years.Skip ( 1 ).Cast<int?> ( ).FirstOrDefault ( ) ?? SelectedYear;
 				UpdateSummary ( );
 				Trends = groups.GroupBy ( x => x.Year ).OrderByDescending ( x => x.Key )
@@ -95,17 +97,17 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			OpenSearchCommand.NotifyCanExecuteChanged ( );
 		}
 
-		private bool CanOpenSearch ( ) => SelectedYear.HasValue && !IsBusy;
+		private bool CanOpenSearch ( ) => SelectedYear.HasValue && !IsBusy && search.CanEditConditions;
 
 		[ RelayCommand ( CanExecute = nameof(CanOpenSearch) ) ]
 		private async Task OpenSearchAsync ( )
 		{
-			search.SearchTargetName = null;
-			search.SelectedYear = SelectedYear?.ToString ( );
-			search.ExamMethodComboBoxSelectedItem = null;
-			search.DepartmentComboBoxSelectedItem = null;
+			if ( !CanOpenSearch ( ) ) return;
+			int? year = SelectedYear;
 			if ( navigation.Navigate ( typeof(SearchPage) ) )
 			{
+				search.ClearAllConditions ( );
+				search.SelectedYear = year?.ToString ( );
 				await search.ExecuteSearchCommand.ExecuteAsync ( null );
 			}
 		}

@@ -7,8 +7,8 @@ namespace ShinroKensakuDesktop.Models
 	{
 		public static async Task<List<ExamMethodData>> GetExamMethodComboBoxSource ( )
 		{
-			string query = """select * from jyukenhouhouTbl""";
-			DataTable table = await MySQLCommand.Query ( query );
+			string query = """select jyukenhouhou_code, jyukenhouhou_name from jyukenhouhouTbl order by jyukenhouhou_code""";
+			DataTable table = await MySQLCommand.Query ( query ).ConfigureAwait ( false );
 			List<ExamMethodData> datas = new( );
 			foreach ( DataRow row in table.Rows )
 			{
@@ -24,8 +24,8 @@ namespace ShinroKensakuDesktop.Models
 
 		public static async Task<List<DepartmentData>> GetDepartmentComboBoxSource ( )
 		{
-			string query = """select * from clsTbl""";
-			DataTable table = await MySQLCommand.Query ( query );
+			string query = """select cls_code, cls_name, cls_lname from clsTbl order by cls_code""";
+			DataTable table = await MySQLCommand.Query ( query ).ConfigureAwait ( false );
 			List<DepartmentData> datas = new( );
 			foreach ( DataRow row in table.Rows )
 			{

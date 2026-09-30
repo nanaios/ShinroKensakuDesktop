@@ -8,26 +8,41 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVisibility" />
     </Page.Resources>
+    <Page.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding ExecuteSearchCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding ExecuteSearchCancelCommand}" />
+    </Page.InputBindings>
     <Grid x:Name="SearchLayout" Height="0" behaviors:NavigationViewport.Fit="True" Margin="24,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel>
+            <ui:TextBlock Text="受験記録の検索" FontTypography="Title" Margin="0,12,0,8" />
             <DockPanel Margin="0,8">
-                <ui:Button Content="検索" Command="{Binding ExecuteSearchCommand}" Appearance="Primary"
+                <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="検索を中断（Esc）" AutomationProperties.Name="検索を中断"
+                           Command="{Binding ExecuteSearchCancelCommand}" DockPanel.Dock="Right" Margin="8,0,0,0"
+                           Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" />
+                <ui:Button Icon="{ui:SymbolIcon Search20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                           ToolTip="検索（Enter）" AutomationProperties.Name="検索"
+                           Command="{Binding ExecuteSearchCommand}" Appearance="Primary"
                            DockPanel.Dock="Right" Margin="8,0,0,0" />
-                <ui:AutoSuggestBox Text="{Binding SearchTargetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                   PlaceholderText="進路先を入力" />
+                <ui:AutoSuggestBox x:Name="SearchNameBox" QuerySubmitted="SearchNameBox_QuerySubmitted"
+                                   Text="{Binding SearchTargetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                   PlaceholderText="進路先の名前で検索（空欄ですべて表示）"
+                                   IsEnabled="{Binding CanEditConditions}" AutomationProperties.Name="進路先の名前" />
             </DockPanel>
             <Expander Header="検索条件" Margin="0,0,0,8">
-                <WrapPanel>
+                <WrapPanel IsEnabled="{Binding CanEditConditions}">
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="年度" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Content="×" Command="{Binding ClearSelectedYearCommand}" DockPanel.Dock="Right"
-                                       Padding="8,4" />
-                            <TextBox Text="{Binding SelectedYear, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                                       ToolTip="年度をクリア" AutomationProperties.Name="年度をクリア"
+                                       Command="{Binding ClearSelectedYearCommand}" DockPanel.Dock="Right" />
+                            <TextBox Text="{Binding SelectedYear, UpdateSourceTrigger=PropertyChanged}" MaxLength="4"
+                                     AutomationProperties.Name="卒業年度">
                                 <i:Interaction.Behaviors>
                                     <behaviors:NumericOnlyBehavior />
                                 </i:Interaction.Behaviors>
@@ -37,30 +52,48 @@
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="受験方法" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Content="×" Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}"
-                                       DockPanel.Dock="Right" Padding="8,4" />
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                                       ToolTip="受験方法をクリア" AutomationProperties.Name="受験方法をクリア"
+                                       Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}" DockPanel.Dock="Right" />
                             <ComboBox ItemsSource="{Binding ExamMethodComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding ExamMethodComboBoxSelectedItem}" />
+                                      SelectedItem="{Binding ExamMethodComboBoxSelectedItem}" AutomationProperties.Name="受験方法" />
                         </DockPanel>
                     </StackPanel>
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="クラス" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Content="×" Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}"
-                                       DockPanel.Dock="Right" Padding="8,4" />
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                                       ToolTip="クラスをクリア" AutomationProperties.Name="クラスをクリア"
+                                       Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}" DockPanel.Dock="Right" />
                             <ComboBox ItemsSource="{Binding DepartmentComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding DepartmentComboBoxSelectedItem}" />
+                                      SelectedItem="{Binding DepartmentComboBoxSelectedItem}" AutomationProperties.Name="クラス" />
                         </DockPanel>
                     </StackPanel>
+                    <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                               Command="{Binding ClearAllConditionsCommand}" ToolTip="検索条件をすべてクリア"
+                               AutomationProperties.Name="検索条件をすべてクリア" Margin="0,24,8,4" />
+                    <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                               Command="{Binding ReloadConditionsCommand}" ToolTip="検索条件を再読み込み"
+                               AutomationProperties.Name="検索条件を再読み込み" Margin="0,24,0,4" />
                 </WrapPanel>
             </Expander>
+            <TextBlock Text="{Binding ConditionStatusText}" TextWrapping="Wrap" />
             <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,0,12"
                          Visibility="{Binding IsLoading, Converter={StaticResource BoolVisibility}}"
                          AutomationProperties.Name="読み込み中" />
         </StackPanel>
         <DockPanel Grid.Row="1" Margin="0,4,0,8">
-            <ui:Button Content="検索結果をCSV保存" Command="{Binding ExportCsvCommand}" DockPanel.Dock="Right" />
-            <TextBlock Text="{Binding SearchResultCountText}" VerticalAlignment="Center" />
+            <ui:Button Icon="{ui:SymbolIcon ArrowDownload20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                       ToolTip="検索結果をCSV保存" AutomationProperties.Name="検索結果をCSV保存"
+                       Command="{Binding ExportCsvCommand}" DockPanel.Dock="Right" />
+            <StackPanel>
+                <TextBlock Text="{Binding SearchResultCountText}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding LastSearchSummary}" TextTrimming="CharacterEllipsis" ToolTip="{Binding LastSearchSummary}"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,12,0" />
+                <TextBlock Text="検索条件や接続設定が変わっています。再検索すると表示とCSV保存に反映されます。"
+                           TextWrapping="Wrap" Margin="0,4,12,0"
+                           Visibility="{Binding IsSearchDirty, Converter={StaticResource BoolVisibility}}" />
+            </StackPanel>
         </DockPanel>
         <ui:DataGrid Grid.Row="2" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
                      IsReadOnly="True" AutoGenerateColumns="False"
@@ -69,7 +102,7 @@
                      VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
                      RowHeight="36" ColumnWidth="140" CanUserAddRows="False" CanUserResizeRows="False"
-
+                     FrozenColumnCount="3" AutomationProperties.Name="受験記録の検索結果"
                      VerticalAlignment="Stretch">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="卒業年度" Width="100" Binding="{Binding Year}" />
@@ -88,10 +121,14 @@
             <ui:DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
                     <Setter Property="MinWidth" Value="50" />
                 </Style>
             </ui:DataGrid.ColumnHeaderStyle>
         </ui:DataGrid>
+        <TextBlock Grid.Row="2" Text="{Binding EmptyStateText}" TextWrapping="Wrap"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24" IsHitTestVisible="False"
+                   Visibility="{Binding HasNoResults, Converter={StaticResource BoolVisibility}}" />
         <TextBlock Grid.Row="3" Text="{Binding StatusText}" Margin="0,8" TextWrapping="Wrap" />
     </Grid>
 </Page>

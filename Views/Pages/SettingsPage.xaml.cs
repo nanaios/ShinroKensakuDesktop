@@ -1,5 +1,6 @@
 ﻿using ShinroKensakuDesktop.ViewModels.Pages;
 using System.Windows.Controls;
+using System.Windows;
 
 namespace ShinroKensakuDesktop.Views.Pages
 {
@@ -12,6 +13,13 @@ namespace ShinroKensakuDesktop.Views.Pages
 		{
 			DataContext = viewModel;
 			InitializeComponent ( );
+		}
+
+		private async void SaveDatabase_Click ( object sender, RoutedEventArgs e )
+		{
+			if ( DataContext is SettingsPageViewModel viewModel &&
+			     await viewModel.SaveDatabaseAsync ( DatabasePassword.Password ) )
+				DatabasePassword.Clear ( );
 		}
 	}
 }

@@ -11,9 +11,14 @@ using Wpf.Ui;
 internal static class Program
 {
     private static int checks;
+    private static readonly BindingErrors bindingErrors = new();
     private static void Check(bool condition, string name)
     {
-        if (!condition) throw new InvalidOperationException(name);
+        if (!condition)
+        {
+            Console.Error.WriteLine("FAIL check: " + name);
+            throw new InvalidOperationException(name);
+        }
         checks++;
         Console.WriteLine($"PASS {name}");
     }
@@ -21,8 +26,11 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        System.Diagnostics.PresentationTraceSources.DataBindingSource.Listeners.Add(bindingErrors);
+        System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Error;
         var app = new App();
         app.InitializeComponent();
+        app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         var frame = new DispatcherFrame();
         var exitCode = 0;
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext());
@@ -53,6 +61,7 @@ internal static class Program
 
     private static async Task RunAsync(string[] args)
     {
+        await ReviewChecks.RunAsync(Check, args.Contains("--database"));
         Check(SearchPageDataGridSourceProvider.FormatResult(true) == "合格", "boolean pass result");
         Check(SearchPageDataGridSourceProvider.FormatResult(0) == "不合格", "numeric fail result");
         Check(SearchPageDataGridSourceProvider.FormatResult(DBNull.Value) == "未確定", "null result");
@@ -60,7 +69,9 @@ internal static class Program
         Check(csv.Contains("\"日本語,\"\"大学\"\"\r\n学部\""), "CSV quotes commas and newlines");
         Check(csv.Contains("\"' =1+1\""), "CSV formula neutralization");
         Check(SearchResultCsv.Create([]).Split("\r\n").Length == 2, "CSV empty header");
-        var search = new SearchPageViewModel();
+        var search = args.Contains("--database") ? new SearchPageViewModel() : new SearchPageViewModel(
+            methods: () => Task.FromResult(new List<ExamMethodData>()),
+            departments: () => Task.FromResult(new List<DepartmentData>()));
         Check(search.SearchResultCountText == "0件" && !search.ExportCsvCommand.CanExecute(null), "empty results and export");
         search.SelectedYear = "invalid";
         await search.ExecuteSearchCommand.ExecuteAsync(null);
@@ -260,8 +271,25 @@ internal static class Program
             encoder.Save(file);
         }
         host.Close();
+        await ReviewUiChecks.RunAsync(Check, args.Contains("--render"));
+        Check(bindingErrors.Count == 0, "WPF pages have no binding errors");
         Console.WriteLine($"Passed {checks} checks.");
     }
+}
+
+internal sealed class BindingErrors : System.Diagnostics.TraceListener
+{
+    public int Count { get; private set; }
+    public override void Write(string? message) { }
+    public override void WriteLine(string? message) { }
+    public override void TraceEvent(System.Diagnostics.TraceEventCache? eventCache, string source,
+        System.Diagnostics.TraceEventType eventType, int id, string? message)
+    {
+        if (eventType is System.Diagnostics.TraceEventType.Error or System.Diagnostics.TraceEventType.Critical) Count++;
+    }
+    public override void TraceEvent(System.Diagnostics.TraceEventCache? eventCache, string source,
+        System.Diagnostics.TraceEventType eventType, int id, string? format, params object?[]? args) =>
+        TraceEvent(eventCache, source, eventType, id, format);
 }
 
 internal sealed class TestPageProvider : Wpf.Ui.Abstractions.INavigationViewPageProvider

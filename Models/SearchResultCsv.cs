@@ -13,8 +13,8 @@ namespace ShinroKensakuDesktop.Models
 			{
 				string? [ ] cells =
 				[
-					row.Year.ToString ( CultureInfo.InvariantCulture ),
-					row.Jyukenbi.ToString ( "yyyy/MM/dd", CultureInfo.InvariantCulture ),
+					row.Year?.ToString ( CultureInfo.InvariantCulture ),
+					row.Jyukenbi?.ToString ( "yyyy/MM/dd", CultureInfo.InvariantCulture ),
 					row.Shinro_name, row.Gakubu, row.Gakka, row.Course, row.Syuusyokusakinai_kubun,
 					row.Jyukenhouhou_name, row.G_name, row.Sei, row.Cls_name, row.Result
 				];

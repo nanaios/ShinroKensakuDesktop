@@ -16,6 +16,7 @@
     </Page.Resources>
     <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="50,24,50,24">
+            <ui:TextBlock Text="設定" FontTypography="Title" Margin="0,0,0,24" />
             <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
                 <ui:CardControl.Header>
                     <Grid>
@@ -28,7 +29,7 @@
                                       Text="アプリケーションのテーマを選択" />
                     </Grid>
                 </ui:CardControl.Header>
-                <ComboBox MinWidth="200"
+                <ComboBox MinWidth="200" AutomationProperties.Name="アプリケーションのテーマ"
                           SelectedIndex="{Binding CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter},Mode=TwoWay}">
                     <ComboBoxItem Content="ライト" />
                     <ComboBoxItem Content="ダーク" />
@@ -36,6 +37,39 @@
                     <ComboBoxItem Content="システム" />
                 </ComboBox>
             </ui:CardControl>
+            <TextBlock Text="{Binding ThemeStatusText}" TextWrapping="Wrap" />
+            <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
+                <StackPanel>
+                    <ui:TextBlock Text="データベースの接続" FontTypography="Subtitle" Margin="0,0,0,12" />
+                    <TextBlock Text="{Binding ConnectionSourceText}" TextWrapping="Wrap" Margin="0,0,0,16" />
+                    <WrapPanel IsEnabled="{Binding CanConfigureLocalConnection}">
+                        <StackPanel Width="240" Margin="0,0,16,12">
+                            <TextBlock Text="サーバー" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding DatabaseServer, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="サーバー" />
+                        </StackPanel>
+                        <StackPanel Width="120" Margin="0,0,16,12">
+                            <TextBlock Text="ポート" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding DatabasePort, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="ポート" />
+                        </StackPanel>
+                        <StackPanel Width="240" Margin="0,0,16,12">
+                            <TextBlock Text="データベース名" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="データベース名" />
+                        </StackPanel>
+                        <StackPanel Width="240" Margin="0,0,16,12">
+                            <TextBlock Text="ユーザー名" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding DatabaseUser, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="ユーザー名" />
+                        </StackPanel>
+                        <StackPanel Width="240" Margin="0,0,16,12">
+                            <TextBlock Text="パスワード" Margin="0,0,0,4" />
+                            <PasswordBox x:Name="DatabasePassword" AutomationProperties.Name="パスワード" />
+                        </StackPanel>
+                    </WrapPanel>
+                    <TextBlock Text="パスワードが空欄の場合は、保存済みのパスワードを引き継ぎます。" TextWrapping="Wrap" Margin="0,0,0,12" />
+                    <ui:Button Content="接続確認して保存" Click="SaveDatabase_Click"
+                               IsEnabled="{Binding CanConfigureLocalConnection}" HorizontalAlignment="Left" />
+                    <TextBlock Text="{Binding DatabaseStatusText}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+            </ui:Card>
             <ui:CardExpander Margin="0,0,0,12" Icon="{ui:SymbolIcon Info16}">
                 <ui:CardExpander.Header>
                     <Grid>
@@ -59,7 +93,12 @@
                 </ui:CardExpander.Header>
                 <ui:CardExpander.Content>
                     <StackPanel>
-                        <ui:TextBlock FontFamily="Noto Sans JP" Text="Test" />
+                        <TextBlock Text="進学・就職の受験記録を検索し、年度ごとの内訳と増減を確認できます。"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="集計は受験記録単位です。同じ生徒の複数回受験を含み、人数や進路決定者数とは異なります。"
+                                   TextWrapping="Wrap" Margin="0,8,0,0" />
+                        <TextBlock Text="検索：Enter　検索の中断：Esc　CSV保存：検索後のダウンロードボタン"
+                                   TextWrapping="Wrap" Margin="0,8,0,0" />
                     </StackPanel>
                 </ui:CardExpander.Content>
             </ui:CardExpander>
