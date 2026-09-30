@@ -61,8 +61,7 @@ internal static class Program
         Check(csv.Contains("\"' =1+1\""), "CSV formula neutralization");
         Check(SearchResultCsv.Create([]).Split("\r\n").Length == 2, "CSV empty header");
         var search = new SearchPageViewModel();
-        search.FirstPage();
-        Check(search.SearchResultPageIndexText == "ページ 0/0" && !search.ExportCsvCommand.CanExecute(null), "empty paging and export");
+        Check(search.SearchResultCountText == "0件" && !search.ExportCsvCommand.CanExecute(null), "empty results and export");
         search.SelectedYear = "invalid";
         await search.ExecuteSearchCommand.ExecuteAsync(null);
         Check(search.StatusText.Contains("1901") && !search.IsBusy, "invalid year handled");
@@ -119,18 +118,15 @@ internal static class Program
             Check(!dashboard.IsBusy && dashboard.StatusText.Contains("最終更新"), "dashboard live refresh");
             Check(dashboard.SelectedYear == groups.Max(x => x.Year), "latest registered year selected");
             search.SelectedYear = dashboard.SelectedYear.ToString();
-            search.ResultVisibleCountLimit = 0;
             await search.ExecuteSearchCommand.ExecuteAsync(null);
-            Check(search.ResultVisibleCountLimit == 1 && search.SearchResultList.Count == 1, "zero page size clamped");
             var selected = await SearchPageDataGridSourceProvider.GetDataGridSource(null, search.SelectedYear, null, null);
             Check(selected.Count == groups.Where(x => x.Year == dashboard.SelectedYear).Sum(x => x.Count), "dashboard year agrees with search");
+            Check(search.SearchResultList.Count == selected.Count, "all matching year records displayed");
             var fullCsv = SearchResultCsv.Create(selected);
             Check(fullCsv.Split("\r\n").Length == selected.Count + 2, "CSV includes all result pages");
-            search.NextPage();
-            Check(search.SearchResultPageIndexText!.StartsWith("ページ 2/"), "next page");
             search.SearchTargetName = "' OR 1=1 -- no such school";
             await search.ExecuteSearchCommand.ExecuteAsync(null);
-            Check(search.SearchResultList.Count == 0 && search.SearchResultPageIndexText == "ページ 0/0", "quoted input safe and stale page cleared");
+            Check(search.SearchResultList.Count == 0 && search.SearchResultCountText == "0件", "quoted input safe and stale page cleared");
             Check(!search.ExportCsvCommand.CanExecute(null), "empty search disables export");
             await search.LoadExamMethodComboBoxItems();
             var methods = search.ExamMethodComboBoxItems.Count;
@@ -138,6 +134,9 @@ internal static class Program
             Check(methods == search.ExamMethodComboBoxItems.Count, "lookup loading is idempotent");
             await dashboard.OpenSearchCommand.ExecuteAsync(null);
             Check(search.SearchTargetName == null && search.SearchResultList.Count > 0 && search.SelectedYear == dashboard.SelectedYear.ToString(), "dashboard navigates and searches selected year");
+            search.SelectedYear = null;
+            await search.ExecuteSearchCommand.ExecuteAsync(null);
+            Check(search.SearchResultList.Count == groups.Sum(x => x.Count) && search.SearchResultList.Count > 1000, "all database records displayed without 1000 row cap");
             Console.WriteLine($"Verified {groups.Sum(x => x.Count)} records across {dashboard.Years.Count} years (no personal data logged).");
         }
         fixture = [new(2024, "進学", "推薦", 10), new(2026, "進学", "推薦", 15), new(2026, "就職", "一般", 5)];
@@ -151,12 +150,49 @@ internal static class Program
         dashboard.OpenComparisonCommand.Execute(null);
         Check(control.SelectedItem?.TargetPageType == typeof(ComparisonPage), "dashboard opens comparison");
         navigation.Navigate(typeof(SearchPage));
+        Check(ShinroKensakuDesktop.Views.Controls.PieChart.SliceGeometry(0, 1) is System.Windows.Media.EllipseGeometry, "single category renders full circle");
+        Check(ShinroKensakuDesktop.Views.Controls.PieChart.SliceGeometry(0, 0).IsEmpty(), "zero category has no slice");
+        var quarter = ShinroKensakuDesktop.Views.Controls.PieChart.SliceGeometry(0, 0.25).GetArea();
+        var full = ShinroKensakuDesktop.Views.Controls.PieChart.SliceGeometry(0, 1).GetArea();
+        Check(Math.Abs(quarter / full - 0.25) < 0.002, "pie sector area follows share");
+        host.Width = 900;
+        host.Height = 600;
+        control.Measure(new Size(850, 500));
+        control.Arrange(new Rect(0, 0, 850, 500));
+        navigation.Navigate(typeof(AnalyticsPage));
+        await Task.Delay(300);
+        host.UpdateLayout();
+        await Task.Delay(300);
+        host.UpdateLayout();
+        var graphScroll = (System.Windows.Controls.ScrollViewer)analyticsPage.Content!;
+        Check(graphScroll.ScrollableHeight > 0 && graphScroll.ActualHeight < 600, "graph has bounded scroll viewport in navigation host");
+        Check(VisualChildren<ShinroKensakuDesktop.Views.Controls.PieChart>(analyticsPage).Count() == 3, "three pie charts rendered");
+        graphScroll.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount, -120) { RoutedEvent = System.Windows.Input.Mouse.MouseWheelEvent });
+        host.UpdateLayout();
+        Check(graphScroll.VerticalOffset > 0, "mouse wheel scrolls graph page");
+        graphScroll.ScrollToBottom();
+        await Task.Delay(100);
+        host.UpdateLayout();
+        var lastChart = VisualChildren<ShinroKensakuDesktop.Views.Controls.PieChart>(analyticsPage).Last();
+        var bottom = lastChart.TransformToAncestor(graphScroll).Transform(new Point(0, lastChart.ActualHeight));
+        Check(Math.Abs(graphScroll.VerticalOffset - graphScroll.ScrollableHeight) < 1 && bottom.Y <= graphScroll.ActualHeight, "last pie chart reachable at page bottom");
+        graphScroll.ScrollToTop();
+        navigation.Navigate(typeof(ComparisonPage));
+        await Task.Delay(100);
+        host.UpdateLayout();
+        Check(((System.Windows.Controls.ScrollViewer)comparisonPage.Content!).ActualHeight < 600, "comparison viewport bounded");
+        navigation.Navigate(typeof(AnalyticsPage));
+        await Task.Delay(100);
+        host.UpdateLayout();
+        Check(graphScroll.ScrollableHeight > 0, "graph scroll survives page navigation");
+        navigation.Navigate(typeof(SearchPage));
         if (args.Contains("--render"))
         {
             foreach (var (page, name) in new[] { (dashboardPage as System.Windows.Controls.Page, "dashboard"), (analyticsPage, "analytics"), (comparisonPage, "comparison") })
             {
                 var body = (FrameworkElement)page.Content!;
                 page.Content = null;
+                System.Windows.Data.BindingOperations.ClearBinding(body, FrameworkElement.HeightProperty);
                 body.DataContext = page.DataContext;
                 var content = new System.Windows.Controls.Border { Background = System.Windows.Media.Brushes.White, Child = body };
                 content.Measure(new Size(1100, 1400));
@@ -173,7 +209,7 @@ internal static class Program
             }
         }
         navigation.Navigate(typeof(SearchPage));
-        search.SearchResultList = new(Enumerable.Range(0, 1000).Select(i => new SearchResultData { Year = 2026, Shinro_name = $"Test {i}" }));
+        search.SearchResultList = new(Enumerable.Range(0, 10000).Select(i => new SearchResultData { Year = 2026, Shinro_name = $"Test {i}" }));
         host.Width = 900;
         host.Height = 600;
         control.Measure(new Size(850, 500));
@@ -181,26 +217,48 @@ internal static class Program
         await Task.Delay(100);
         host.UpdateLayout();
         var resultGrid = (System.Windows.Controls.DataGrid)searchPage.FindName("ResultGrid");
-        var pageScroll = (System.Windows.Controls.ScrollViewer)searchPage.FindName("PageScroll");
+        var searchLayout = (FrameworkElement)searchPage.FindName("SearchLayout");
         await Task.Delay(300);
         host.UpdateLayout();
+        await host.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+        host.UpdateLayout();
         var realized = VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count();
-        Check(realized > 0 && realized < 100, "1000 records realize fewer than 100 rows");
-        Check(pageScroll.ScrollableHeight > 0, "small window supports page scrolling");
+        Check(realized > 0 && realized < 100, "10000 records realize fewer than 100 rows");
+        Check(searchLayout.ActualHeight < 600 && resultGrid.ActualHeight > 100, "search layout fits small viewport");
+        var outerScroll = VisualChildren<Wpf.Ui.Controls.DynamicScrollViewer>(control).First();
+        Check(outerScroll.ScrollableHeight < 1, "no outer page scrolling around result grid");
         var gridScroll = VisualChildren<System.Windows.Controls.ScrollViewer>(resultGrid).First();
         Check(gridScroll.ScrollableHeight > 0 && gridScroll.ScrollableWidth > 0, "result grid scrolls vertically and horizontally");
         gridScroll.ScrollToBottom();
         await Task.Delay(100);
         host.UpdateLayout();
         Check(gridScroll.VerticalOffset > 0 && VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count() < 100, "scrolling recycles result rows");
-        resultGrid.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount, -120) { RoutedEvent = System.Windows.Input.Mouse.PreviewMouseWheelEvent });
+        gridScroll.RaiseEvent(new System.Windows.Input.MouseWheelEventArgs(System.Windows.Input.Mouse.PrimaryDevice, Environment.TickCount, 120) { RoutedEvent = System.Windows.Input.Mouse.MouseWheelEvent });
         host.UpdateLayout();
-        Check(pageScroll.VerticalOffset > 0, "wheel at table bottom scrolls the page");
-        var expander = VisualChildren<Wpf.Ui.Controls.CardExpander>(searchPage).First();
+        Check(gridScroll.VerticalOffset < gridScroll.ScrollableHeight && outerScroll.VerticalOffset == 0, "wheel scrolls only results");
+        var expander = VisualChildren<System.Windows.Controls.Expander>(searchPage).First();
         expander.IsExpanded = true;
         host.UpdateLayout();
         Check(resultGrid.ActualHeight > 100 && VisualChildren<System.Windows.Controls.DataGridRow>(resultGrid).Count() < 100, "expanded filters preserve bounded virtualized grid");
-        Console.WriteLine($"Realized {realized} rows for 1000 records.");
+        Check(outerScroll.ScrollableHeight < 1, "expanded filters do not create nested page scroll");
+        gridScroll.ScrollToBottom();
+        await Task.Delay(100);
+        host.UpdateLayout();
+        await Task.Delay(200);
+        host.UpdateLayout();
+        Check(resultGrid.ItemContainerGenerator.ContainerFromIndex(9999) != null, "last of 10000 records reachable");
+        Console.WriteLine($"Realized {realized} rows for 10000 records.");
+        if (args.Contains("--render"))
+        {
+            gridScroll.ScrollToTop();
+            host.UpdateLayout();
+            var preview = new System.Windows.Media.Imaging.RenderTargetBitmap((int)Math.Ceiling(control.ActualWidth), (int)Math.Ceiling(control.ActualHeight), 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+            preview.Render(control);
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(preview));
+            using var file = System.IO.File.Create(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "kaken-search-preview.png"));
+            encoder.Save(file);
+        }
         host.Close();
         Console.WriteLine($"Passed {checks} checks.");
     }

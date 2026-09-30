@@ -12,11 +12,16 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 	public partial class SearchPageViewModel : ObservableObject
 	{
 		private List<SearchResultData>? searchResults;
-		private int pageIndex;
-		private int pageCount;
         [ObservableProperty] public partial string StatusText { get; set; } = "条件を指定して検索してください。";
         [ObservableProperty] public partial bool IsBusy { get; set; }
-        partial void OnIsBusyChanged(bool value) => ExportCsvCommand.NotifyCanExecuteChanged();
+        [ObservableProperty] public partial bool IsLoadingConditions { get; set; }
+        public bool IsLoading => IsBusy || IsLoadingConditions;
+        partial void OnIsBusyChanged(bool value)
+        {
+            ExportCsvCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(IsLoading));
+        }
+        partial void OnIsLoadingConditionsChanged(bool value) => OnPropertyChanged(nameof(IsLoading));
 
 		[ObservableProperty]
 		public partial string? CurrentSearchQuery { get; set; } = "なし";
@@ -31,12 +36,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ObservableProperty]
 		public partial ObservableCollection<SearchResultData> SearchResultList { get; set; } = new ( );
 		[ObservableProperty]
-		public partial string? SearchResultCountText { get; set; } = null;
-		[ObservableProperty]
-		public partial string? SearchResultPageIndexText { get; set; } = null;
-		[ObservableProperty]
-		public partial int ResultVisibleCountLimit { get; set; } = 50;
-
+		public partial string? SearchResultCountText { get; set; } = "0件";
 		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
 		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
 
@@ -93,7 +93,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
         {
             IsBusy = true;
             searchResults = null;
-            ShowPage();
+            ShowResults();
             StatusText = "検索しています…";
             try
             {
@@ -103,8 +103,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
                     return;
                 }
                 searchResults = await SearchPageDataGridSourceProvider.GetDataGridSource(SearchTargetName, SelectedYear, ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id);
-                FirstPage();
-                StatusText = searchResults.Count == 0 ? "条件に一致する受験記録はありません。" : $"検索結果：{searchResults.Count:N0}件。CSV保存は全ページが対象です。";
+                ShowResults();
+                StatusText = searchResults.Count == 0 ? "条件に一致する受験記録はありません。" : "検索完了";
             }
             catch (Exception)
             {
@@ -136,52 +136,11 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
                 StatusText = "CSVを保存できませんでした。ファイルが開かれていないか、保存先を確認してください。";
             }
         }
-		[RelayCommand]
-		public void NextPage ( )
-		{
-			if ( pageIndex + 1 >= pageCount ) return;
-			pageIndex++;
-			ShowPage ( );
-		}
-		[RelayCommand]
-		public void PreviousPage ( )
-		{
-			if ( pageIndex - 1 < 0 ) return;
-			pageIndex--;
-			ShowPage ( );
-		}
-		[RelayCommand]
-		public void FirstPage ( )
-		{
-			pageIndex = 0;
-			ShowPage ( );
-		}
-		partial void OnResultVisibleCountLimitChanged(int value) => FirstPage();
-        private void ShowPage ( )
-		{
-            if (searchResults == null || searchResults.Count == 0)
-            {
-                SearchResultList = new();
-                pageIndex = pageCount = 0;
-                SearchResultCountText = "0件";
-                SearchResultPageIndexText = "ページ 0/0";
-                return;
-            }
-            var limit = Math.Clamp(ResultVisibleCountLimit, 1, 1000);
-            if (ResultVisibleCountLimit != limit)
-            {
-                ResultVisibleCountLimit = limit;
-                return; // The property change refreshes the page once with the normalized value.
-            }
-			// Replace the page in one notification instead of issuing one per record.
-			pageCount = ( int ) Math.Ceiling ( ( double ) searchResults.Count / ResultVisibleCountLimit );
-			pageIndex = Math.Clamp(pageIndex, 0, pageCount - 1);
-            var count = Math.Min ( ResultVisibleCountLimit, searchResults.Count - pageIndex * ResultVisibleCountLimit );
-			int start = pageIndex * ResultVisibleCountLimit;
-            SearchResultList = new(searchResults.GetRange(start, count));
-			SearchResultCountText = $"{start + 1}-{start + count}件目を表示中";
-			SearchResultPageIndexText = $"ページ {pageIndex + 1}/{pageCount}";
-		}
+        private void ShowResults()
+        {
+            SearchResultList = new(searchResults ?? []);
+            SearchResultCountText = $"{SearchResultList.Count:N0}件";
+        }
 		private void UpdateSearchQuery ( )
 		{
 			string searchQuery = string.Empty;
