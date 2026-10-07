@@ -22,10 +22,12 @@
             <ui:TextBlock Text="ダッシュボード" FontTypography="Title" Margin="0,0,0,24" />
             <WrapPanel Margin="0,0,0,16">
                 <TextBlock Text="{Binding YearCaption}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}"
+                           Style="{StaticResource IconActionButton}"
                            ToolTip="再読み込み" AutomationProperties.Name="再読み込み"
                            Command="{Binding RefreshCommand}" Margin="0,0,12,8" />
-                <ui:Button Icon="{ui:SymbolIcon ArrowTrending20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                <ui:Button Icon="{ui:SymbolIcon ArrowTrending20, FontSize=20}"
+                           Style="{StaticResource IconActionButton}"
                            ToolTip="進路グラフを開く" AutomationProperties.Name="進路グラフを開く"
                            Appearance="Primary" Command="{Binding OpenAnalyticsCommand}"
                            Margin="0,0,0,8" />

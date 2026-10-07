@@ -37,7 +37,11 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ RelayCommand ]
 		public async Task RefreshAsync ( )
 		{
-			if ( IsBusy ) return;
+			if ( IsBusy )
+			{
+				return;
+			}
+
 			int? previous = SelectedYear;
 			int? previousBaseline = BaselineYear;
 			IsBusy = true;
@@ -102,7 +106,11 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ RelayCommand ( CanExecute = nameof(CanOpenSearch) ) ]
 		private async Task OpenSearchAsync ( )
 		{
-			if ( !CanOpenSearch ( ) ) return;
+			if ( !CanOpenSearch ( ) )
+			{
+				return;
+			}
+
 			int? year = SelectedYear;
 			if ( navigation.Navigate ( typeof(SearchPage) ) )
 			{

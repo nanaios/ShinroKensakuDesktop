@@ -13,14 +13,19 @@ namespace ShinroKensakuDesktop.Views.Pages
 			Loaded += async ( _, _ ) =>
 			{
 				if ( viewModel.LoadConditionsCommand.CanExecute ( null ) )
+				{
 					await viewModel.LoadConditionsCommand.ExecuteAsync ( null );
+				}
 			};
 		}
 
-		private async void SearchNameBox_QuerySubmitted ( AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs e )
+		private async void SearchNameBox_QuerySubmitted ( AutoSuggestBox sender,
+			AutoSuggestBoxQuerySubmittedEventArgs e )
 		{
 			if ( DataContext is SearchPageViewModel viewModel && viewModel.ExecuteSearchCommand.CanExecute ( null ) )
+			{
 				await viewModel.ExecuteSearchCommand.ExecuteAsync ( null );
+			}
 		}
 	}
 }

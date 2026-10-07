@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using Wpf.Ui.Appearance;
 
@@ -16,7 +17,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 					ApplicationTheme.Dark => 1,
 					ApplicationTheme.HighContrast => 2,
 					ApplicationTheme.Unknown => 3,
-					_ => System.Windows.DependencyProperty.UnsetValue
+					_ => DependencyProperty.UnsetValue
 				};
 			}
 
@@ -33,7 +34,7 @@ namespace ShinroKensakuDesktop.Views.Converters
 					1 => ApplicationTheme.Dark,
 					2 => ApplicationTheme.HighContrast,
 					3 => ApplicationTheme.Unknown,
-					_ => System.Windows.Data.Binding.DoNothing
+					_ => Binding.DoNothing
 				};
 			}
 

@@ -17,7 +17,8 @@ namespace ShinroKensakuDesktop.Models
 
 		public static async Task<List<SearchResultData>> GetDataGridSource ( string? target, string? year,
 			string? examMethod, sbyte? department, CancellationToken cancellationToken = default ) =>
-			await GetDataGridSource ( SearchCriteria.Create ( target, year, examMethod, department ), cancellationToken ).ConfigureAwait ( false );
+			await GetDataGridSource ( SearchCriteria.Create ( target, year, examMethod, department ),
+				cancellationToken ).ConfigureAwait ( false );
 
 		public static async Task<List<SearchResultData>> GetDataGridSource ( SearchCriteria criteria,
 			CancellationToken cancellationToken = default )
@@ -58,7 +59,8 @@ namespace ShinroKensakuDesktop.Models
 
 			if ( criteria.Target != null )
 			{
-				parameters.Add ( new MySqlParameter ( "@target", $"%{SearchCriteria.EscapeLike ( criteria.Target )}%" ) );
+				parameters.Add (
+					new MySqlParameter ( "@target", $"%{SearchCriteria.EscapeLike ( criteria.Target )}%" ) );
 				conditionsShingaku.Add ( "gakkou_name like @target ESCAPE '!'" );
 				conditionsSyuusyoku.Add ( "houjin_name like @target ESCAPE '!'" );
 			}
@@ -97,7 +99,8 @@ namespace ShinroKensakuDesktop.Models
 			query +=
 				"\nORDER BY year DESC, jyukenbi DESC, shinro_name, g_name, jyukenhouhou_name, gakubu, gakka, course, syuusyokusakinai_kubun, cls_name, gouhi";
 
-			DataTable table = await MySQLCommand.Query ( query, cancellationToken, parameters.ToArray ( ) ).ConfigureAwait ( false );
+			DataTable table = await MySQLCommand.Query ( query, cancellationToken, parameters.ToArray ( ) )
+				.ConfigureAwait ( false );
 			List<SearchResultData> datas = new( );
 			foreach ( DataRow row in table.Rows )
 			{
@@ -109,20 +112,20 @@ namespace ShinroKensakuDesktop.Models
 			return datas;
 		}
 
-		public static SearchResultData MapRow ( DataRow row ) => new()
-				{
-					Year = row.IsNull ( "year" ) ? null : Convert.ToInt16 ( row [ "year" ] ),
-					Jyukenbi = row.IsNull ( "jyukenbi" ) ? null : Convert.ToDateTime ( row [ "jyukenbi" ] ),
-					Shinro_name = row [ "shinro_name" ] as string,
-					Gakubu = row [ "gakubu" ] as string,
-					Gakka = row [ "gakka" ] as string,
-					Course = row [ "course" ] as string,
-					Syuusyokusakinai_kubun = row [ "syuusyokusakinai_kubun" ] as string,
-					Jyukenhouhou_name = row [ "jyukenhouhou_name" ] as string,
-					G_name = row [ "g_name" ] as string,
-					Sei = row [ "sei" ] as string,
-					Cls_name = row [ "cls_name" ] as string,
-					Result = FormatResult ( row [ "gouhi" ] )
-				};
+		public static SearchResultData MapRow ( DataRow row ) => new( )
+		{
+			Year = row.IsNull ( "year" ) ? null : Convert.ToInt16 ( row [ "year" ] ),
+			Jyukenbi = row.IsNull ( "jyukenbi" ) ? null : Convert.ToDateTime ( row [ "jyukenbi" ] ),
+			Shinro_name = row [ "shinro_name" ] as string,
+			Gakubu = row [ "gakubu" ] as string,
+			Gakka = row [ "gakka" ] as string,
+			Course = row [ "course" ] as string,
+			Syuusyokusakinai_kubun = row [ "syuusyokusakinai_kubun" ] as string,
+			Jyukenhouhou_name = row [ "jyukenhouhou_name" ] as string,
+			G_name = row [ "g_name" ] as string,
+			Sei = row [ "sei" ] as string,
+			Cls_name = row [ "cls_name" ] as string,
+			Result = FormatResult ( row [ "gouhi" ] )
+		};
 	}
 }

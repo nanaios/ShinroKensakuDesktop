@@ -38,7 +38,8 @@ namespace ShinroKensakuDesktop.Views.Behaviors
 
 			if ( text == null || text.Any ( c => c is < '0' or > '9' ) ||
 			     ( AssociatedObject.MaxLength > 0 &&
-			       AssociatedObject.Text.Length - AssociatedObject.SelectionLength + text.Length > AssociatedObject.MaxLength ) )
+			       AssociatedObject.Text.Length - AssociatedObject.SelectionLength + text.Length >
+			       AssociatedObject.MaxLength ) )
 			{
 				e.CancelCommand ( );
 			}

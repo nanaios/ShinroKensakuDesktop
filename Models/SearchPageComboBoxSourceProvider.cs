@@ -7,7 +7,8 @@ namespace ShinroKensakuDesktop.Models
 	{
 		public static async Task<List<ExamMethodData>> GetExamMethodComboBoxSource ( )
 		{
-			string query = """select jyukenhouhou_code, jyukenhouhou_name from jyukenhouhouTbl order by jyukenhouhou_code""";
+			string query =
+				"""select jyukenhouhou_code, jyukenhouhou_name from jyukenhouhouTbl order by jyukenhouhou_code""";
 			DataTable table = await MySQLCommand.Query ( query ).ConfigureAwait ( false );
 			List<ExamMethodData> datas = new( );
 			foreach ( DataRow row in table.Rows )

@@ -20,7 +20,8 @@
                 <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" MinWidth="130"
                           Style="{StaticResource YearSelector}"
                           Margin="0,0,24,8" AutomationProperties.Name="比較対象年度" />
-                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}"
+                           Style="{StaticResource IconActionButton}"
                            ToolTip="再読み込み" AutomationProperties.Name="再読み込み"
                            Command="{Binding RefreshCommand}" Margin="0,0,0,8" />
             </WrapPanel>

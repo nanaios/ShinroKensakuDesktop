@@ -45,19 +45,23 @@
                     <WrapPanel IsEnabled="{Binding CanConfigureLocalConnection}">
                         <StackPanel Width="240" Margin="0,0,16,12">
                             <TextBlock Text="サーバー" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding DatabaseServer, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="サーバー" />
+                            <TextBox Text="{Binding DatabaseServer, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="サーバー" />
                         </StackPanel>
                         <StackPanel Width="120" Margin="0,0,16,12">
                             <TextBlock Text="ポート" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding DatabasePort, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="ポート" />
+                            <TextBox Text="{Binding DatabasePort, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="ポート" />
                         </StackPanel>
                         <StackPanel Width="240" Margin="0,0,16,12">
                             <TextBlock Text="データベース名" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="データベース名" />
+                            <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="データベース名" />
                         </StackPanel>
                         <StackPanel Width="240" Margin="0,0,16,12">
                             <TextBlock Text="ユーザー名" Margin="0,0,0,4" />
-                            <TextBox Text="{Binding DatabaseUser, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="ユーザー名" />
+                            <TextBox Text="{Binding DatabaseUser, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="ユーザー名" />
                         </StackPanel>
                         <StackPanel Width="240" Margin="0,0,16,12">
                             <TextBlock Text="パスワード" Margin="0,0,0,4" />

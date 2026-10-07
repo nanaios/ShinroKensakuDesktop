@@ -2,10 +2,10 @@
 using ShinroKensakuDesktop.ViewModels.Pages;
 using ShinroKensakuDesktop.ViewModels.Windows;
 using ShinroKensakuDesktop.Views.Pages;
+using System.Windows;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Controls;
-using System.Windows;
 
 namespace ShinroKensakuDesktop.Views.Windows
 {

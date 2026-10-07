@@ -58,8 +58,8 @@ namespace ShinroKensakuDesktop.Views.Controls
 			List<ChartBar> rows = ItemsSource?.ToList ( ) ?? [ ];
 			double total = rows.Sum ( x => ( double ) Math.Max ( 0, x.Count ) );
 			WrapPanel layout = new( );
-			Canvas canvas = new() { Width = 240, Height = 240, Margin = new Thickness ( 0, 8, 24, 8 ) };
-			StackPanel legend = new() { Margin = new Thickness ( 0, 12, 0, 12 ), MaxWidth = 360 };
+			Canvas canvas = new( ) { Width = 240, Height = 240, Margin = new Thickness ( 0, 8, 24, 8 ) };
+			StackPanel legend = new( ) { Margin = new Thickness ( 0, 12, 0, 12 ), MaxWidth = 360 };
 			layout.Children.Add ( canvas );
 			layout.Children.Add ( legend );
 			double start = 0;
@@ -80,10 +80,10 @@ namespace ShinroKensakuDesktop.Views.Controls
 					row.Label == "就職" ? Palette [ 1 ] : Palette [ i % Palette.Length ] )!;
 				brush.Freeze ( );
 				string caption = $"{row.Label}  {row.Count:N0} 件（{fraction:P1}）";
-				Path slice = new() { Data = SliceGeometry ( start, fraction ), Fill = brush, ToolTip = caption };
+				Path slice = new( ) { Data = SliceGeometry ( start, fraction ), Fill = brush, ToolTip = caption };
 				AutomationProperties.SetName ( slice, caption );
 				canvas.Children.Add ( slice );
-				DockPanel entry = new() { Margin = new Thickness ( 0, 0, 0, 10 ) };
+				DockPanel entry = new( ) { Margin = new Thickness ( 0, 0, 0, 10 ) };
 				entry.Children.Add ( new Border
 				{
 					Width = 12,

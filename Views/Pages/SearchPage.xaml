@@ -38,7 +38,8 @@
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="年度" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
+                                       Style="{StaticResource IconActionButton}"
                                        ToolTip="年度をクリア" AutomationProperties.Name="年度をクリア"
                                        Command="{Binding ClearSelectedYearCommand}" DockPanel.Dock="Right" />
                             <TextBox Text="{Binding SelectedYear, UpdateSourceTrigger=PropertyChanged}" MaxLength="4"
@@ -52,27 +53,34 @@
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="受験方法" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
+                                       Style="{StaticResource IconActionButton}"
                                        ToolTip="受験方法をクリア" AutomationProperties.Name="受験方法をクリア"
-                                       Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}" DockPanel.Dock="Right" />
+                                       Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}"
+                                       DockPanel.Dock="Right" />
                             <ComboBox ItemsSource="{Binding ExamMethodComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding ExamMethodComboBoxSelectedItem}" AutomationProperties.Name="受験方法" />
+                                      SelectedItem="{Binding ExamMethodComboBoxSelectedItem}"
+                                      AutomationProperties.Name="受験方法" />
                         </DockPanel>
                     </StackPanel>
                     <StackPanel Width="180" Margin="0,4,8,4">
                         <TextBlock Text="クラス" Margin="0,0,0,4" />
                         <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
+                                       Style="{StaticResource IconActionButton}"
                                        ToolTip="クラスをクリア" AutomationProperties.Name="クラスをクリア"
-                                       Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}" DockPanel.Dock="Right" />
+                                       Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}"
+                                       DockPanel.Dock="Right" />
                             <ComboBox ItemsSource="{Binding DepartmentComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding DepartmentComboBoxSelectedItem}" AutomationProperties.Name="クラス" />
+                                      SelectedItem="{Binding DepartmentComboBoxSelectedItem}"
+                                      AutomationProperties.Name="クラス" />
                         </DockPanel>
                     </StackPanel>
                     <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
                                Command="{Binding ClearAllConditionsCommand}" ToolTip="検索条件をすべてクリア"
                                AutomationProperties.Name="検索条件をすべてクリア" Margin="0,24,8,4" />
-                    <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}" Style="{StaticResource IconActionButton}"
+                    <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}"
+                               Style="{StaticResource IconActionButton}"
                                Command="{Binding ReloadConditionsCommand}" ToolTip="検索条件を再読み込み"
                                AutomationProperties.Name="検索条件を再読み込み" Margin="0,24,0,4" />
                 </WrapPanel>
@@ -88,7 +96,8 @@
                        Command="{Binding ExportCsvCommand}" DockPanel.Dock="Right" />
             <StackPanel>
                 <TextBlock Text="{Binding SearchResultCountText}" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding LastSearchSummary}" TextTrimming="CharacterEllipsis" ToolTip="{Binding LastSearchSummary}"
+                <TextBlock Text="{Binding LastSearchSummary}" TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding LastSearchSummary}"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,12,0" />
                 <TextBlock Text="検索条件や接続設定が変わっています。再検索すると表示とCSV保存に反映されます。"
                            TextWrapping="Wrap" Margin="0,4,12,0"
