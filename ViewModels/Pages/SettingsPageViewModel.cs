@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 
 namespace ShinroKensakuDesktop.ViewModels.Pages
 {
@@ -167,15 +168,19 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			if ( CurrentApplicationTheme == ApplicationTheme.Unknown )
 			{
 				ApplicationThemeManager.ApplySystemTheme ( false );
+				/* ApplySystemTheme always applies Mica to the main window, so restore the opaque background. */
 				if ( window?.IsLoaded == true )
 				{
-					SystemThemeWatcher.Watch ( window );
+					WindowBackgroundManager.UpdateBackground ( window, ApplicationThemeManager.GetAppTheme ( ),
+						WindowBackdropType.None );
+					SystemThemeWatcher.Watch ( window, WindowBackdropType.None, false );
 					watchingTheme = true;
 				}
 			}
 			else
 			{
-				ApplicationThemeManager.Apply ( CurrentApplicationTheme );
+				/* The window does not use a backdrop; the default (Mica) makes the background transparent. */
+				ApplicationThemeManager.Apply ( CurrentApplicationTheme, WindowBackdropType.None );
 			}
 		}
 
