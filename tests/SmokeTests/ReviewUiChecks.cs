@@ -61,6 +61,18 @@ internal static class ReviewUiChecks
         encoder.Save(output);
     }
 
+    // Skia draws only inside a live window, so each chart is scrolled into view and captured there.
+    private static async Task RenderCharts(MainWindow window, List<ShinroKensakuDesktop.Views.Controls.SeriesChartView> charts, string theme)
+    {
+        for (int i = 0; i < charts.Count; i++)
+        {
+            charts[i].BringIntoView();
+            await Task.Delay(1200);
+            window.UpdateLayout();
+            Render(window, $"analytics-{theme}-chart{i + 1}");
+        }
+    }
+
     public static async Task RunAsync(Action<bool, string> check, bool render)
     {
         string directory = Path.Combine(Path.GetTempPath(), "kaken-ui-" + Guid.NewGuid().ToString("N"));
@@ -81,7 +93,7 @@ internal static class ReviewUiChecks
             }).ToList());
         }, () => Task.FromResult(new List<ExamMethodData> { new("A", "一般") }),
             () => Task.FromResult(new List<DepartmentData> { new(1, "検証クラス", "検証学科") }));
-        List<DashboardGroup> fixture = [new(2024, "進学", "一般", 100), new(2025, "進学", "一般", 200), new(2026, "進学", "一般", 300), new(2026, "就職", "推薦", 50)];
+        List<DashboardGroup> fixture = [new(2024, "進学", "一般", 100, "情報工学科", 13), new(2025, "進学", "一般", 200, "情報工学科", 13), new(2026, "進学", "一般", 300, "建築工学科", 16), new(2026, "就職", "推薦", 50, "情報工学科", 13)];
         var provider = new TestPageProvider();
         var navigation = new NavigationService(provider);
         var dashboard = new DashboardPageViewModel(navigation, search, () => Task.FromResult(fixture));
@@ -154,7 +166,19 @@ internal static class ReviewUiChecks
             await Task.Delay(400);
             window.UpdateLayout();
             if (render) Render(window, "analytics-light");
-            check(Children<ShinroKensakuDesktop.Views.Controls.PieChart>(analyticsPage).Count() == 3, "real main window hosts all charts");
+            var charts = Children<ShinroKensakuDesktop.Views.Controls.SeriesChartView>(analyticsPage).ToList();
+            check(charts.Count == 3 && !charts[0].IsDark, "real main window hosts all charts");
+            if (render) await RenderCharts(window, charts, "light");
+            settings.CurrentApplicationTheme = ApplicationTheme.Dark;
+            await Task.Delay(400);
+            window.UpdateLayout();
+            if (render) await RenderCharts(window, charts, "dark");
+            var darkStroke = ((LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint)((LiveChartsCore.SkiaSharpView.LineSeries<int>)charts[0].Chart.Series.ElementAt(1)).Stroke!).Color;
+            check(charts[0].IsDark && darkStroke == SkiaSharp.SKColor.Parse(ShinroKensakuDesktop.Views.Controls.SeriesChartView.SeriesColor(0, true)), "charts repaint with dark palette on theme switch");
+            settings.CurrentApplicationTheme = ApplicationTheme.Light;
+            await Task.Delay(400);
+            await analytics.OpenYearSearchCommand.ExecuteAsync(2025);
+            check(search.SelectedYear == "2025" && searchCalls == 2 && search.SearchTargetName == null, "chart point opens search for that year");
             settings.CurrentApplicationTheme = ApplicationTheme.Unknown;
         }
         finally
