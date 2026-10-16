@@ -4,6 +4,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:controls="clr-namespace:ShinroKensakuDesktop.Views.Controls"
       Title="検索" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVisibility" />
@@ -12,14 +13,18 @@
         <KeyBinding Key="Enter" Command="{Binding ExecuteSearchCommand}" />
         <KeyBinding Key="Escape" Command="{Binding ExecuteSearchCancelCommand}" />
     </Page.InputBindings>
-    <Grid x:Name="SearchLayout" Height="0" behaviors:NavigationViewport.Fit="True" Margin="24,0">
+    <Grid x:Name="SearchLayout" Height="0" behaviors:NavigationViewport.Fit="True" Margin="36,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel>
-            <ui:TextBlock Text="受験記録の検索" FontTypography="Title" Margin="0,12,0,8" />
-            <DockPanel Margin="0,8">
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,12">
+                <ui:TextBlock Text="受験記録の検索" FontTypography="Title" />
+                <controls:InfoTip Margin="8,4,0,0"
+                                  Text="進路先の名前と検索条件で受験記録を検索します。Enterで検索、Escで中断します。空欄の条件は絞り込みに使いません。" />
+            </StackPanel>
+            <DockPanel Margin="0,0,0,8">
                 <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
                            ToolTip="検索を中断（Esc）" AutomationProperties.Name="検索を中断"
                            Command="{Binding ExecuteSearchCancelCommand}" DockPanel.Dock="Right" Margin="8,0,0,0"
@@ -36,7 +41,7 @@
             <Expander Header="検索条件" Margin="0,0,0,8">
                 <WrapPanel IsEnabled="{Binding CanEditConditions}">
                     <StackPanel Width="180" Margin="0,4,8,4">
-                        <TextBlock Text="年度" Margin="0,0,0,4" />
+                        <TextBlock Text="卒業年度" Margin="0,0,0,4" />
                         <DockPanel>
                             <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
                                        Style="{StaticResource IconActionButton}"
@@ -99,9 +104,13 @@
                 <TextBlock Text="{Binding LastSearchSummary}" TextTrimming="CharacterEllipsis"
                            ToolTip="{Binding LastSearchSummary}"
                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,12,0" />
-                <TextBlock Text="検索条件や接続設定が変わっています。再検索すると表示とCSV保存に反映されます。"
-                           TextWrapping="Wrap" Margin="0,4,12,0"
-                           Visibility="{Binding IsSearchDirty, Converter={StaticResource BoolVisibility}}" />
+                <StackPanel Orientation="Horizontal" Margin="0,4,12,0"
+                            Visibility="{Binding IsSearchDirty, Converter={StaticResource BoolVisibility}}">
+                    <ui:SymbolIcon Symbol="Warning16" FontSize="16" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource SystemFillColorCautionBrush}" />
+                    <TextBlock Text="再検索が必要です" VerticalAlignment="Center" Margin="6,0,0,0" />
+                    <controls:InfoTip Text="検索条件や接続設定が変わっています。再検索すると表示とCSV保存に反映されます。" />
+                </StackPanel>
             </StackPanel>
         </DockPanel>
         <ui:DataGrid Grid.Row="2" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"

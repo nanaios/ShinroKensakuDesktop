@@ -168,6 +168,9 @@ internal static class ReviewUiChecks
             if (render) Render(window, "analytics-light");
             var charts = Children<ShinroKensakuDesktop.Views.Controls.SeriesChartView>(analyticsPage).ToList();
             check(charts.Count == 3 && !charts[0].IsDark, "real main window hosts all charts");
+            var tips = Children<ShinroKensakuDesktop.Views.Controls.InfoTip>(analyticsPage).ToList();
+            check(tips.Count >= 4 && tips.All(x => x.Text.Length > 0 && x.ToolTip is System.Windows.Controls.ToolTip { Content: System.Windows.Controls.TextBlock text } && text.Text == x.Text)
+                && tips.Any(x => x.Text.Contains(analytics.PointHint)), "analytics guidance is shown through info tooltips");
             if (render) await RenderCharts(window, charts, "light");
             settings.CurrentApplicationTheme = ApplicationTheme.Dark;
             await Task.Delay(400);

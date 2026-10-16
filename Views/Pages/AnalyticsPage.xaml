@@ -11,76 +11,95 @@
     <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto"
                   Background="{DynamicResource ApplicationBackgroundBrush}">
         <StackPanel Margin="36,20,36,32">
-            <ui:TextBlock Text="進路グラフ" FontTypography="Title" Margin="0,0,0,24" />
-            <WrapPanel Margin="0,0,0,16">
-                <TextBlock Text="表示する年度" VerticalAlignment="Center" Margin="0,0,12,8" />
-                <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding RangeStartYear}" MinWidth="120"
-                          Style="{StaticResource YearSelector}"
-                          Margin="0,0,8,8" AutomationProperties.Name="表示する最初の年度" />
-                <TextBlock Text="～" VerticalAlignment="Center" Margin="0,0,8,8" />
-                <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding RangeEndYear}" MinWidth="120"
-                          Style="{StaticResource YearSelector}"
-                          Margin="0,0,16,8" AutomationProperties.Name="表示する最後の年度" />
-                <ui:Button Content="直近5年度" Command="{Binding ShowRecentYearsCommand}" Margin="0,0,8,8"
-                           ToolTip="最新の登録年度から5年度分を表示" />
-                <ui:Button Content="全期間" Command="{Binding ShowAllYearsCommand}" Margin="0,0,12,8"
-                           ToolTip="登録されている全年度を表示" />
+            <DockPanel Style="{StaticResource PageHeader}">
                 <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}"
                            Style="{StaticResource IconActionButton}"
                            ToolTip="再読み込み" AutomationProperties.Name="再読み込み"
-                           Command="{Binding RefreshCommand}" Margin="0,0,0,8" />
-            </WrapPanel>
-            <WrapPanel Margin="0,0,0,16">
-                <TextBlock Text="学科" VerticalAlignment="Center" Margin="0,0,12,8" />
-                <ComboBox ItemsSource="{Binding Departments}" SelectedItem="{Binding SelectedDepartment}" MinWidth="200"
-                          Style="{StaticResource YearSelector}"
-                          Margin="0,0,0,8" AutomationProperties.Name="表示する学科" />
+                           Command="{Binding RefreshCommand}" DockPanel.Dock="Right" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal">
+                    <ui:TextBlock Text="進路グラフ" FontTypography="Title" />
+                    <charts:InfoTip Margin="8,4,0,0"
+                                    Text="選択した年度範囲と学科の受験記録を集計します。件数は受験記録単位で、同じ生徒の複数回受験を含みます。" />
+                </StackPanel>
+            </DockPanel>
+            <WrapPanel Margin="0,0,0,4">
+                <StackPanel Orientation="Horizontal" Margin="0,0,32,12">
+                    <TextBlock Text="年度" VerticalAlignment="Center" Margin="0,0,12,0" />
+                    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding RangeStartYear}" MinWidth="110"
+                              Style="{StaticResource YearSelector}" AutomationProperties.Name="表示する最初の年度" />
+                    <TextBlock Text="～" VerticalAlignment="Center" Margin="8,0" />
+                    <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding RangeEndYear}" MinWidth="110"
+                              Style="{StaticResource YearSelector}" AutomationProperties.Name="表示する最後の年度" />
+                    <ui:Button Content="直近5年度" Command="{Binding ShowRecentYearsCommand}" Margin="12,0,0,0"
+                               ToolTip="最新の登録年度から5年度分を表示" />
+                    <ui:Button Content="全期間" Command="{Binding ShowAllYearsCommand}" Margin="8,0,0,0"
+                               ToolTip="登録されている全年度を表示" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="学科" VerticalAlignment="Center" Margin="0,0,12,0" />
+                    <ComboBox ItemsSource="{Binding Departments}" SelectedItem="{Binding SelectedDepartment}"
+                              MinWidth="200" Style="{StaticResource YearSelector}"
+                              AutomationProperties.Name="表示する学科" />
+                    <charts:InfoTip Text="学科はクラス名から学年を除いて求めます。クラスが登録されていない記録は「未設定」にまとめます。" />
+                </StackPanel>
             </WrapPanel>
             <ProgressBar IsIndeterminate="True" Height="3"
-                         Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,12" />
-            <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,0,0,16" />
-            <TextBlock Text="件数は受験記録単位です。同じ生徒の複数回受験を含みます。"
-                       TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
-            <ui:TextBlock Text="{Binding RangeCaption}" FontTypography="BodyStrong" Margin="0,0,0,12" />
-            <WrapPanel>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" Margin="0,0,0,8" />
+            <DockPanel Margin="0,0,0,12">
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource SecondaryText}" DockPanel.Dock="Right"
+                           MaxWidth="420" TextAlignment="Right" VerticalAlignment="Bottom" Margin="16,0,0,0" />
+                <ui:TextBlock Text="{Binding RangeCaption}" FontTypography="BodyStrong" TextWrapping="Wrap"
+                              VerticalAlignment="Bottom" />
+            </DockPanel>
+            <WrapPanel Margin="0,0,0,4">
+                <ui:Card Style="{StaticResource StatCard}">
                     <StackPanel>
-                        <TextBlock Text="受験記録の総数" />
-                        <TextBlock Text="{Binding RangeTotalText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                        <TextBlock Text="受験記録の総数" Style="{StaticResource SecondaryText}" />
+                        <TextBlock Text="{Binding RangeTotalText}" Style="{StaticResource StatValue}" />
                     </StackPanel>
                 </ui:Card>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                <ui:Card Style="{StaticResource StatCard}">
                     <StackPanel>
-                        <TextBlock Text="進学の受験記録" />
-                        <TextBlock Text="{Binding RangeStudyText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                        <TextBlock Text="進学" Style="{StaticResource SecondaryText}" />
+                        <TextBlock Text="{Binding RangeStudyText}" Style="{StaticResource StatValue}" />
                     </StackPanel>
                 </ui:Card>
-                <ui:Card Width="240" Margin="0,0,16,16" Padding="24">
+                <ui:Card Style="{StaticResource StatCard}">
                     <StackPanel>
-                        <TextBlock Text="就職の受験記録" />
-                        <TextBlock Text="{Binding RangeWorkText}" FontSize="36" FontWeight="SemiBold" Margin="0,12,0,0" />
+                        <TextBlock Text="就職" Style="{StaticResource SecondaryText}" />
+                        <TextBlock Text="{Binding RangeWorkText}" Style="{StaticResource StatValue}" />
                     </StackPanel>
                 </ui:Card>
             </WrapPanel>
-            <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
+            <ui:Card Style="{StaticResource SectionCard}">
                 <StackPanel>
-                    <ui:TextBlock Text="年度別の推移（合計・進学・就職）" FontTypography="Subtitle" />
-                    <TextBlock Text="{Binding PointHint}" TextWrapping="Wrap"
-                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,0,12" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <ui:TextBlock Text="年度別の推移" FontTypography="Subtitle" />
+                        <charts:InfoTip Margin="8,2,0,0"
+                                        Text="{Binding PointHint, StringFormat='合計（破線）・進学・就職の件数を年度ごとに表示します。{0}'}" />
+                    </StackPanel>
                     <charts:SeriesChartView Data="{Binding KindTrendChart}" Kind="Line"
                                             PointCommand="{Binding OpenYearSearchCommand}" />
                 </StackPanel>
             </ui:Card>
-            <ui:Card Padding="24" Margin="0,0,0,16" HorizontalContentAlignment="Stretch">
+            <ui:Card Style="{StaticResource SectionCard}">
                 <StackPanel>
-                    <ui:TextBlock Text="受験方法別の推移" FontTypography="Subtitle" Margin="0,0,0,12" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <ui:TextBlock Text="受験方法別の推移" FontTypography="Subtitle" />
+                        <charts:InfoTip Margin="8,2,0,0"
+                                        Text="{Binding PointHint, StringFormat='受験方法ごとの件数を年度ごとに表示します。種類が多い場合は、件数上位7種類以外を「その他」にまとめます。{0}'}" />
+                    </StackPanel>
                     <charts:SeriesChartView Data="{Binding MethodTrendChart}" Kind="Line"
                                             PointCommand="{Binding OpenYearSearchCommand}" />
                 </StackPanel>
             </ui:Card>
-            <ui:Card Padding="24" HorizontalContentAlignment="Stretch">
+            <ui:Card Style="{StaticResource SectionCard}" Margin="0">
                 <StackPanel>
-                    <ui:TextBlock Text="受験方法別の件数（選択範囲の合計）" FontTypography="Subtitle" Margin="0,0,0,12" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <ui:TextBlock Text="受験方法別の件数" FontTypography="Subtitle" />
+                        <charts:InfoTip Margin="8,2,0,0"
+                                        Text="選択した年度範囲の合計を、進学・就職の積み上げで件数の多い順に表示します。" />
+                    </StackPanel>
                     <charts:SeriesChartView Data="{Binding MethodBreakdownChart}" Kind="StackedBar" />
                 </StackPanel>
             </ui:Card>

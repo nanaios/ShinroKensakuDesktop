@@ -65,7 +65,10 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				DatabasePort = storedConnection.Port.ToString ( );
 				DatabaseName = storedConnection.Database;
 				DatabaseUser = storedConnection.UserID;
-				DatabaseStatusText = "保存済みの接続設定を読み込みました。";
+				/* The source explanation sits behind an ⓘ, so keep the environment case visible here. */
+				DatabaseStatusText = DatabaseSettings.UsesEnvironment
+					? "環境変数の接続設定を使用しています。"
+					: "保存済みの接続設定を読み込みました。";
 			}
 			catch ( Exception )
 			{

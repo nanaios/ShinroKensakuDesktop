@@ -15,6 +15,29 @@
                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
                 <Setter Property="ToolTipService.InitialShowDelay" Value="350" />
             </Style>
+            <Style x:Key="PageHeader" TargetType="DockPanel">
+                <Setter Property="Margin" Value="0,0,0,20" />
+                <Setter Property="LastChildFill" Value="True" />
+            </Style>
+            <Style x:Key="SectionCard" TargetType="ui:Card" BasedOn="{StaticResource {x:Type ui:Card}}">
+                <Setter Property="Padding" Value="24,20" />
+                <Setter Property="Margin" Value="0,0,0,16" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+            <Style x:Key="StatCard" TargetType="ui:Card" BasedOn="{StaticResource {x:Type ui:Card}}">
+                <Setter Property="Width" Value="220" />
+                <Setter Property="Padding" Value="20,16" />
+                <Setter Property="Margin" Value="0,0,12,12" />
+            </Style>
+            <Style x:Key="SecondaryText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+            <Style x:Key="StatValue" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Margin" Value="0,6,0,0" />
+            </Style>
             <Style x:Key="YearSelector" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsBusy}" Value="True">
