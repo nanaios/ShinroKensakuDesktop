@@ -8,8 +8,8 @@ WPFで進学・就職の受験記録を検索するアプリです。.NET 10 SDK
 .\Run-App.ps1
 ```
 
-.NET 10 SDKとWindows Desktopランタイムを確認して起動します。通常のインストール先に加え、ユーザー領域の`kaken-dotnet`と
-`.dotnet`も確認します。
+PATH上の`dotnet`に.NET 10 SDKとWindows Desktopランタイムがあることを確認して起動します。Riderから起動する場合は、
+「Toolset and Build」の.NET CLIに64bit版（`C:\Program Files\dotnet\dotnet.exe`）を指定してください。32bit版を指定すると起動に失敗します。
 
 初回は「設定 → データベースの接続」で接続情報を入力し、「接続確認して保存」を押してください。接続できた設定だけを、このWindowsユーザー専用の暗号化ファイル
 `%LOCALAPPDATA%\KST-DeCS\database.bin`に保存します。パスワード欄を空欄にすると保存済みのパスワードを引き継ぎます。接続変更後は各画面で再検索・再読み込みしてください。

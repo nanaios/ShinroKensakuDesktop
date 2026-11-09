@@ -9,23 +9,13 @@ if (($Database -or $Render) -and -not $Verify) {
     throw '-Database と -Render は -Verify と組み合わせて指定してください。'
 }
 
-$systemDotnet = Get-Command dotnet -ErrorAction SilentlyContinue
-$candidates = @(
-    (Join-Path $env:LOCALAPPDATA 'kaken-dotnet\dotnet.exe'),
-    (Join-Path $env:USERPROFILE '.dotnet\dotnet.exe')
-)
-if ($systemDotnet) { $candidates = @($systemDotnet.Source) + $candidates }
-$runtime = $null
-foreach ($candidate in $candidates | Select-Object -Unique) {
-    if (-not (Test-Path -LiteralPath $candidate)) { continue }
-    $sdks = & $candidate --list-sdks
-    $runtimes = & $candidate --list-runtimes
-    if (($sdks -match '^10\.') -and ($runtimes -match '^Microsoft.WindowsDesktop.App 10\.')) {
-        $runtime = $candidate
-        break
-    }
+$dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
+if (-not $dotnet) { throw 'dotnetが見つかりません。.NET 10 SDK（x64）を導入してください。' }
+$runtime = $dotnet.Source
+if (-not ((& $runtime --list-sdks) -match '^10\.') -or
+    -not ((& $runtime --list-runtimes) -match '^Microsoft\.WindowsDesktop\.App 10\.')) {
+    throw "$runtime に.NET 10 SDKとWindows Desktopランタイムがありません。.NET 10 SDK（x64）を導入してください。"
 }
-if (-not $runtime) { throw '.NET 10 SDKとWindows Desktopランタイムを導入してください。' }
 
 if ($Verify) {
     $project = Join-Path $PSScriptRoot 'tests\SmokeTests\SmokeTests.csproj'
