@@ -166,10 +166,23 @@ internal static class ReviewUiChecks
             check(settingsPage.FindName("ReportLinkBox") is Wpf.Ui.Controls.TextBox { PlaceholderText: var hint } && hint.StartsWith("https://")
                 && searchPage.FindName("ReportButton") is FrameworkElement reportButton && System.Windows.Automation.AutomationProperties.GetName(reportButton) == "受験報告書をブラウザで開く",
                 "report link is set in settings and opened from the search page");
+            var connectionForm = (FrameworkElement)settingsPage.FindName("ConnectionForm");
+            var reportBox = (FrameworkElement)settingsPage.FindName("ReportLinkBox");
+            check(!settings.IsAdvancedMode && connectionForm.Visibility != Visibility.Visible && reportBox.Visibility != Visibility.Visible, "settings open read-only");
             if (render) Render(window, "settings-light");
+            settings.IsAdvancedMode = true;
+            window.UpdateLayout();
+            check(connectionForm.IsVisible && reportBox.IsVisible, "advanced settings reveal the editors");
+            if (render)
+            {
+                ((System.Windows.Controls.ScrollViewer)settingsPage.Content).ScrollToBottom();
+                window.UpdateLayout();
+                Render(window, "settings-advanced-light");
+            }
             navigation.Navigate(typeof(AnalyticsPage));
             await Task.Delay(400);
             window.UpdateLayout();
+            check(!settings.IsAdvancedMode, "leaving the settings page locks it again");
             if (render) Render(window, "analytics-light");
             var charts = Children<ShinroKensakuDesktop.Views.Controls.SeriesChartView>(analyticsPage).ToList();
             check(charts.Count == 2 && !charts[0].IsDark, "real main window hosts all charts");

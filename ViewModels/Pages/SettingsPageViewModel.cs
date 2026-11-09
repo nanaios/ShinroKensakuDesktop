@@ -38,17 +38,57 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			LoadDatabaseFields ( );
 		}
 
+		/* Off at every start: the connection and the report link are shown but cannot be edited until it is turned on.
+		   It only guards against accidental changes; it is not access control. */
+		[ ObservableProperty ] public partial bool IsAdvancedMode { get; set; }
+
+		private bool reverting;
+
 		/* The folder the 受験報告書 button opens; saved when the field is left, only if it is an https address. */
 		[ ObservableProperty ] public partial string ReportLink { get; set; } = "";
 		[ ObservableProperty ] public partial string ReportLinkError { get; set; } = "";
 		public bool HasReportLinkError => ReportLinkError.Length > 0;
 		public Uri? ReportUri => HasReportLinkError ? null : UserPreferences.ParseReportLink ( ReportLink );
 		public bool HasReportUri => ReportUri != null;
+		public string ReportLinkStateText => HasReportUri ? "登録済み" : "未登録";
+		public bool ShowEnvironmentNotice => IsAdvancedMode && UsesEnvironment;
+
+		/* Turning it off drops edits that were not saved, so the page always shows what is stored. */
+		partial void OnIsAdvancedModeChanged ( bool value )
+		{
+			OnPropertyChanged ( nameof(CanConfigureLocalConnection) );
+			OnPropertyChanged ( nameof(ShowEnvironmentNotice) );
+			if ( value )
+			{
+				return;
+			}
+
+			RevertReportLink ( );
+			ReportLinkError = "";
+			RestoreDatabaseFields ( );
+			SetDatabaseNotice ( "", NoticeSeverity.None );
+		}
+
+		private void RevertReportLink ( )
+		{
+			reverting = true;
+			try { ReportLink = UserPreferences.LoadReportLink ( preferencesPath ) ?? ""; }
+			finally { reverting = false; }
+		}
 
 		partial void OnReportLinkChanged ( string value )
 		{
-			if ( initializing )
+			if ( initializing || reverting || !IsAdvancedMode )
 			{
+				/* While locked, a change is undone at once, so the stored link is all that can be shown. */
+				if ( !initializing && !reverting )
+				{
+					RevertReportLink ( );
+				}
+
+				OnPropertyChanged ( nameof(ReportUri) );
+				OnPropertyChanged ( nameof(HasReportUri) );
+				OnPropertyChanged ( nameof(ReportLinkStateText) );
 				return;
 			}
 
@@ -72,6 +112,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 
 			OnPropertyChanged ( nameof(ReportUri) );
 			OnPropertyChanged ( nameof(HasReportUri) );
+			OnPropertyChanged ( nameof(ReportLinkStateText) );
 		}
 
 		partial void OnReportLinkErrorChanged ( string value )
@@ -79,6 +120,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			OnPropertyChanged ( nameof(HasReportLinkError) );
 			OnPropertyChanged ( nameof(ReportUri) );
 			OnPropertyChanged ( nameof(HasReportUri) );
+			OnPropertyChanged ( nameof(ReportLinkStateText) );
 		}
 
 		[ ObservableProperty ]
@@ -94,7 +136,8 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ ObservableProperty ] public partial ConnectionStatus ConnectionState { get; set; } = ConnectionStatus.NotConfigured;
 		[ ObservableProperty ] public partial string ConnectionTarget { get; set; } = "";
 		[ ObservableProperty ] public partial bool IsTestingConnection { get; set; }
-		public bool CanConfigureLocalConnection => !DatabaseSettings.UsesEnvironment && !IsTestingConnection;
+		public bool CanConfigureLocalConnection =>
+			IsAdvancedMode && !DatabaseSettings.UsesEnvironment && !IsTestingConnection;
 		public bool UsesEnvironment => DatabaseSettings.UsesEnvironment;
 		public bool HasThemeError => ThemeStatusText.Length > 0;
 
@@ -138,10 +181,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			try
 			{
 				storedConnection = new MySqlConnectionStringBuilder ( DatabaseSettings.LoadConnectionString ( ) );
-				DatabaseServer = storedConnection.Server;
-				DatabasePort = storedConnection.Port.ToString ( );
-				DatabaseName = storedConnection.Database;
-				DatabaseUser = storedConnection.UserID;
+				RestoreDatabaseFields ( );
 				ConnectionTarget = Target ( storedConnection );
 				ConnectionState = DatabaseSettings.UsesEnvironment ? ConnectionStatus.Environment : ConnectionStatus.Saved;
 			}
@@ -150,6 +190,15 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				/* No credentials or exception details are displayed. */
 				ConnectionState = ConnectionStatus.NotConfigured;
 			}
+		}
+
+		/* The fields show the stored connection; with none stored they return to the defaults. */
+		private void RestoreDatabaseFields ( )
+		{
+			DatabaseServer = storedConnection?.Server ?? "localhost";
+			DatabasePort = storedConnection?.Port.ToString ( ) ?? "3306";
+			DatabaseName = storedConnection?.Database ?? "";
+			DatabaseUser = storedConnection?.UserID ?? "";
 		}
 
 		private static string Target ( MySqlConnectionStringBuilder builder ) =>

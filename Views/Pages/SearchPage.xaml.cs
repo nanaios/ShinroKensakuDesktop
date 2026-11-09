@@ -77,7 +77,7 @@ namespace ShinroKensakuDesktop.Views.Pages
 
 		private void ReportButton_ToolTipOpening ( object sender, ToolTipEventArgs e ) =>
 			ReportButton.ToolTip = UserPreferences.ParseReportLink ( UserPreferences.LoadReportLink ( ) ) == null
-				? "リンクが未登録です。押すと設定を開きます"
+				? "リンクが未登録です。押すと設定を開きます（詳細設定をオンにして登録）"
 				: "受験報告書をブラウザで開く";
 
 		private void OpenSettings_Click ( object sender, RoutedEventArgs e )
