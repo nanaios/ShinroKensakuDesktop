@@ -9,26 +9,30 @@
                  x:Class="ShinroKensakuDesktop.Views.Windows.MainWindow" Width="1200" Height="800"
                  MinWidth="780" MinHeight="540" WindowStartupLocation="CenterScreen" Title="{Binding Title}">
     <Grid x:Name="Root">
-        <ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Margin="48,0,0,0" Panel.ZIndex="1" />
+        <ui:TitleBar x:Name="WindowTitle" Title="{Binding Title}" Panel.ZIndex="1" VerticalAlignment="Top">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="HatGraduation24" Foreground="{DynamicResource StudyBrush}" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+        <!-- LeftFluent keeps every label visible under its icon at any window width; it starts below the title bar. -->
         <ui:NavigationView
             x:Name="MainView" xmlns:pages="clr-namespace:ShinroKensakuDesktop.Views.Pages"
-            IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False" IsPaneToggleVisible="True"
-            IsTopSeparatorVisible="False" OpenPaneLength="200" PaneDisplayMode="Left"
-            IsPaneOpen="False" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Row="4"
-            FrameMargin="0,48,0,0">
+            IsBackButtonVisible="Visible" IsFooterSeparatorVisible="False" IsPaneToggleVisible="False"
+            IsTopSeparatorVisible="False" PaneDisplayMode="LeftFluent" Margin="0,48,0,0"
+            VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem TargetPageType="pages:DashBoardPage" Content="ダッシュボード" Tag="DashBoard"
-                                       Icon="{ui:SymbolIcon Symbol=Home12}" />
+                                       Icon="{ui:SymbolIcon Symbol=Home24}" />
                 <ui:NavigationViewItem TargetPageType="pages:AnalyticsPage" Content="進路グラフ" Tag="Analytics"
-                                       Icon="{ui:SymbolIcon Symbol=ArrowTrending12}" />
+                                       Icon="{ui:SymbolIcon Symbol=DataTrending24}" />
                 <ui:NavigationViewItem TargetPageType="pages:ComparisonPage" Content="年度比較" Tag="Comparison"
-                                       Icon="{ui:SymbolIcon Symbol=Clock12}" />
+                                       Icon="{ui:SymbolIcon Symbol=ArrowSwap24}" />
                 <ui:NavigationViewItem TargetPageType="pages:SearchPage" Content="検索" Tag="Search"
-                                       Icon="{ui:SymbolIcon Symbol=Search12}" />
+                                       Icon="{ui:SymbolIcon Symbol=Search24}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem TargetPageType="pages:SettingsPage" Content="設定" Tag="Settings"
-                                       Icon="{ui:SymbolIcon Symbol=Settings16}" />
+                                       Icon="{ui:SymbolIcon Symbol=Settings24}" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
     </Grid>

@@ -20,7 +20,7 @@ namespace ShinroKensakuDesktop.Views.Pages
 			if ( DataContext is SettingsPageViewModel viewModel &&
 			     await viewModel.SaveDatabaseAsync ( DatabasePassword.Password ) )
 			{
-				DatabasePassword.Clear ( );
+				DatabasePassword.Password = string.Empty;
 			}
 		}
 	}

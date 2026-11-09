@@ -7,122 +7,185 @@
       d:DesignWidth="1440" ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
       d:DataContext="{d:DesignInstance Type=vm:SettingsPageViewModel, IsDesignTimeCreatable=True}"
-      Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="Settings"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}" Title="設定"
       xmlns:converters="clr-namespace:ShinroKensakuDesktop.Views.Converters"
       xmlns:controls="clr-namespace:ShinroKensakuDesktop.Views.Controls"
       xmlns:vm="clr-namespace:ShinroKensakuDesktop.ViewModels.Pages"
       x:Class="ShinroKensakuDesktop.Views.Pages.SettingsPage">
     <Page.Resources>
         <converters:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
+        <Style x:Key="CardHeaderTitle" TargetType="ui:TextBlock">
+            <Setter Property="FontTypography" Value="Body" />
+        </Style>
+        <Style x:Key="CardHeaderNote" TargetType="ui:TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            <Setter Property="FontTypography" Value="Caption" />
+        </Style>
+        <!-- The connection state is read from the badge's colour and icon, with one word. -->
+        <Style x:Key="ConnectionBadge" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="8,3,10,3" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.Connected}">
+                    <Setter Property="Background" Value="{DynamicResource SystemFillColorSuccessBackgroundBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.Failed}">
+                    <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBackgroundBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.NotConfigured}">
+                    <Setter Property="Background" Value="{DynamicResource SystemFillColorCautionBackgroundBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ConnectionIcon" TargetType="ui:SymbolIcon">
+            <Setter Property="Symbol" Value="LockClosed16" />
+            <Setter Property="Filled" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.Connected}">
+                    <Setter Property="Symbol" Value="CheckmarkCircle16" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.Failed}">
+                    <Setter Property="Symbol" Value="ErrorCircle16" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.NotConfigured}">
+                    <Setter Property="Symbol" Value="Warning16" />
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ConnectionState}" Value="{x:Static vm:ConnectionStatus.Testing}">
+                    <Setter Property="Symbol" Value="ArrowSync16" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
-    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="36,20,36,32">
-            <ui:TextBlock Text="設定" FontTypography="Title" Margin="0,0,0,20" />
-            <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
+    <ScrollViewer behaviors:NavigationViewport.Fit="True" VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource ApplicationBackgroundBrush}">
+        <StackPanel Margin="{StaticResource PagePadding}">
+            <DockPanel Style="{StaticResource PageHeader}">
+                <ui:TextBlock Text="設定" FontTypography="Title" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <ui:TextBlock Text="外観" Style="{StaticResource GroupHeading}" Margin="0,0,0,8" />
+            <ui:CardControl Margin="0,0,0,8" Icon="{ui:SymbolIcon Color24}">
                 <ui:CardControl.Header>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="テーマ" />
-                        <ui:TextBlock Grid.Row="1" Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                                      Text="アプリケーションのテーマを選択" />
-                    </Grid>
+                    <StackPanel>
+                        <ui:TextBlock Text="テーマ" Style="{StaticResource CardHeaderTitle}" />
+                        <ui:TextBlock Text="ライト・ダーク・Windowsの設定に合わせる" Style="{StaticResource CardHeaderNote}" />
+                    </StackPanel>
                 </ui:CardControl.Header>
-                <ComboBox MinWidth="200" AutomationProperties.Name="アプリケーションのテーマ"
+                <ComboBox MinWidth="220" AutomationProperties.Name="アプリケーションのテーマ"
                           SelectedIndex="{Binding CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter},Mode=TwoWay}">
                     <ComboBoxItem Content="ライト" />
                     <ComboBoxItem Content="ダーク" />
                     <ComboBoxItem Content="ハイコントラスト" />
-                    <ComboBoxItem Content="システム" />
+                    <ComboBoxItem Content="Windowsの設定に合わせる" />
                 </ComboBox>
             </ui:CardControl>
-            <TextBlock Text="{Binding ThemeStatusText}" TextWrapping="Wrap" />
-            <ui:Card Style="{StaticResource SectionCard}" Margin="0,0,0,12">
+            <controls:NoticeBar Title="テーマは変わりましたが、次回の起動用に保存できませんでした" Margin="0,0,0,8"
+                                Severity="{Binding HasThemeError, Converter={StaticResource BoolToSeverity}}" />
+
+            <ui:TextBlock Text="データベース" Style="{StaticResource GroupHeading}" Margin="0,16,0,8" />
+            <ui:CardExpander Icon="{ui:SymbolIcon Database24}" IsExpanded="True" Margin="0,0,0,8">
+                <ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition /><ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <ui:TextBlock Text="データベースの接続" Style="{StaticResource CardHeaderTitle}" />
+                            <ui:TextBlock Text="{Binding ConnectionTarget}" Style="{StaticResource CardHeaderNote}"
+                                          Visibility="{Binding ConnectionTarget, Converter={StaticResource TextVisibility}}" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Style="{StaticResource ConnectionBadge}" Margin="0,0,16,0"
+                                VerticalAlignment="Center" AutomationProperties.Name="{Binding ConnectionStateText}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Style="{StaticResource ConnectionIcon}" />
+                                <TextBlock Text="{Binding ConnectionStateText}" FontSize="12" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ui:CardExpander.Header>
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <ui:TextBlock Text="データベースの接続" FontTypography="Subtitle" />
-                        <controls:InfoTip Margin="8,2,0,0" Text="{Binding ConnectionSourceText}" />
-                    </StackPanel>
-                    <WrapPanel IsEnabled="{Binding CanConfigureLocalConnection}">
-                        <StackPanel Width="240" Margin="0,0,16,12">
-                            <TextBlock Text="サーバー" Margin="0,0,0,4" />
+                    <controls:NoticeBar Title="環境変数で接続先が指定されています"
+                                        Message="変更するときは環境変数を書き換えて、アプリを再起動してください。"
+                                        Severity="{Binding UsesEnvironment, Converter={StaticResource BoolToSeverity}, ConverterParameter=Info}" />
+                    <Grid IsEnabled="{Binding CanConfigureLocalConnection}" MaxWidth="640" HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="320" /><ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="240" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="サーバー" Style="{StaticResource FieldLabel}" />
                             <TextBox Text="{Binding DatabaseServer, UpdateSourceTrigger=PropertyChanged}"
                                      AutomationProperties.Name="サーバー" />
                         </StackPanel>
-                        <StackPanel Width="120" Margin="0,0,16,12">
-                            <TextBlock Text="ポート" Margin="0,0,0,4" />
+                        <StackPanel Grid.Column="2" Margin="0,0,0,12" Width="120" HorizontalAlignment="Left">
+                            <TextBlock Text="ポート" Style="{StaticResource FieldLabel}" />
                             <TextBox Text="{Binding DatabasePort, UpdateSourceTrigger=PropertyChanged}"
                                      AutomationProperties.Name="ポート" />
                         </StackPanel>
-                        <StackPanel Width="240" Margin="0,0,16,12">
-                            <TextBlock Text="データベース名" Margin="0,0,0,4" />
+                        <StackPanel Grid.Row="1" Margin="0,0,0,12">
+                            <TextBlock Text="データベース名" Style="{StaticResource FieldLabel}" />
                             <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}"
                                      AutomationProperties.Name="データベース名" />
                         </StackPanel>
-                        <StackPanel Width="240" Margin="0,0,16,12">
-                            <TextBlock Text="ユーザー名" Margin="0,0,0,4" />
+                        <StackPanel Grid.Row="2" Margin="0,0,0,12">
+                            <TextBlock Text="ユーザー名" Style="{StaticResource FieldLabel}" />
                             <TextBox Text="{Binding DatabaseUser, UpdateSourceTrigger=PropertyChanged}"
                                      AutomationProperties.Name="ユーザー名" />
                         </StackPanel>
-                        <StackPanel Width="240" Margin="0,0,16,12">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBlock Text="パスワード" VerticalAlignment="Center" />
-                                <controls:InfoTip Width="20" Height="20"
-                                                  Text="空欄のまま保存すると、保存済みのパスワードを引き継ぎます。" />
-                            </StackPanel>
-                            <PasswordBox x:Name="DatabasePassword" AutomationProperties.Name="パスワード" />
+                        <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,0,0,12">
+                            <TextBlock Text="パスワード" Style="{StaticResource FieldLabel}" />
+                            <ui:PasswordBox x:Name="DatabasePassword" PlaceholderText="変更しない場合は空欄"
+                                            AutomationProperties.Name="パスワード" />
                         </StackPanel>
-                    </WrapPanel>
-                    <DockPanel Margin="0,4,0,0">
-                        <ui:Button Content="接続確認して保存" Click="SaveDatabase_Click" Appearance="Primary"
-                                   IsEnabled="{Binding CanConfigureLocalConnection}" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding DatabaseStatusText}" TextWrapping="Wrap" VerticalAlignment="Center"
-                                   Margin="16,0,0,0" />
-                    </DockPanel>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
+                        <ui:Button Click="SaveDatabase_Click" Appearance="Primary"
+                                   IsEnabled="{Binding CanConfigureLocalConnection}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:ProgressRing IsIndeterminate="True" Width="16" Height="16" Margin="0,0,8,0"
+                                                 Visibility="{Binding IsTestingConnection, Converter={StaticResource BoolVisibility}}" />
+                                <TextBlock Text="接続を確認して保存" />
+                            </StackPanel>
+                        </ui:Button>
+                        <ui:SymbolIcon Symbol="LockClosed16" FontSize="14" Margin="16,0,4,0" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="このWindowsユーザーだけが読める形で暗号化して保存" Style="{StaticResource CaptionText}" />
+                    </StackPanel>
+                    <controls:NoticeBar Title="{Binding DatabaseNoticeTitle}" Message="{Binding DatabaseStatusText}"
+                                        Severity="{Binding DatabaseNoticeSeverity}" Margin="0" />
                 </StackPanel>
-            </ui:Card>
-            <ui:CardExpander Margin="0,0,0,12" Icon="{ui:SymbolIcon Info16}">
+            </ui:CardExpander>
+
+            <ui:TextBlock Text="このアプリについて" Style="{StaticResource GroupHeading}" Margin="0,16,0,8" />
+            <ui:CardExpander Icon="{ui:SymbolIcon Info24}">
                 <ui:CardExpander.Header>
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition /><ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <ui:TextBlock Grid.Row="0" Grid.Column="0" FontTypography="Body" Text="KST-DeCS" />
-                        <ui:TextBlock Grid.Row="1" Grid.Column="0"
-                                      Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
-                                      Text="© 2026 KST J3-20 Ryodai Nagano" />
-                        <TextBlock Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Margin="0,0,16,0"
-                                   VerticalAlignment="Center"
-                                   Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                        <StackPanel>
+                            <ui:TextBlock Text="KST-DeCS" Style="{StaticResource CardHeaderTitle}" />
+                            <ui:TextBlock Text="© 2026 KST J3-20 Ryodai Nagano" Style="{StaticResource CardHeaderNote}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Margin="0,0,16,0" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    Text="{Binding ApplicationVersion}" />
                     </Grid>
                 </ui:CardExpander.Header>
-                <ui:CardExpander.Content>
-                    <StackPanel>
-                        <TextBlock Text="進学・就職の受験記録を検索し、年度ごとの内訳と増減を確認できます。"
-                                   TextWrapping="Wrap" Margin="0,0,0,12" />
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" /><ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" /><RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Enter" FontWeight="SemiBold" Margin="0,0,24,4" />
-                            <TextBlock Grid.Column="1" Text="検索" Style="{StaticResource SecondaryText}" />
-                            <TextBlock Grid.Row="1" Text="Esc" FontWeight="SemiBold" Margin="0,0,24,0" />
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="検索の中断"
-                                       Style="{StaticResource SecondaryText}" />
-                        </Grid>
-                    </StackPanel>
-                </ui:CardExpander.Content>
+                <TextBlock Text="進学・就職の受験記録を検索し、年度ごとの内訳と増減を確認できます。" TextWrapping="Wrap" />
             </ui:CardExpander>
         </StackPanel>
     </ScrollViewer>

@@ -9,6 +9,17 @@ using Wpf.Ui.Controls;
 
 namespace ShinroKensakuDesktop.ViewModels.Pages
 {
+	/* Shown as a badge on the connection card: the state is read from its icon and colour plus one word. */
+	public enum ConnectionStatus
+	{
+		NotConfigured,
+		Saved,
+		Testing,
+		Connected,
+		Failed,
+		Environment
+	}
+
 	public partial class SettingsPageViewModel : ObservableObject, IDisposable
 	{
 		private readonly bool initializing = true;
@@ -33,13 +44,34 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		[ ObservableProperty ] public partial string DatabasePort { get; set; } = "3306";
 		[ ObservableProperty ] public partial string DatabaseName { get; set; } = "";
 		[ ObservableProperty ] public partial string DatabaseUser { get; set; } = "";
-		[ ObservableProperty ] public partial string DatabaseStatusText { get; set; } = "接続情報を入力し、接続確認して保存してください。";
+		[ ObservableProperty ] public partial string DatabaseStatusText { get; set; } = "";
+		[ ObservableProperty ] public partial NoticeSeverity DatabaseNoticeSeverity { get; set; }
+		[ ObservableProperty ] public partial ConnectionStatus ConnectionState { get; set; } = ConnectionStatus.NotConfigured;
+		[ ObservableProperty ] public partial string ConnectionTarget { get; set; } = "";
 		[ ObservableProperty ] public partial bool IsTestingConnection { get; set; }
 		public bool CanConfigureLocalConnection => !DatabaseSettings.UsesEnvironment && !IsTestingConnection;
+		public bool UsesEnvironment => DatabaseSettings.UsesEnvironment;
+		public bool HasThemeError => ThemeStatusText.Length > 0;
 
-		public string ConnectionSourceText => DatabaseSettings.UsesEnvironment
-			? "環境変数で接続が指定されています。変更する場合は環境変数を更新してアプリを再起動してください。"
-			: "接続設定は、このWindowsユーザーだけが復号できる形式で端末に保存します。";
+		public string ConnectionStateText => ConnectionState switch
+		{
+			ConnectionStatus.Saved => "保存済み",
+			ConnectionStatus.Testing => "確認中",
+			ConnectionStatus.Connected => "接続済み",
+			ConnectionStatus.Failed => "接続できません",
+			ConnectionStatus.Environment => "環境変数",
+			_ => "未設定"
+		};
+
+		public string DatabaseNoticeTitle => DatabaseNoticeSeverity == NoticeSeverity.Success
+			? "接続を確認して保存しました"
+			: "保存できませんでした";
+
+		partial void OnConnectionStateChanged ( ConnectionStatus value ) => OnPropertyChanged ( nameof(ConnectionStateText) );
+
+		partial void OnDatabaseNoticeSeverityChanged ( NoticeSeverity value ) =>
+			OnPropertyChanged ( nameof(DatabaseNoticeTitle) );
+		partial void OnThemeStatusTextChanged ( string value ) => OnPropertyChanged ( nameof(HasThemeError) );
 
 		public string ApplicationVersion => Assembly.GetExecutingAssembly ( ).GetName ( ).Version?.ToString ( ) ?? "不明";
 
@@ -65,15 +97,23 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				DatabasePort = storedConnection.Port.ToString ( );
 				DatabaseName = storedConnection.Database;
 				DatabaseUser = storedConnection.UserID;
-				/* The source explanation sits behind an ⓘ, so keep the environment case visible here. */
-				DatabaseStatusText = DatabaseSettings.UsesEnvironment
-					? "環境変数の接続設定を使用しています。"
-					: "保存済みの接続設定を読み込みました。";
+				ConnectionTarget = Target ( storedConnection );
+				ConnectionState = DatabaseSettings.UsesEnvironment ? ConnectionStatus.Environment : ConnectionStatus.Saved;
 			}
 			catch ( Exception )
 			{
 				/* No credentials or exception details are displayed. */
+				ConnectionState = ConnectionStatus.NotConfigured;
 			}
+		}
+
+		private static string Target ( MySqlConnectionStringBuilder builder ) =>
+			$"{builder.Server}:{builder.Port} / {builder.Database}";
+
+		private void SetDatabaseNotice ( string text, NoticeSeverity severity )
+		{
+			DatabaseStatusText = text;
+			DatabaseNoticeSeverity = severity;
 		}
 
 		partial void OnIsTestingConnectionChanged ( bool value ) =>
@@ -90,12 +130,14 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			     string.IsNullOrWhiteSpace ( DatabaseUser ) || !uint.TryParse ( DatabasePort, out uint port ) ||
 			     port is 0 or > 65535 )
 			{
-				DatabaseStatusText = "サーバー・データベース・ユーザー名を入力し、ポートは1～65535で指定してください。";
+				SetDatabaseNotice ( "サーバー・データベース名・ユーザー名を入力し、ポートは1～65535で指定してください。",
+					NoticeSeverity.Error );
 				return false;
 			}
 
 			IsTestingConnection = true;
-			DatabaseStatusText = "接続を確認しています…";
+			ConnectionState = ConnectionStatus.Testing;
+			SetDatabaseNotice ( "", NoticeSeverity.None );
 			try
 			{
 				MySqlConnectionStringBuilder builder = storedConnection == null
@@ -115,12 +157,15 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				await MySQLCommand.TestConnectionAsync ( builder.ConnectionString );
 				DatabaseSettings.SaveConnectionString ( builder.ConnectionString );
 				storedConnection = builder;
-				DatabaseStatusText = "接続確認して保存しました。各画面で再検索・再読み込みすると反映されます。";
+				ConnectionTarget = Target ( builder );
+				ConnectionState = ConnectionStatus.Connected;
+				SetDatabaseNotice ( "各画面で再読み込み・再検索すると、新しい接続先のデータが表示されます。", NoticeSeverity.Success );
 				return true;
 			}
 			catch ( Exception )
 			{
-				DatabaseStatusText = "接続確認または保存に失敗しました。入力内容・MySQLの稼働・保存先の権限を確認してください。";
+				ConnectionState = ConnectionStatus.Failed;
+				SetDatabaseNotice ( "入力内容、MySQLが動いているか、保存先の権限を確認してください。", NoticeSeverity.Error );
 				return false;
 			}
 			finally { IsTestingConnection = false; }

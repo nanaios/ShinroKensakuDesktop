@@ -2,9 +2,22 @@ using System.Globalization;
 
 namespace ShinroKensakuDesktop.Models
 {
-	public sealed record SearchCriteria ( string? Target, int? Year, string? ExamMethod, sbyte? Department )
+	/* Department is a class code (clsTbl). Gakka is a department name derived from class names; its classes are
+	   kept as a sorted, comma-joined string so two criteria compare by value. */
+	public sealed record SearchCriteria (
+		string? Target,
+		int? Year,
+		string? ExamMethod,
+		sbyte? Department,
+		string? Gakka = null,
+		string? GakkaClasses = null )
 	{
-		public static SearchCriteria Create ( string? target, string? year, string? method, sbyte? department )
+		public IReadOnlyList<sbyte> GakkaClassCodes => string.IsNullOrEmpty ( GakkaClasses )
+			? [ ]
+			: GakkaClasses.Split ( ',' ).Select ( x => sbyte.Parse ( x, CultureInfo.InvariantCulture ) ).ToList ( );
+
+		public static SearchCriteria Create ( string? target, string? year, string? method, sbyte? department,
+			string? gakka = null, IEnumerable<sbyte>? gakkaClasses = null )
 		{
 			string? yearText = Normalize ( year );
 			int? parsed = null;
@@ -20,7 +33,12 @@ namespace ShinroKensakuDesktop.Models
 				parsed = value;
 			}
 
-			return new SearchCriteria ( Normalize ( target ), parsed, Normalize ( method ), department );
+			string? gakkaName = Normalize ( gakka );
+			string? classes = gakkaName == null
+				? null
+				: string.Join ( ",", ( gakkaClasses ?? [ ] ).Distinct ( ).Order ( )
+					.Select ( x => x.ToString ( CultureInfo.InvariantCulture ) ) );
+			return new SearchCriteria ( Normalize ( target ), parsed, Normalize ( method ), department, gakkaName, classes );
 		}
 
 		private static string? Normalize ( string? value ) =>

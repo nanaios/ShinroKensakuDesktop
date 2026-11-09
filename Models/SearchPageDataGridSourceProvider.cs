@@ -24,7 +24,7 @@ namespace ShinroKensakuDesktop.Models
 			CancellationToken cancellationToken = default )
 		{
 			string queryShingaku = """
-			                       select year,jyukenbi,gakkou_name AS shinro_name,gakubu,gakka,course,NULL AS syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
+			                       select '進学' AS kind,year,jyukenbi,gakkou_name AS shinro_name,gakubu,gakka,course,NULL AS syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
 			                       from shingakukekkaTbl
 			                       left join jyukenhouhouTbl
 			                       on shingakukekkaTbl.jyukenhouhou_code = jyukenhouhouTbl.jyukenhouhou_code
@@ -38,7 +38,7 @@ namespace ShinroKensakuDesktop.Models
 			                       on shingakusakiTbl.gakkou_code = gakkoumeiTbl.gakkou_code
 			                       """;
 			string querySyuusyoku = """
-			                        select year,jyukenbi,houjin_name,NULL,NULL,NULL,syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
+			                        select '就職',year,jyukenbi,houjin_name,NULL,NULL,NULL,syuusyokusakinai_kubun,jyukenhouhou_name,g_name,sei,cls_name,gouhi
 			                        from syuusyokukekkaTbl
 			                        left join jyukenhouhouTbl
 			                        on syuusyokukekkaTbl.jyukenhouhou_code = jyukenhouhouTbl.jyukenhouhou_code
@@ -86,6 +86,22 @@ namespace ShinroKensakuDesktop.Models
 				conditionsSyuusyoku.Add ( "seitoTbl.cls_code = @department" );
 			}
 
+			/* A department is a set of classes; 未設定 also covers records with no class at all. */
+			if ( criteria.Gakka != null )
+			{
+				List<string> names = criteria.GakkaClassCodes.Select ( ( code, i ) =>
+				{
+					parameters.Add ( new MySqlParameter ( $"@gakka{i}", code ) );
+					return $"@gakka{i}";
+				} ).ToList ( );
+				string classes = names.Count == 0 ? "FALSE" : $"clsTbl.cls_code IN ({string.Join ( ", ", names )})";
+				string condition = criteria.Gakka == DashboardDataProvider.Unassigned
+					? $"(clsTbl.cls_code IS NULL OR {classes})"
+					: classes;
+				conditionsShingaku.Add ( condition );
+				conditionsSyuusyoku.Add ( condition );
+			}
+
 			if ( conditionsShingaku.Count != 0 )
 			{
 				querySyuusyoku += $"\nwhere {string.Join ( " and ", conditionsSyuusyoku )}";
@@ -114,6 +130,7 @@ namespace ShinroKensakuDesktop.Models
 
 		public static SearchResultData MapRow ( DataRow row ) => new( )
 		{
+			Kind = row.Table.Columns.Contains ( "kind" ) ? row [ "kind" ] as string : null,
 			Year = row.IsNull ( "year" ) ? null : Convert.ToInt16 ( row [ "year" ] ),
 			Jyukenbi = row.IsNull ( "jyukenbi" ) ? null : Convert.ToDateTime ( row [ "jyukenbi" ] ),
 			Shinro_name = row [ "shinro_name" ] as string,

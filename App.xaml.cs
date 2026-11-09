@@ -13,6 +13,8 @@ namespace ShinroKensakuDesktop
 	{
 		private ServiceProvider? _serviceProvider;
 
+		public App ( ) => Views.ThemeColors.Attach ( );
+
 		protected override void OnStartup ( StartupEventArgs e )
 		{
 			ServiceCollection services = new( );

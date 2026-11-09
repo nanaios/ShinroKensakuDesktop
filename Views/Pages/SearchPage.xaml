@@ -3,150 +3,201 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:behaviors="clr-namespace:ShinroKensakuDesktop.Views.Behaviors"
-      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:controls="clr-namespace:ShinroKensakuDesktop.Views.Controls"
       Title="検索" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-    <Page.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolVisibility" />
-    </Page.Resources>
     <Page.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding ExecuteSearchCommand}" />
         <KeyBinding Key="Escape" Command="{Binding ExecuteSearchCancelCommand}" />
     </Page.InputBindings>
-    <Grid x:Name="SearchLayout" Height="0" behaviors:NavigationViewport.Fit="True" Margin="36,0">
+    <Page.Resources>
+        <Style x:Key="FilterField" TargetType="StackPanel">
+            <Setter Property="Width" Value="168" />
+            <Setter Property="Margin" Value="0,0,12,12" />
+        </Style>
+        <Style x:Key="BadgeText" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+        </Style>
+        <!-- 区分: the kind's icon and colour, as on every other page. -->
+        <DataTemplate x:Key="KindCell">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,8,0">
+                <ui:SymbolIcon x:Name="Icon" Symbol="HatGraduation20" FontSize="16"
+                               Foreground="{DynamicResource StudyBrush}" />
+                <TextBlock Text="{Binding Kind}" Style="{StaticResource BadgeText}" />
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Kind}" Value="就職">
+                    <Setter TargetName="Icon" Property="Symbol" Value="Briefcase20" />
+                    <Setter TargetName="Icon" Property="Foreground" Value="{DynamicResource WorkBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Kind}" Value="{x:Null}">
+                    <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        <!-- 合否: 合格 is a success badge with a check, 不合格 a grey badge, 未確定 an outline only. -->
+        <DataTemplate x:Key="ResultCell">
+            <Border x:Name="Badge" CornerRadius="10" Padding="8,2" Margin="6,0,8,0" HorizontalAlignment="Left"
+                    VerticalAlignment="Center" BorderThickness="1" BorderBrush="Transparent"
+                    Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}">
+                <StackPanel Orientation="Horizontal">
+                    <ui:SymbolIcon x:Name="Icon" Symbol="Checkmark12" FontSize="12" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                    <TextBlock Text="{Binding Result}" Style="{StaticResource BadgeText}" />
+                </StackPanel>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Result}" Value="不合格">
+                    <Setter TargetName="Badge" Property="Background"
+                            Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                    <Setter TargetName="Icon" Property="Symbol" Value="Dismiss12" />
+                    <Setter TargetName="Icon" Property="Foreground"
+                            Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Result}" Value="未確定">
+                    <Setter TargetName="Badge" Property="Background" Value="Transparent" />
+                    <Setter TargetName="Badge" Property="BorderBrush"
+                            Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                    <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Page.Resources>
+    <Grid x:Name="SearchLayout" Height="0" behaviors:NavigationViewport.Fit="True" Margin="32,0"
+          Background="{DynamicResource ApplicationBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,20,0,12">
-                <ui:TextBlock Text="受験記録の検索" FontTypography="Title" />
-                <controls:InfoTip Margin="8,4,0,0"
-                                  Text="進路先の名前と検索条件で受験記録を検索します。Enterで検索、Escで中断します。空欄の条件は絞り込みに使いません。" />
-            </StackPanel>
-            <DockPanel Margin="0,0,0,8">
-                <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
-                           ToolTip="検索を中断（Esc）" AutomationProperties.Name="検索を中断"
-                           Command="{Binding ExecuteSearchCancelCommand}" DockPanel.Dock="Right" Margin="8,0,0,0"
-                           Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}" />
-                <ui:Button Icon="{ui:SymbolIcon Search20, FontSize=20}" Style="{StaticResource IconActionButton}"
-                           ToolTip="検索（Enter）" AutomationProperties.Name="検索"
-                           Command="{Binding ExecuteSearchCommand}" Appearance="Primary"
-                           DockPanel.Dock="Right" Margin="8,0,0,0" />
+            <DockPanel Style="{StaticResource PageHeader}" Margin="0,24,0,16">
+                <ui:TextBlock Text="検索" FontTypography="Title" VerticalAlignment="Center" />
+            </DockPanel>
+            <DockPanel Margin="0,0,0,12">
+                <ui:Button Content="検索" Icon="{ui:SymbolIcon Search20}" Appearance="Primary" MinWidth="88"
+                           Command="{Binding ExecuteSearchCommand}" DockPanel.Dock="Right" Margin="8,0,0,0"
+                           ToolTip="検索（Enter）" AutomationProperties.Name="検索" />
+                <ui:Button Content="条件をクリア" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent"
+                           Command="{Binding ClearAllConditionsCommand}" DockPanel.Dock="Right" Margin="8,0,0,0"
+                           ToolTip="進路先の名前と条件をすべて外す" />
                 <ui:AutoSuggestBox x:Name="SearchNameBox" QuerySubmitted="SearchNameBox_QuerySubmitted"
                                    Text="{Binding SearchTargetName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                   PlaceholderText="進路先の名前で検索（空欄ですべて表示）"
+                                   PlaceholderText="進路先の名前（空欄なら全件）"
                                    IsEnabled="{Binding CanEditConditions}" AutomationProperties.Name="進路先の名前" />
             </DockPanel>
-            <Expander Header="検索条件" Margin="0,0,0,8">
-                <WrapPanel IsEnabled="{Binding CanEditConditions}">
-                    <StackPanel Width="180" Margin="0,4,8,4">
-                        <TextBlock Text="卒業年度" Margin="0,0,0,4" />
-                        <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
-                                       Style="{StaticResource IconActionButton}"
-                                       ToolTip="年度をクリア" AutomationProperties.Name="年度をクリア"
-                                       Command="{Binding ClearSelectedYearCommand}" DockPanel.Dock="Right" />
-                            <TextBox Text="{Binding SelectedYear, UpdateSourceTrigger=PropertyChanged}" MaxLength="4"
-                                     AutomationProperties.Name="卒業年度">
-                                <i:Interaction.Behaviors>
-                                    <behaviors:NumericOnlyBehavior />
-                                </i:Interaction.Behaviors>
-                            </TextBox>
-                        </DockPanel>
-                    </StackPanel>
-                    <StackPanel Width="180" Margin="0,4,8,4">
-                        <TextBlock Text="受験方法" Margin="0,0,0,4" />
-                        <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
-                                       Style="{StaticResource IconActionButton}"
-                                       ToolTip="受験方法をクリア" AutomationProperties.Name="受験方法をクリア"
-                                       Command="{Binding ClearExamMethodComboBoxSelectedItemCommand}"
-                                       DockPanel.Dock="Right" />
-                            <ComboBox ItemsSource="{Binding ExamMethodComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding ExamMethodComboBoxSelectedItem}"
-                                      AutomationProperties.Name="受験方法" />
-                        </DockPanel>
-                    </StackPanel>
-                    <StackPanel Width="180" Margin="0,4,8,4">
-                        <TextBlock Text="クラス" Margin="0,0,0,4" />
-                        <DockPanel>
-                            <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}"
-                                       Style="{StaticResource IconActionButton}"
-                                       ToolTip="クラスをクリア" AutomationProperties.Name="クラスをクリア"
-                                       Command="{Binding ClearDepartmentComboBoxSelectedItemCommand}"
-                                       DockPanel.Dock="Right" />
-                            <ComboBox ItemsSource="{Binding DepartmentComboBoxItems}" DisplayMemberPath="Name"
-                                      SelectedItem="{Binding DepartmentComboBoxSelectedItem}"
-                                      AutomationProperties.Name="クラス" />
-                        </DockPanel>
-                    </StackPanel>
-                    <ui:Button Icon="{ui:SymbolIcon Dismiss20, FontSize=20}" Style="{StaticResource IconActionButton}"
-                               Command="{Binding ClearAllConditionsCommand}" ToolTip="検索条件をすべてクリア"
-                               AutomationProperties.Name="検索条件をすべてクリア" Margin="0,24,8,4" />
-                    <ui:Button Icon="{ui:SymbolIcon ArrowClockwise20, FontSize=20}"
-                               Style="{StaticResource IconActionButton}"
-                               Command="{Binding ReloadConditionsCommand}" ToolTip="検索条件を再読み込み"
-                               AutomationProperties.Name="検索条件を再読み込み" Margin="0,24,0,4" />
-                </WrapPanel>
-            </Expander>
-            <TextBlock Text="{Binding ConditionStatusText}" TextWrapping="Wrap" />
-            <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,0,12"
-                         Visibility="{Binding IsLoading, Converter={StaticResource BoolVisibility}}"
-                         AutomationProperties.Name="読み込み中" />
-        </StackPanel>
-        <DockPanel Grid.Row="1" Margin="0,4,0,8">
-            <ui:Button Icon="{ui:SymbolIcon ArrowDownload20, FontSize=20}" Style="{StaticResource IconActionButton}"
-                       ToolTip="検索結果をCSV保存" AutomationProperties.Name="検索結果をCSV保存"
-                       Command="{Binding ExportCsvCommand}" DockPanel.Dock="Right" />
-            <StackPanel>
-                <TextBlock Text="{Binding SearchResultCountText}" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding LastSearchSummary}" TextTrimming="CharacterEllipsis"
-                           ToolTip="{Binding LastSearchSummary}"
-                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,12,0" />
-                <StackPanel Orientation="Horizontal" Margin="0,4,12,0"
-                            Visibility="{Binding IsSearchDirty, Converter={StaticResource BoolVisibility}}">
-                    <ui:SymbolIcon Symbol="Warning16" FontSize="16" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource SystemFillColorCautionBrush}" />
-                    <TextBlock Text="再検索が必要です" VerticalAlignment="Center" Margin="6,0,0,0" />
-                    <controls:InfoTip Text="検索条件や接続設定が変わっています。再検索すると表示とCSV保存に反映されます。" />
+            <!-- Conditions are always visible, so the table is never read against hidden filters. -->
+            <WrapPanel IsEnabled="{Binding CanEditConditions}">
+                <StackPanel Style="{StaticResource FilterField}">
+                    <TextBlock Text="卒業年度" Style="{StaticResource FieldLabel}" />
+                    <ComboBox ItemsSource="{Binding YearOptions}" SelectedItem="{Binding SelectedYearOption}"
+                              AutomationProperties.Name="卒業年度" />
                 </StackPanel>
+                <StackPanel Style="{StaticResource FilterField}">
+                    <TextBlock Text="受験方法" Style="{StaticResource FieldLabel}" />
+                    <ComboBox ItemsSource="{Binding ExamMethodOptions}" DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedExamMethodOption}" AutomationProperties.Name="受験方法" />
+                </StackPanel>
+                <StackPanel Style="{StaticResource FilterField}">
+                    <TextBlock Text="学科" Style="{StaticResource FieldLabel}" />
+                    <ComboBox ItemsSource="{Binding DepartmentNameOptions}"
+                              SelectedItem="{Binding SelectedDepartmentNameOption}" AutomationProperties.Name="学科" />
+                </StackPanel>
+                <StackPanel Style="{StaticResource FilterField}">
+                    <TextBlock Text="クラス" Style="{StaticResource FieldLabel}" />
+                    <ComboBox ItemsSource="{Binding ClassOptions}" DisplayMemberPath="Name"
+                              SelectedItem="{Binding SelectedClassOption}" AutomationProperties.Name="クラス" />
+                </StackPanel>
+            </WrapPanel>
+            <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,0,8" AutomationProperties.Name="読み込み中"
+                         Visibility="{Binding IsLoading, Converter={StaticResource BoolVisibility}, ConverterParameter=Hide}" />
+            <controls:NoticeBar Title="検索条件の選択肢を取得できませんでした" Message="{Binding ConditionStatusText}"
+                                Severity="{Binding HasConditionError, Converter={StaticResource BoolToSeverity}}">
+                <ui:Button Content="再試行" Command="{Binding ReloadConditionsCommand}" />
+            </controls:NoticeBar>
+            <controls:NoticeBar Title="{Binding StatusText}" Severity="{Binding StatusSeverity}">
+                <ui:Button Content="接続設定を開く" Click="OpenSettings_Click"
+                           Visibility="{Binding IsConnectionError, Converter={StaticResource BoolVisibility}}" />
+            </controls:NoticeBar>
+            <controls:NoticeBar Title="条件が変わりました" Message="{Binding DirtyMessage}"
+                                Severity="{Binding IsSearchDirty, Converter={StaticResource BoolToSeverity}}">
+                <ui:Button Content="再検索" Appearance="Primary" Command="{Binding ExecuteSearchCommand}" />
+            </controls:NoticeBar>
+        </StackPanel>
+        <DockPanel Grid.Row="1" Margin="0,0,0,8"
+                   Visibility="{Binding HasLastSearch, Converter={StaticResource BoolVisibility}}">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <ui:Button x:Name="ColumnsButton" Content="列" Icon="{ui:SymbolIcon ColumnTriple20}"
+                           Click="ColumnsButton_Click" ToolTip="表示する列を選ぶ" AutomationProperties.Name="表示する列を選ぶ" />
+                <ui:Button Content="CSV" Icon="{ui:SymbolIcon ArrowDownload20}" Margin="8,0,0,0"
+                           Command="{Binding ExportCsvCommand}" ToolTipService.ShowOnDisabled="True"
+                           AutomationProperties.Name="検索結果をCSV保存">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="ToolTip" Value="検索結果をCSVで保存" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSearchDirty}" Value="True">
+                                    <Setter Property="ToolTip" Value="条件が変わったため保存できません。再検索してください" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
             </StackPanel>
+            <ui:TextBlock Text="{Binding SearchResultCountText}" FontTypography="Subtitle" VerticalAlignment="Center" />
         </DockPanel>
-        <ui:DataGrid Grid.Row="2" Name="ResultGrid" HeadersVisibility="All" ItemsSource="{Binding SearchResultList}"
+        <ui:DataGrid Grid.Row="2" Name="ResultGrid" HeadersVisibility="Column" ItemsSource="{Binding SearchResultList}"
                      IsReadOnly="True" AutoGenerateColumns="False"
                      EnableRowVirtualization="True" EnableColumnVirtualization="True"
                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                      VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     RowHeight="36" ColumnWidth="140" CanUserAddRows="False" CanUserResizeRows="False"
+                     RowHeight="36" ColumnWidth="128" CanUserAddRows="False" CanUserResizeRows="False"
                      FrozenColumnCount="3" AutomationProperties.Name="受験記録の検索結果"
-                     VerticalAlignment="Stretch">
+                     VerticalAlignment="Stretch" Margin="0,0,0,24">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="卒業年度" Width="100" Binding="{Binding Year}" />
-                <DataGridTextColumn Header="受験日" Binding="{Binding Jyukenbi, StringFormat='yyyy/MM/dd'}" />
-                <DataGridTextColumn Header="進路先" Width="260" Binding="{Binding Shinro_name}" />
+                <DataGridTextColumn Header="卒業年度" Width="88" Binding="{Binding Year}" />
+                <DataGridTemplateColumn Header="区分" Width="88" SortMemberPath="Kind"
+                                        CellTemplate="{StaticResource KindCell}" />
+                <DataGridTextColumn Header="進路先" Width="240" Binding="{Binding Shinro_name}" />
+                <DataGridTextColumn Header="受験方法" Binding="{Binding Jyukenhouhou_name}" />
+                <DataGridTemplateColumn Header="合否" Width="104" SortMemberPath="Result"
+                                        CellTemplate="{StaticResource ResultCell}" />
+                <DataGridTextColumn Header="氏名" Binding="{Binding G_name}" />
+                <DataGridTextColumn Header="クラス" Binding="{Binding Cls_name}" />
+                <DataGridTextColumn Header="受験日" Width="112" Binding="{Binding Jyukenbi, StringFormat='yyyy/MM/dd'}" />
                 <DataGridTextColumn Header="学部" Binding="{Binding Gakubu}" />
                 <DataGridTextColumn Header="学科" Binding="{Binding Gakka}" />
-                <DataGridTextColumn Header="コース" Binding="{Binding Course}" />
+                <DataGridTextColumn Header="コース" Binding="{Binding Course}" Visibility="Collapsed" />
                 <DataGridTextColumn Header="就職先内区分" Binding="{Binding Syuusyokusakinai_kubun}" />
-                <DataGridTextColumn Header="受験方法" Binding="{Binding Jyukenhouhou_name}" />
-                <DataGridTextColumn Header="氏名" Binding="{Binding G_name}" />
-                <DataGridTextColumn Header="性別" Binding="{Binding Sei}" />
-                <DataGridTextColumn Header="クラス" Binding="{Binding Cls_name}" />
-                <DataGridTextColumn Header="合否" Binding="{Binding Result}" />
+                <DataGridTextColumn Header="性別" Width="72" Binding="{Binding Sei}" Visibility="Collapsed" />
             </DataGrid.Columns>
             <ui:DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
                     <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
                     <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
                     <Setter Property="MinWidth" Value="50" />
+                    <!-- Same left inset as the cell text, so each header sits over its values. -->
+                    <Setter Property="Padding" Value="12,8,8,8" />
                 </Style>
             </ui:DataGrid.ColumnHeaderStyle>
         </ui:DataGrid>
-        <TextBlock Grid.Row="2" Text="{Binding EmptyStateText}" TextWrapping="Wrap"
-                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24" IsHitTestVisible="False"
-                   Visibility="{Binding HasNoResults, Converter={StaticResource BoolVisibility}}" />
-        <TextBlock Grid.Row="3" Text="{Binding StatusText}" Margin="0,8" TextWrapping="Wrap" />
+        <!-- Searching: progress and the way out, where the results will appear. -->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}">
+            <ui:ProgressRing IsIndeterminate="True" Width="40" Height="40" />
+            <TextBlock Text="検索しています" HorizontalAlignment="Center" Margin="0,12,0,12" />
+            <ui:Button Content="中断（Esc）" HorizontalAlignment="Center" Command="{Binding ExecuteSearchCancelCommand}"
+                       AutomationProperties.Name="検索を中断" />
+        </StackPanel>
+        <!-- Nothing to show: what to do next, and a way to do it. -->
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24"
+                    Visibility="{Binding ShowEmptyState, Converter={StaticResource BoolVisibility}}">
+            <ui:SymbolIcon Symbol="DocumentSearch24" FontSize="48" HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+            <ui:TextBlock Text="{Binding EmptyStateText}" FontTypography="BodyStrong" HorizontalAlignment="Center"
+                          TextWrapping="Wrap" Margin="0,12,0,12" />
+            <ui:Button Content="条件をクリア" HorizontalAlignment="Center" Command="{Binding ClearAllConditionsCommand}"
+                       Visibility="{Binding HasLastSearch, Converter={StaticResource BoolVisibility}}" />
+        </StackPanel>
+        <ui:SnackbarPresenter x:Name="Snackbar" Grid.Row="2" VerticalAlignment="Bottom" />
     </Grid>
 </Page>

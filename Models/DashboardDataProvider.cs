@@ -12,8 +12,6 @@ namespace ShinroKensakuDesktop.Models
 		string Department = DashboardDataProvider.Unassigned,
 		int DepartmentOrder = int.MaxValue );
 
-	public record DashboardSummary ( string Label, int Count );
-
 	public static partial class DashboardDataProvider
 	{
 		public const string Unassigned = "未設定";

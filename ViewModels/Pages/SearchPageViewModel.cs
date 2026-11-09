@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using ShinroKensakuDesktop.Models;
 using ShinroKensakuDesktop.Models.Data;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -11,47 +12,120 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 {
 	public partial class SearchPageViewModel : ObservableObject
 	{
+		/* Every selector starts with すべて, so "no filter" is a visible choice rather than an empty box. */
+		public const string All = "すべて";
+		public static readonly ExamMethodData AllMethods = new("", All);
+		public static readonly DepartmentData AllClasses = new(sbyte.MinValue, All, "");
+
 		private readonly SemaphoreSlim departmentGate = new(1, 1);
 		private readonly Func<Task<List<DepartmentData>>> loadDepartments;
 		private readonly Func<Task<List<ExamMethodData>>> loadMethods;
 		private readonly Func<SearchCriteria, CancellationToken, Task<List<SearchResultData>>> loadResults;
+		private readonly Func<Task<List<int>>> loadYears;
 		private readonly SemaphoreSlim methodGate = new(1, 1);
+		private readonly SemaphoreSlim yearGate = new(1, 1);
 		private int conditionsVersion = DatabaseSettings.Version;
+		private List<int> knownYears = [ ];
 		private int lastConnectionVersion;
 		private SearchCriteria? lastCriteria;
-		private bool methodsLoaded, departmentsLoaded;
+		private bool methodsLoaded, departmentsLoaded, yearsLoaded;
 		private List<SearchResultData>? searchResults;
 
 		public SearchPageViewModel (
 			Func<SearchCriteria, CancellationToken, Task<List<SearchResultData>>>? load = null,
 			Func<Task<List<ExamMethodData>>>? methods = null,
-			Func<Task<List<DepartmentData>>>? departments = null )
+			Func<Task<List<DepartmentData>>>? departments = null,
+			Func<Task<List<int>>>? years = null )
 		{
 			loadResults = load ?? SearchPageDataGridSourceProvider.GetDataGridSource;
 			loadMethods = methods ?? SearchPageComboBoxSourceProvider.GetExamMethodComboBoxSource;
 			loadDepartments = departments ?? SearchPageComboBoxSourceProvider.GetDepartmentComboBoxSource;
+			loadYears = years ?? SearchPageComboBoxSourceProvider.GetYearComboBoxSource;
 		}
 
+		/* Raised after a CSV file is written, with a short message for a transient confirmation. */
+		public event EventHandler<string>? Exported;
+
 		[ ObservableProperty ] public partial string StatusText { get; set; } = "条件を指定して検索してください。";
+		[ ObservableProperty ] public partial NoticeSeverity StatusSeverity { get; set; }
+		[ ObservableProperty ] public partial bool IsConnectionError { get; set; }
 		[ ObservableProperty ] public partial string ConditionStatusText { get; set; } = "";
 		[ ObservableProperty ] public partial bool IsBusy { get; set; }
 		[ ObservableProperty ] public partial bool IsExporting { get; set; }
 		[ ObservableProperty ] public partial bool IsLoadingConditions { get; set; }
 		[ ObservableProperty ] public partial string CurrentSearchQuery { get; set; } = "すべての受験記録";
-		[ ObservableProperty ] public partial string LastSearchSummary { get; set; } = "まだ検索していません";
+		[ ObservableProperty ] public partial string LastSearchSummary { get; set; } = "";
 		[ ObservableProperty ] public partial ExamMethodData? ExamMethodComboBoxSelectedItem { get; set; }
 		[ ObservableProperty ] public partial DepartmentData? DepartmentComboBoxSelectedItem { get; set; }
 		[ ObservableProperty ] public partial string? SearchTargetName { get; set; }
 		[ ObservableProperty ] public partial string? SelectedYear { get; set; }
 
+		/* A department (学科) name as the graph derives it; null means every department. */
+		[ ObservableProperty ] public partial string? SelectedDepartmentName { get; set; }
+
 		[ ObservableProperty ]
 		public partial ObservableCollection<SearchResultData> SearchResultList { get; set; } = new( );
 
 		[ ObservableProperty ] public partial string SearchResultCountText { get; set; } = "0件";
+		[ ObservableProperty ] public partial List<string> YearOptions { get; set; } = [ All ];
+		[ ObservableProperty ] public partial List<ExamMethodData> ExamMethodOptions { get; set; } = [ AllMethods ];
+		[ ObservableProperty ] public partial List<string> DepartmentNameOptions { get; set; } = [ All ];
+		[ ObservableProperty ] public partial List<DepartmentData> ClassOptions { get; set; } = [ AllClasses ];
 
 		public ObservableCollection<ExamMethodData> ExamMethodComboBoxItems { get; } = [ ];
 		public ObservableCollection<DepartmentData> DepartmentComboBoxItems { get; } = [ ];
 		public bool IsLoading => IsBusy || IsLoadingConditions || IsExporting;
+		public bool HasConditionError => ConditionStatusText.Length > 0;
+		public bool HasLastSearch => lastCriteria != null;
+
+		/* Selector values: すべて maps to null. A null from the control (its items being replaced) is ignored. */
+		public string SelectedYearOption
+		{
+			get => string.IsNullOrWhiteSpace ( SelectedYear ) ? All : SelectedYear.Trim ( );
+			set
+			{
+				if ( value != null )
+				{
+					SelectedYear = value == All ? null : value;
+				}
+			}
+		}
+
+		public ExamMethodData SelectedExamMethodOption
+		{
+			get => ExamMethodComboBoxSelectedItem ?? AllMethods;
+			set
+			{
+				if ( value != null )
+				{
+					ExamMethodComboBoxSelectedItem = value == AllMethods ? null : value;
+				}
+			}
+		}
+
+		public string SelectedDepartmentNameOption
+		{
+			get => SelectedDepartmentName ?? All;
+			set
+			{
+				if ( value != null )
+				{
+					SelectedDepartmentName = value == All ? null : value;
+				}
+			}
+		}
+
+		public DepartmentData SelectedClassOption
+		{
+			get => DepartmentComboBoxSelectedItem ?? AllClasses;
+			set
+			{
+				if ( value != null )
+				{
+					DepartmentComboBoxSelectedItem = value == AllClasses ? null : value;
+				}
+			}
+		}
 
 		public bool IsSearchDirty
 		{
@@ -72,15 +146,32 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			}
 		}
 
+		public string DirtyMessage => LastSearchSummary.Length == 0
+			? "表示中の結果とCSVは、前の条件で検索したものです。"
+			: $"表示中の結果とCSVは「{LastSearchSummary}」で検索したものです。";
+
 		public bool HasNoResults => !IsBusy && SearchResultList.Count == 0;
-		public string EmptyStateText => lastCriteria == null ? "条件を指定して検索してください。" : "条件に一致する受験記録はありません。";
+
+		/* An error explains itself in the notice, so the empty table stays blank then. */
+		public bool ShowEmptyState => HasNoResults && StatusSeverity != NoticeSeverity.Error;
+
+		public string EmptyStateText => lastCriteria == null ? "進路先の名前か条件を指定して検索" : "条件に一致する受験記録はありません";
 		public bool CanEditConditions => !IsBusy && !IsExporting;
 
 		private SearchCriteria CurrentCriteria ( ) => SearchCriteria.Create ( SearchTargetName, SelectedYear,
-			ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id );
+			ExamMethodComboBoxSelectedItem?.Id, DepartmentComboBoxSelectedItem?.Id, SelectedDepartmentName,
+			ClassesOf ( SelectedDepartmentName ) );
+
+		private IEnumerable<sbyte> ClassesOf ( string? department ) => department == null
+			? [ ]
+			: DepartmentComboBoxItems.Where ( x => DashboardDataProvider.DepartmentOf ( x.LongName ) == department )
+				.Select ( x => x.Id );
 
 		partial void OnIsBusyChanged ( bool value ) => NotifyState ( );
 		partial void OnIsExportingChanged ( bool value ) => NotifyState ( );
+		partial void OnStatusSeverityChanged ( NoticeSeverity value ) => OnPropertyChanged ( nameof(ShowEmptyState) );
+		partial void OnConditionStatusTextChanged ( string value ) => OnPropertyChanged ( nameof(HasConditionError) );
+		partial void OnLastSearchSummaryChanged ( string value ) => OnPropertyChanged ( nameof(DirtyMessage) );
 
 		partial void OnIsLoadingConditionsChanged ( bool value )
 		{
@@ -88,13 +179,39 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			ReloadConditionsCommand.NotifyCanExecuteChanged ( );
 		}
 
-		partial void OnExamMethodComboBoxSelectedItemChanged ( ExamMethodData? value ) => UpdateSearchQuery ( );
-		partial void OnDepartmentComboBoxSelectedItemChanged ( DepartmentData? value ) => UpdateSearchQuery ( );
-		partial void OnSelectedYearChanged ( string? value ) => UpdateSearchQuery ( );
+		partial void OnExamMethodComboBoxSelectedItemChanged ( ExamMethodData? value )
+		{
+			OnPropertyChanged ( nameof(SelectedExamMethodOption) );
+			UpdateSearchQuery ( );
+		}
+
+		partial void OnDepartmentComboBoxSelectedItemChanged ( DepartmentData? value )
+		{
+			OnPropertyChanged ( nameof(SelectedClassOption) );
+			UpdateSearchQuery ( );
+		}
+
+		partial void OnSelectedDepartmentNameChanged ( string? value )
+		{
+			UpdateDepartmentOptions ( );
+			OnPropertyChanged ( nameof(SelectedDepartmentNameOption) );
+			UpdateSearchQuery ( );
+		}
+
+		partial void OnSelectedYearChanged ( string? value )
+		{
+			UpdateYearOptions ( );
+			OnPropertyChanged ( nameof(SelectedYearOption) );
+			UpdateSearchQuery ( );
+		}
+
 		partial void OnSearchTargetNameChanged ( string? value ) => UpdateSearchQuery ( );
 
-		partial void OnSearchResultListChanged ( ObservableCollection<SearchResultData> value ) =>
+		partial void OnSearchResultListChanged ( ObservableCollection<SearchResultData> value )
+		{
 			OnPropertyChanged ( nameof(HasNoResults) );
+			OnPropertyChanged ( nameof(ShowEmptyState) );
+		}
 
 		private void NotifyState ( )
 		{
@@ -105,8 +222,10 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			OnPropertyChanged ( nameof(IsLoading) );
 			OnPropertyChanged ( nameof(CanEditConditions) );
 			OnPropertyChanged ( nameof(HasNoResults) );
+			OnPropertyChanged ( nameof(ShowEmptyState) );
 			OnPropertyChanged ( nameof(IsSearchDirty) );
 			OnPropertyChanged ( nameof(EmptyStateText) );
+			OnPropertyChanged ( nameof(HasLastSearch) );
 		}
 
 		private void CheckConnectionVersion ( )
@@ -117,11 +236,15 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			}
 
 			conditionsVersion = DatabaseSettings.Version;
-			methodsLoaded = departmentsLoaded = false;
+			methodsLoaded = departmentsLoaded = yearsLoaded = false;
 			ExamMethodComboBoxItems.Clear ( );
 			DepartmentComboBoxItems.Clear ( );
 			ExamMethodComboBoxSelectedItem = null;
 			DepartmentComboBoxSelectedItem = null;
+			knownYears = [ ];
+			ExamMethodOptions = [ AllMethods ];
+			UpdateDepartmentOptions ( );
+			UpdateYearOptions ( );
 			NotifyState ( );
 		}
 
@@ -133,11 +256,11 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			try
 			{
 				CheckConnectionVersion ( );
-				await Task.WhenAll ( LoadExamMethodComboBoxItems ( ), LoadDepartmentComboBoxItems ( ) );
+				await Task.WhenAll ( LoadExamMethodComboBoxItems ( ), LoadDepartmentComboBoxItems ( ), LoadYearOptions ( ) );
 			}
 			catch ( Exception )
 			{
-				ConditionStatusText = "検索条件を取得できませんでした。設定の接続を確認し、条件を再読み込みしてください。";
+				ConditionStatusText = "データベースの接続を確認して、再読み込みしてください。";
 			}
 			finally { IsLoadingConditions = false; }
 		}
@@ -152,7 +275,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				return;
 			}
 
-			methodsLoaded = departmentsLoaded = false;
+			methodsLoaded = departmentsLoaded = yearsLoaded = false;
 			await LoadConditionsAsync ( );
 		}
 
@@ -174,7 +297,9 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 					ExamMethodComboBoxItems.Add ( item );
 				}
 
+				ExamMethodOptions = [ AllMethods, .. items ];
 				ExamMethodComboBoxSelectedItem = items.FirstOrDefault ( x => x.Id == selectedId );
+				OnPropertyChanged ( nameof(SelectedExamMethodOption) );
 				methodsLoaded = true;
 			}
 			finally { methodGate.Release ( ); }
@@ -199,19 +324,69 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				}
 
 				DepartmentComboBoxSelectedItem = items.FirstOrDefault ( x => x.Id == selectedId );
+				UpdateDepartmentOptions ( );
 				departmentsLoaded = true;
 			}
 			finally { departmentGate.Release ( ); }
 		}
 
-		[ RelayCommand ]
-		public void ClearExamMethodComboBoxSelectedItem ( ) => ExamMethodComboBoxSelectedItem = null;
+		private async Task LoadYearOptions ( )
+		{
+			await yearGate.WaitAsync ( );
+			try
+			{
+				if ( yearsLoaded )
+				{
+					return;
+				}
 
-		[ RelayCommand ]
-		public void ClearDepartmentComboBoxSelectedItem ( ) => DepartmentComboBoxSelectedItem = null;
+				knownYears = await loadYears ( );
+				UpdateYearOptions ( );
+				yearsLoaded = true;
+			}
+			finally { yearGate.Release ( ); }
+		}
 
-		[ RelayCommand ]
-		public void ClearSelectedYear ( ) => SelectedYear = null;
+		/* A year set from elsewhere (a chart point) is shown even before, or without, the year list. */
+		private void UpdateYearOptions ( )
+		{
+			IEnumerable<int> years = knownYears;
+			if ( int.TryParse ( SelectedYear?.Trim ( ), NumberStyles.None, CultureInfo.InvariantCulture, out int year ) )
+			{
+				years = years.Append ( year );
+			}
+
+			YearOptions = [ All, .. years.Distinct ( ).OrderDescending ( ).Select ( x => x.ToString ( CultureInfo.InvariantCulture ) ) ];
+			OnPropertyChanged ( nameof(SelectedYearOption) );
+		}
+
+		/* Departments in class order; classes narrow to the chosen department and a class outside it is dropped. */
+		private void UpdateDepartmentOptions ( )
+		{
+			List<string> names = DepartmentComboBoxItems
+				.GroupBy ( x => DashboardDataProvider.DepartmentOf ( x.LongName ) )
+				.OrderBy ( x => x.Key == DashboardDataProvider.Unassigned ).ThenBy ( x => x.Min ( y => y.Id ) )
+				.Select ( x => x.Key ).ToList ( );
+			if ( SelectedDepartmentName != null && !names.Contains ( SelectedDepartmentName ) )
+			{
+				names.Add ( SelectedDepartmentName );
+			}
+
+			DepartmentNameOptions = [ All, .. names ];
+			ClassOptions =
+			[
+				AllClasses, .. DepartmentComboBoxItems.Where ( x => SelectedDepartmentName == null ||
+				                                                    DashboardDataProvider.DepartmentOf ( x.LongName ) ==
+				                                                    SelectedDepartmentName )
+			];
+			if ( DepartmentComboBoxSelectedItem != null && !ClassOptions.Contains ( DepartmentComboBoxSelectedItem ) )
+			{
+				DepartmentComboBoxSelectedItem = null;
+			}
+
+			OnPropertyChanged ( nameof(SelectedDepartmentNameOption) );
+			OnPropertyChanged ( nameof(SelectedClassOption) );
+		}
 
 		[ RelayCommand ( CanExecute = nameof(CanSearch) ) ]
 		public void ClearAllConditions ( )
@@ -219,10 +394,18 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			SearchTargetName = null;
 			SelectedYear = null;
 			ExamMethodComboBoxSelectedItem = null;
+			SelectedDepartmentName = null;
 			DepartmentComboBoxSelectedItem = null;
 		}
 
 		private bool CanSearch ( ) => !IsBusy && !IsExporting;
+
+		private void SetStatus ( string text, NoticeSeverity severity, bool connection = false )
+		{
+			StatusText = text;
+			IsConnectionError = connection;
+			StatusSeverity = severity;
+		}
 
 		[ RelayCommand ( CanExecute = nameof(CanSearch), IncludeCancelCommand = true ) ]
 		public async Task ExecuteSearch ( CancellationToken cancellationToken )
@@ -236,7 +419,7 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			try { criteria = CurrentCriteria ( ); }
 			catch ( ArgumentException )
 			{
-				StatusText = "年度は1901～2155の数字で入力してください。";
+				SetStatus ( "卒業年度は1901～2155の数字で入力してください。", NoticeSeverity.Error );
 				return;
 			}
 
@@ -245,9 +428,9 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 			IsBusy = true;
 			searchResults = null;
 			lastCriteria = null;
-			LastSearchSummary = "検索しています…";
+			LastSearchSummary = "";
 			ShowResults ( );
-			StatusText = "検索しています…";
+			SetStatus ( "検索しています…", NoticeSeverity.None );
 			try
 			{
 				List<SearchResultData> loaded = await loadResults ( criteria, cancellationToken );
@@ -255,19 +438,17 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 				searchResults = loaded;
 				lastCriteria = criteria;
 				lastConnectionVersion = connectionVersion;
-				LastSearchSummary = "表示中：" + summary;
+				LastSearchSummary = summary;
 				ShowResults ( );
-				StatusText = loaded.Count == 0 ? "条件に一致する受験記録はありません。" : "検索完了";
+				SetStatus ( loaded.Count == 0 ? "条件に一致する受験記録はありません。" : "検索完了", NoticeSeverity.None );
 			}
 			catch ( OperationCanceledException ) when ( cancellationToken.IsCancellationRequested )
 			{
-				LastSearchSummary = "検索を中断しました";
-				StatusText = "検索を中断しました。条件を指定して再検索できます。";
+				SetStatus ( "検索を中断しました。", NoticeSeverity.Info );
 			}
 			catch ( Exception )
 			{
-				LastSearchSummary = "検索結果を取得できませんでした";
-				StatusText = "検索できませんでした。設定画面で接続を確認し、再検索してください。";
+				SetStatus ( "検索できませんでした。データベースの接続を確認して、もう一度検索してください。", NoticeSeverity.Error, true );
 			}
 			finally { IsBusy = false; }
 		}
@@ -315,11 +496,12 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 						}
 					}
 				} );
-				StatusText = $"検索結果{snapshot.Length:N0}件をCSVに保存しました。";
+				SetStatus ( $"検索結果{snapshot.Length:N0}件をCSVに保存しました。", NoticeSeverity.None );
+				Exported?.Invoke ( this, $"{snapshot.Length:N0}件を{Path.GetFileName ( dialog.FileName )}に保存しました" );
 			}
 			catch ( Exception )
 			{
-				StatusText = "CSVを保存できませんでした。ファイルが開かれていないか、保存先を確認してください。";
+				SetStatus ( "CSVを保存できませんでした。ファイルが開かれていないか、保存先を確認してください。", NoticeSeverity.Error );
 			}
 			finally { IsExporting = false; }
 		}
@@ -341,12 +523,17 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 
 			if ( !string.IsNullOrWhiteSpace ( SelectedYear ) )
 			{
-				parts.Add ( $"年度：{SelectedYear.Trim ( )}年" );
+				parts.Add ( $"卒業年度：{SelectedYear.Trim ( )}" );
 			}
 
 			if ( ExamMethodComboBoxSelectedItem != null )
 			{
 				parts.Add ( $"受験方法：{ExamMethodComboBoxSelectedItem.Name}" );
+			}
+
+			if ( SelectedDepartmentName != null )
+			{
+				parts.Add ( $"学科：{SelectedDepartmentName}" );
 			}
 
 			if ( DepartmentComboBoxSelectedItem != null )

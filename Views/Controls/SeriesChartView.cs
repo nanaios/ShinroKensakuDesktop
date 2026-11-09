@@ -13,46 +13,40 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using Wpf.Ui.Controls;
+using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace ShinroKensakuDesktop.Views.Controls
 {
-	public enum SeriesChartKind
-	{
-		Line,
-		StackedBar
-	}
-
-	/* Maps SeriesChart data onto a LiveCharts chart and repaints it from the current WPF-UI theme resources. */
+	/* A year line chart. The legend sits above the plot with each series' latest value, so the reader does not
+	   travel to the bottom; hovering a legend entry emphasises that line. Repaints from the current theme. */
 	public sealed class SeriesChartView : UserControl
 	{
 		public static readonly DependencyProperty DataProperty = DependencyProperty.Register (
 			nameof(Data), typeof(SeriesChart), typeof(SeriesChartView),
 			new PropertyMetadata ( SeriesChart.Empty, ( d, _ ) => ( ( SeriesChartView ) d ).RenderChart ( ) ) );
 
-		public static readonly DependencyProperty KindProperty = DependencyProperty.Register (
-			nameof(Kind), typeof(SeriesChartKind), typeof(SeriesChartView),
-			new PropertyMetadata ( SeriesChartKind.Line, ( d, _ ) => ( ( SeriesChartView ) d ).RenderChart ( ) ) );
-
 		public static readonly DependencyProperty PointCommandProperty = DependencyProperty.Register (
 			nameof(PointCommand), typeof(ICommand), typeof(SeriesChartView),
 			new PropertyMetadata ( null, ( d, _ ) => ( ( SeriesChartView ) d ).RenderChart ( ) ) );
 
-		/* Validated categorical palette (light / dark steps of the same eight hues), assigned by slot, never cycled. */
-		private static readonly string [ ] LightPalette =
-			[ "#2A78D6", "#EB6834", "#1BAF7A", "#EDA100", "#E87BA4", "#008300", "#4A3AA7", "#E34948" ];
-
-		private static readonly string [ ] DarkPalette =
-			[ "#3987E5", "#D95926", "#199E70", "#C98500", "#D55181", "#008300", "#9085E9", "#E66767" ];
+		/* Plots each series as its share of the year's total of all series (they must partition the total). */
+		public static readonly DependencyProperty ShowShareProperty = DependencyProperty.Register (
+			nameof(ShowShare), typeof(bool), typeof(SeriesChartView),
+			new PropertyMetadata ( false, ( d, _ ) => ( ( SeriesChartView ) d ).RenderChart ( ) ) );
 
 		private readonly CartesianChart chart = new( )
 		{
-			LegendPosition = LegendPosition.Bottom,
-			LegendTextSize = 13,
-			TooltipTextSize = 13,
+			LegendPosition = LegendPosition.Hidden,
+			TooltipTextSize = 14,
 			ZoomMode = ZoomAndPanMode.None,
+			Height = 280,
 			/* Let the card surface show through in every theme. */
 			Background = Brushes.Transparent
 		};
+
+		private readonly List<( ChartSeries Source, LineSeries<double> Series, SKColor Color )> drawn = [ ];
 
 		private readonly TextBlock empty = new( )
 		{
@@ -60,6 +54,17 @@ namespace ShinroKensakuDesktop.Views.Controls
 			Margin = new Thickness ( 0, 16, 0, 16 ),
 			Visibility = Visibility.Collapsed
 		};
+
+		private readonly StackPanel hint = new( )
+		{
+			Orientation = Orientation.Horizontal,
+			HorizontalAlignment = HorizontalAlignment.Right,
+			Margin = new Thickness ( 0, 4, 0, 0 )
+		};
+
+		private readonly WrapPanel legend = new( ) { HorizontalAlignment = HorizontalAlignment.Right };
+		private readonly TextBlock unit = new( ) { FontSize = 12, VerticalAlignment = VerticalAlignment.Bottom };
+		private readonly DockPanel header = new( ) { Margin = new Thickness ( 0, 0, 0, 4 ) };
 
 		static SeriesChartView ( )
 		{
@@ -73,8 +78,28 @@ namespace ShinroKensakuDesktop.Views.Controls
 		public SeriesChartView ( )
 		{
 			chart.DataPointerDown += OnDataPointerDown;
+			header.Children.Add ( unit );
+			DockPanel.SetDock ( unit, Dock.Left );
+			header.Children.Add ( legend );
+			SymbolIcon pointer = new( ) { Symbol = SymbolRegular.CursorClick20, FontSize = 16, Margin = new Thickness ( 0, 0, 4, 0 ) };
+			pointer.SetResourceReference ( Control.ForegroundProperty, "TextFillColorSecondaryBrush" );
+			TextBlock hintText = new( ) { Text = "点をクリックで、その年度の明細", FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+			hintText.SetResourceReference ( TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush" );
+			hint.Children.Add ( pointer );
+			hint.Children.Add ( hintText );
+			unit.SetResourceReference ( TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush" );
+			empty.SetResourceReference ( TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush" );
+
 			Grid layout = new( );
+			layout.RowDefinitions.Add ( new RowDefinition { Height = GridLength.Auto } );
+			layout.RowDefinitions.Add ( new RowDefinition { Height = GridLength.Auto } );
+			layout.RowDefinitions.Add ( new RowDefinition { Height = GridLength.Auto } );
+			Grid.SetRow ( chart, 1 );
+			Grid.SetRow ( hint, 2 );
+			Grid.SetRowSpan ( empty, 3 );
+			layout.Children.Add ( header );
 			layout.Children.Add ( chart );
+			layout.Children.Add ( hint );
 			layout.Children.Add ( empty );
 			Content = layout;
 			/* Theme switches replace this resource, which repaints the chart through OnPropertyChanged. */
@@ -87,24 +112,24 @@ namespace ShinroKensakuDesktop.Views.Controls
 			set => SetValue ( DataProperty, value );
 		}
 
-		public SeriesChartKind Kind
-		{
-			get => ( SeriesChartKind ) GetValue ( KindProperty );
-			set => SetValue ( KindProperty, value );
-		}
-
 		public ICommand? PointCommand
 		{
 			get => ( ICommand? ) GetValue ( PointCommandProperty );
 			set => SetValue ( PointCommandProperty, value );
 		}
 
+		public bool ShowShare
+		{
+			get => ( bool ) GetValue ( ShowShareProperty );
+			set => SetValue ( ShowShareProperty, value );
+		}
+
 		public CartesianChart Chart => chart;
+		public Panel Legend => legend;
 
 		public bool IsDark => Luminance ( BrushColor ( "TextFillColorPrimaryBrush", Colors.Black ) ) > 0.5;
 
-		public static string SeriesColor ( int slot, bool dark ) =>
-			( dark ? DarkPalette : LightPalette ) [ Math.Clamp ( slot, 0, LightPalette.Length - 1 ) ];
+		public static string SeriesColor ( int slot, bool dark ) => ThemeColors.SeriesColor ( slot, dark );
 
 		protected override void OnPropertyChanged ( DependencyPropertyChangedEventArgs e )
 		{
@@ -119,96 +144,142 @@ namespace ShinroKensakuDesktop.Views.Controls
 		{
 			SeriesChart data = Data ?? SeriesChart.Empty;
 			bool hasData = data.HasData;
+			bool clickable = PointCommand != null && data.Keys.Count > 0;
 			chart.Visibility = hasData ? Visibility.Visible : Visibility.Collapsed;
+			header.Visibility = chart.Visibility;
+			hint.Visibility = hasData && clickable ? Visibility.Visible : Visibility.Collapsed;
 			empty.Visibility = hasData ? Visibility.Collapsed : Visibility.Visible;
-			empty.Foreground = new SolidColorBrush ( BrushColor ( "TextFillColorSecondaryBrush", Colors.Gray ) );
-			bool line = Kind == SeriesChartKind.Line;
-			chart.Height = line ? 320 : Math.Max ( 160, ( data.Labels.Count * 44 ) + 96 );
-			chart.FindingStrategy = line ? FindingStrategy.CompareOnlyX : FindingStrategy.CompareOnlyY;
-			Cursor = line && PointCommand != null && data.Keys.Count > 0 ? Cursors.Hand : null;
+			chart.FindingStrategy = FindingStrategy.CompareOnlyX;
+			Cursor = clickable ? Cursors.Hand : null;
 			AutomationProperties.SetName ( this, Describe ( data ) );
+			drawn.Clear ( );
+			legend.Children.Clear ( );
 			if ( !hasData )
 			{
 				chart.Series = [ ];
 				return;
 			}
 
+			bool share = ShowShare;
 			bool dark = IsDark;
 			SKColor primary = Sk ( BrushColor ( "TextFillColorPrimaryBrush", Colors.Black ) );
 			SKColor secondary = Sk ( BrushColor ( "TextFillColorSecondaryBrush", Colors.Gray ) );
 			SKColor surface = Sk ( BrushColor ( "ApplicationBackgroundBrush", Colors.White ) );
-			SKColor grid = secondary.WithAlpha ( 48 );
-			chart.LegendTextPaint = new SolidColorPaint ( primary );
 			chart.TooltipTextPaint = new SolidColorPaint ( primary );
 			chart.TooltipBackgroundPaint = new SolidColorPaint ( surface );
+			unit.Text = share ? "%" : "件";
 
-			Axis categories = new( )
-			{
-				Labels = data.Labels.ToArray ( ),
-				LabelsPaint = new SolidColorPaint ( secondary ),
-				TextSize = 13,
-				SeparatorsPaint = null,
-				MinStep = 1,
-				ForceStepToMin = true,
-				/* Bar categories read top-down in ranked order. */
-				IsInverted = !line
-			};
-			Axis values = new( )
-			{
-				MinLimit = 0,
-				MinStep = 1,
-				Labeler = value => value.ToString ( "N0" ),
-				LabelsPaint = new SolidColorPaint ( secondary ),
-				TextSize = 13,
-				SeparatorsPaint = new SolidColorPaint ( grid ) { StrokeThickness = 1 }
-			};
-			chart.XAxes = [ line ? categories : values ];
-			chart.YAxes = [ line ? values : categories ];
-			chart.Series = data.Series.Select ( s => line ? LineSeries ( s, dark, secondary, surface ) : BarSeries ( s, data.Labels, dark, surface ) )
+			chart.XAxes =
+			[
+				new Axis
+				{
+					Labels = data.Labels.ToArray ( ),
+					LabelsPaint = new SolidColorPaint ( secondary ),
+					TextSize = 12,
+					SeparatorsPaint = null,
+					MinStep = 1,
+					ForceStepToMin = true
+				}
+			];
+			chart.YAxes =
+			[
+				new Axis
+				{
+					MinLimit = 0,
+					MinStep = 1,
+					Labeler = value => share ? $"{value:0}%" : value.ToString ( "N0" ),
+					LabelsPaint = new SolidColorPaint ( secondary ),
+					TextSize = 12,
+					SeparatorsPaint = new SolidColorPaint ( secondary.WithAlpha ( 48 ) ) { StrokeThickness = 1 }
+				}
+			];
+
+			double [ ] totals = Enumerable.Range ( 0, data.Labels.Count )
+				.Select ( i => ( double ) data.Series.Where ( s => !s.IsReference && i < s.Values.Count ).Sum ( s => s.Values [ i ] ) )
 				.ToArray ( );
+			foreach ( ChartSeries source in data.Series )
+			{
+				SKColor color = source.IsReference ? secondary : SKColor.Parse ( SeriesColor ( source.Slot, dark ) );
+				double [ ] values = source.Values.Select ( ( v, i ) =>
+					share ? totals [ i ] == 0 ? 0 : v * 100.0 / totals [ i ] : v ).ToArray ( );
+				LineSeries<double> series = new( )
+				{
+					Name = source.Name,
+					Values = values,
+					Fill = null,
+					LineSmoothness = 0,
+					GeometrySize = source.IsReference ? 7 : 9,
+					GeometryFill = new SolidColorPaint ( surface ),
+					YToolTipLabelFormatter = point => share
+						? $"{point.Coordinate.PrimaryValue:0.0}%（{source.Values [ point.Index ]:N0}件）"
+						: $"{point.Coordinate.PrimaryValue:N0} 件"
+				};
+				drawn.Add ( ( source, series, color ) );
+				legend.Children.Add ( LegendItem ( source, color, values.Length == 0 ? 0 : values [ ^1 ], share ) );
+			}
+
+			Highlight ( null );
+			chart.Series = drawn.Select ( x => ( ISeries ) x.Series ).ToArray ( );
 		}
 
-		private static ISeries LineSeries ( ChartSeries source, bool dark, SKColor reference, SKColor surface )
+		/* The legend entry carries the latest value, so the end of each line is read without the tooltip. */
+		private FrameworkElement LegendItem ( ChartSeries source, SKColor color, double latest, bool share )
 		{
-			SKColor color = source.IsReference ? reference : SKColor.Parse ( SeriesColor ( source.Slot, dark ) );
-			return new LineSeries<int>
+			Line swatch = new( )
 			{
-				Name = source.Name,
-				Values = source.Values.ToArray ( ),
-				Fill = null,
-				LineSmoothness = 0,
-				Stroke = new SolidColorPaint ( color )
+				X1 = 0, X2 = 18, Y1 = 0, Y2 = 0,
+				Stroke = new SolidColorBrush ( Color.FromArgb ( color.Alpha, color.Red, color.Green, color.Blue ) ),
+				StrokeThickness = 3,
+				StrokeDashArray = source.IsReference ? [ 1.5, 1 ] : null,
+				VerticalAlignment = VerticalAlignment.Center,
+				Margin = new Thickness ( 0, 0, 6, 0 )
+			};
+			string value = share ? $"{latest:0}%" : latest.ToString ( "N0" );
+			StackPanel item = new( )
+			{
+				Orientation = Orientation.Horizontal,
+				Margin = new Thickness ( 16, 2, 0, 2 ),
+				Background = Brushes.Transparent,
+				Cursor = Cursors.Arrow
+			};
+			item.Children.Add ( swatch );
+			item.Children.Add ( new TextBlock { Text = source.Name, VerticalAlignment = VerticalAlignment.Center } );
+			item.Children.Add ( new TextBlock
+			{
+				Text = value,
+				FontWeight = FontWeights.SemiBold,
+				Margin = new Thickness ( 6, 0, 0, 0 ),
+				VerticalAlignment = VerticalAlignment.Center
+			} );
+			item.MouseEnter += ( _, _ ) => Highlight ( source.Name );
+			item.MouseLeave += ( _, _ ) => Highlight ( null );
+			AutomationProperties.SetName ( item, $"{source.Name} {value}" );
+			return item;
+		}
+
+		/* Every other line fades while one legend entry is hovered. */
+		private void Highlight ( string? name )
+		{
+			foreach ( ( ChartSeries source, LineSeries<double> series, SKColor color ) in drawn )
+			{
+				bool focus = name == null || source.Name == name;
+				SKColor shown = focus ? color : color.WithAlpha ( 56 );
+				float thickness = name != null && focus ? 3 : 2;
+				series.Stroke = new SolidColorPaint ( shown )
 				{
-					StrokeThickness = 2,
+					StrokeThickness = thickness,
 					/* The total is a reference line, so it is dashed rather than given a palette colour. */
 					PathEffect = source.IsReference ? new DashEffect ( [ 6, 4 ] ) : null
-				},
-				GeometrySize = source.IsReference ? 7 : 9,
-				GeometryStroke = new SolidColorPaint ( color ) { StrokeThickness = 2 },
-				GeometryFill = new SolidColorPaint ( surface ),
-				YToolTipLabelFormatter = point => $"{point.Coordinate.PrimaryValue:N0} 件"
-			};
+				};
+				series.GeometryStroke = new SolidColorPaint ( shown ) { StrokeThickness = 2 };
+			}
 		}
-
-		/* Row tooltips take their header from the X formatter and each series line from the Y formatter. */
-		private static ISeries BarSeries ( ChartSeries source, IReadOnlyList<string> labels, bool dark, SKColor surface ) =>
-			new StackedRowSeries<int>
-			{
-				Name = source.Name,
-				Values = source.Values.ToArray ( ),
-				Fill = new SolidColorPaint ( SKColor.Parse ( SeriesColor ( source.Slot, dark ) ) ),
-				/* A surface-coloured edge keeps a 2px gap between stacked segments. */
-				Stroke = new SolidColorPaint ( surface ) { StrokeThickness = 2 },
-				MaxBarWidth = 28,
-				XToolTipLabelFormatter = point => point.Index < labels.Count ? labels [ point.Index ] : "",
-				YToolTipLabelFormatter = point => $"{point.Coordinate.PrimaryValue:N0} 件"
-			};
 
 		private void OnDataPointerDown ( IChartView sender, IEnumerable<ChartPoint> points )
 		{
 			ChartPoint? point = points.FirstOrDefault ( );
 			IReadOnlyList<int> keys = Data?.Keys ?? [ ];
-			if ( Kind != SeriesChartKind.Line || point == null || point.Index < 0 || point.Index >= keys.Count )
+			if ( point == null || point.Index < 0 || point.Index >= keys.Count )
 			{
 				return;
 			}
@@ -224,7 +295,7 @@ namespace ShinroKensakuDesktop.Views.Controls
 		private static string Describe ( SeriesChart data ) => !data.HasData
 			? "表示できるデータがありません"
 			: string.Join ( "。", data.Series.Select ( s => s.Name + "：" + string.Join ( "、",
-				data.Labels.Zip ( s.Values, ( label, value ) => $"{label} {value:N0}件" ) ) ) );
+				data.Labels.Zip ( s.Values, ( label, value ) => $"{label}年度 {value:N0}件" ) ) ) );
 
 		private Color BrushColor ( string key, Color fallback ) =>
 			TryFindResource ( key ) is SolidColorBrush brush ? brush.Color : fallback;

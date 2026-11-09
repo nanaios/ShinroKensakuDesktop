@@ -23,6 +23,18 @@ namespace ShinroKensakuDesktop.Models
 			return datas;
 		}
 
+		/* Every graduation year with at least one record, newest first. */
+		public static async Task<List<int>> GetYearComboBoxSource ( )
+		{
+			DataTable table = await MySQLCommand.Query ( """
+			                                             SELECT year FROM shingakukekkaTbl WHERE year IS NOT NULL
+			                                             UNION
+			                                             SELECT year FROM syuusyokukekkaTbl WHERE year IS NOT NULL
+			                                             ORDER BY year DESC
+			                                             """ ).ConfigureAwait ( false );
+			return table.Rows.Cast<DataRow> ( ).Select ( row => Convert.ToInt32 ( row [ "year" ] ) ).ToList ( );
+		}
+
 		public static async Task<List<DepartmentData>> GetDepartmentComboBoxSource ( )
 		{
 			string query = """select cls_code, cls_name, cls_lname from clsTbl order by cls_code""";

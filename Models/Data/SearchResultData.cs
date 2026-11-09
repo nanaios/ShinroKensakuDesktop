@@ -2,6 +2,9 @@
 {
 	public class SearchResultData
 	{
+		/* 進学 or 就職: the table the record came from. */
+		public string? Kind { get; init; }
+
 		public short? Year { get; init; }
 		public DateTime? Jyukenbi { get; init; }
 		public string? Shinro_name { get; init; }

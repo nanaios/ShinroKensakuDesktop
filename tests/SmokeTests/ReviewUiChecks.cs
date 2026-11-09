@@ -82,17 +82,20 @@ internal static class ReviewUiChecks
         settings.DatabaseUser = "検証用ユーザー";
         settings.DatabaseName = "検証用データベース";
         int searchCalls = 0;
-        var search = new SearchPageViewModel((_, _) =>
+        SearchCriteria? lastCriteria = null;
+        var search = new SearchPageViewModel((criteria, _) =>
         {
             searchCalls++;
+            lastCriteria = criteria;
             return Task.FromResult(Enumerable.Range(0, 1200).Select(i => new SearchResultData
             {
-                Year = 2026, Jyukenbi = new DateTime(2026, 9, 30), Shinro_name = $"検証用大学 {i}",
+                Kind = i % 3 == 0 ? "就職" : "進学", Year = 2026, Jyukenbi = new DateTime(2026, 9, 30), Shinro_name = $"検証用大学 {i}",
                 Gakubu = "工学部", Gakka = "情報学科", Jyukenhouhou_name = "一般", G_name = "検証データ",
-                Cls_name = "検証クラス", Result = "合格"
+                Cls_name = "検証クラス", Result = (i % 3) switch { 0 => "合格", 1 => "不合格", _ => "未確定" }
             }).ToList());
         }, () => Task.FromResult(new List<ExamMethodData> { new("A", "一般") }),
-            () => Task.FromResult(new List<DepartmentData> { new(1, "検証クラス", "検証学科") }));
+            () => Task.FromResult(new List<DepartmentData> { new(1, "検証クラス", "情報工学科1年") }),
+            () => Task.FromResult(new List<int> { 2026, 2025, 2024 }));
         List<DashboardGroup> fixture = [new(2024, "進学", "一般", 100, "情報工学科", 13), new(2025, "進学", "一般", 200, "情報工学科", 13), new(2026, "進学", "一般", 300, "建築工学科", 16), new(2026, "就職", "推薦", 50, "情報工学科", 13)];
         var provider = new TestPageProvider();
         var navigation = new NavigationService(provider);
@@ -137,7 +140,6 @@ internal static class ReviewUiChecks
             check(searchPage.InputBindings.OfType<System.Windows.Input.KeyBinding>().Any(x => x.Key == System.Windows.Input.Key.Escape), "search page exposes Escape cancellation shortcut");
             window.Width = 900;
             window.Height = 600;
-            Children<System.Windows.Controls.Expander>(searchPage).First().IsExpanded = true;
             var grid = (System.Windows.Controls.DataGrid)searchPage.FindName("ResultGrid");
             foreach (var theme in new[] { ApplicationTheme.Light, ApplicationTheme.Dark })
             {
@@ -159,7 +161,7 @@ internal static class ReviewUiChecks
             await Task.Delay(400);
             window.UpdateLayout();
             var settingsPage = (SettingsPage)provider.Pages[typeof(SettingsPage)];
-            check(settingsPage.FindName("DatabasePassword") is System.Windows.Controls.PasswordBox password && password.Password.Length == 0, "settings never repopulates password into visible control");
+            check(settingsPage.FindName("DatabasePassword") is Wpf.Ui.Controls.PasswordBox password && password.Password.Length == 0 && password.PlaceholderText.Contains("空欄"), "settings never repopulates password and states the blank rule in place");
             check(Children<System.Windows.Controls.TextBlock>(settingsPage).All(x => x.Text != "Test"), "settings contains application guidance instead of placeholder text");
             if (render) Render(window, "settings-light");
             navigation.Navigate(typeof(AnalyticsPage));
@@ -167,21 +169,39 @@ internal static class ReviewUiChecks
             window.UpdateLayout();
             if (render) Render(window, "analytics-light");
             var charts = Children<ShinroKensakuDesktop.Views.Controls.SeriesChartView>(analyticsPage).ToList();
-            check(charts.Count == 3 && !charts[0].IsDark, "real main window hosts all charts");
-            var tips = Children<ShinroKensakuDesktop.Views.Controls.InfoTip>(analyticsPage).ToList();
-            check(tips.Count >= 4 && tips.All(x => x.Text.Length > 0 && x.ToolTip is System.Windows.Controls.ToolTip { Content: System.Windows.Controls.TextBlock text } && text.Text == x.Text)
-                && tips.Any(x => x.Text.Contains(analytics.PointHint)), "analytics guidance is shown through info tooltips");
+            check(charts.Count == 2 && !charts[0].IsDark, "real main window hosts all charts");
+            var tips = new System.Windows.Controls.Page[] { (System.Windows.Controls.Page)provider.Pages[typeof(DashBoardPage)], analyticsPage, comparisonPage, searchPage, settingsPage }
+                .SelectMany(Children<ShinroKensakuDesktop.Views.Controls.InfoTip>).ToList();
+            check(tips.Count <= 3 && tips.All(x => x.Text.Length > 0 && x.ToolTip is System.Windows.Controls.ToolTip { Content: System.Windows.Controls.TextBlock text } && text.Text == x.Text
+                && System.Windows.Automation.AutomationProperties.GetName(x).EndsWith("の説明") && x.FocusVisualStyle != null), "only optional definitions stay behind info tips, named and focusable");
+            check(Children<System.Windows.Controls.TextBlock>(analyticsPage).Any(x => x.Text == "点をクリックで、その年度の明細" && x.IsVisible), "chart click target is stated beside the chart");
             if (render) await RenderCharts(window, charts, "light");
             settings.CurrentApplicationTheme = ApplicationTheme.Dark;
             await Task.Delay(400);
             window.UpdateLayout();
             if (render) await RenderCharts(window, charts, "dark");
-            var darkStroke = ((LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint)((LiveChartsCore.SkiaSharpView.LineSeries<int>)charts[0].Chart.Series.ElementAt(1)).Stroke!).Color;
+            var darkStroke = ((LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint)((LiveChartsCore.SkiaSharpView.LineSeries<double>)charts[0].Chart.Series.ElementAt(1)).Stroke!).Color;
             check(charts[0].IsDark && darkStroke == SkiaSharp.SKColor.Parse(ShinroKensakuDesktop.Views.Controls.SeriesChartView.SeriesColor(0, true)), "charts repaint with dark palette on theme switch");
+            check(((SolidColorBrush)Application.Current.Resources["StudyBrush"]).Color == (Color)ColorConverter.ConvertFromString(ShinroKensakuDesktop.Views.Controls.SeriesChartView.SeriesColor(0, true))
+                && ((SolidColorBrush)Application.Current.Resources["WorkBrush"]).Color == (Color)ColorConverter.ConvertFromString(ShinroKensakuDesktop.Views.Controls.SeriesChartView.SeriesColor(1, true)), "kind colours follow the theme outside the charts");
+            charts[0].Legend.Children[1].RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = UIElement.MouseEnterEvent });
+            var faded = ((LiveChartsCore.SkiaSharpView.Painting.SolidColorPaint)((LiveChartsCore.SkiaSharpView.LineSeries<double>)charts[0].Chart.Series.ElementAt(2)).Stroke!).Color;
+            check(faded.Alpha < 255, "hovering a legend entry fades the other lines");
+            charts[0].Legend.Children[1].RaiseEvent(new System.Windows.Input.MouseEventArgs(System.Windows.Input.Mouse.PrimaryDevice, 0) { RoutedEvent = UIElement.MouseLeaveEvent });
             settings.CurrentApplicationTheme = ApplicationTheme.Light;
             await Task.Delay(400);
             await analytics.OpenYearSearchCommand.ExecuteAsync(2025);
             check(search.SelectedYear == "2025" && searchCalls == 2 && search.SearchTargetName == null, "chart point opens search for that year");
+            analytics.SelectedDepartment = "情報工学科";
+            navigation.Navigate(typeof(AnalyticsPage));
+            await Task.Delay(100);
+            await analytics.OpenYearSearchCommand.ExecuteAsync(2025);
+            check(search.SelectedDepartmentName == "情報工学科" && lastCriteria is { Gakka: "情報工学科", GakkaClasses: "1", Year: 2025 }, "chart point carries the graph's department into the search");
+            navigation.Navigate(typeof(ComparisonPage));
+            await Task.Delay(100);
+            await analytics.OpenSearchCommand.ExecuteAsync(null);
+            check(search.SelectedDepartmentName == null && searchCalls == 4, "comparison years open without a department");
+            analytics.SelectedDepartment = AnalyticsPageViewModel.AllDepartments;
             settings.CurrentApplicationTheme = ApplicationTheme.Unknown;
         }
         finally

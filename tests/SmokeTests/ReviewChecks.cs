@@ -30,15 +30,13 @@ internal static class ReviewChecks
         check(mapped.Year == 2026 && mapped.Jyukenbi == null && mapped.Result == "未確定", "row mapping accepts null date and numeric year types");
         row["year"] = DBNull.Value;
         check(SearchPageDataGridSourceProvider.MapRow(row).Year == null, "missing year is not fabricated");
-        check(!SearchResultCsv.Create([mapped]).Contains("0001/01/01"), "CSV preserves missing dates");
-        var input = new System.Windows.Controls.TextBox { MaxLength = 4 };
-        var numeric = new ShinroKensakuDesktop.Views.Behaviors.NumericOnlyBehavior();
-        numeric.Attach(input);
-        var paste = new System.Windows.DataObjectPastingEventArgs(new System.Windows.DataObject(System.Windows.DataFormats.Text, "20261234"), false, System.Windows.DataFormats.Text)
-            { RoutedEvent = System.Windows.DataObject.PastingEvent };
-        input.RaiseEvent(paste);
-        check(paste.CommandCancelled, "oversized year paste is rejected instead of truncated");
-        numeric.Detach();
+        check(!SearchResultCsv.Create([mapped]).Contains("0001/01/01") && mapped.Kind == null, "CSV preserves missing dates and kind");
+        fixture.Columns.Add("kind", typeof(object));
+        row["kind"] = "就職";
+        check(SearchPageDataGridSourceProvider.MapRow(row).Kind == "就職", "row mapping reads the record kind");
+        check(SearchResultCsv.Create([]).StartsWith("卒業年度,区分,進路先,受験方法,合否,氏名,クラス,受験日,"), "CSV columns follow the result table order");
+        check(SearchCriteria.Create(null, null, null, null, "情報工学科", new sbyte[] { 3, 1, 3 }) == new SearchCriteria(null, null, null, null, "情報工学科", "1,3"), "department classes compare by value");
+        check(SearchCriteria.Create(null, null, null, null, " ", new sbyte[] { 1 }).Gakka == null, "blank department does not filter");
 
         TaskCompletionSource<List<SearchResultData>> completion = new();
         SearchCriteria? captured = null;
@@ -65,13 +63,43 @@ internal static class ReviewChecks
         cancelSearch.ExecuteSearchCancelCommand.Execute(null);
         await running;
         check(!cancelSearch.IsBusy && cancelSearch.StatusText.Contains("中断") && cancelSearch.SearchResultList.Count == 0, "cancel search clears busy state and results");
+        check(cancelSearch.StatusSeverity == NoticeSeverity.Info && cancelSearch.ShowEmptyState && !cancelSearch.HasLastSearch, "cancel is an information notice over the empty table");
         var failingSearch = new SearchPageViewModel((_, _) => Task.FromException<List<SearchResultData>>(new IOException("private error details")));
         await failingSearch.ExecuteSearchCommand.ExecuteAsync(null);
         check(!failingSearch.IsBusy && !failingSearch.StatusText.Contains("private") && !failingSearch.ExportCsvCommand.CanExecute(null), "search failures show no internal error details");
+        check(failingSearch.StatusSeverity == NoticeSeverity.Error && failingSearch.IsConnectionError && !failingSearch.ShowEmptyState, "search failure is an error notice with a way to the settings");
+        var emptySearch = new SearchPageViewModel((_, _) => Task.FromResult(new List<SearchResultData>()));
+        check(emptySearch.ShowEmptyState && emptySearch.EmptyStateText.Contains("指定して検索") && emptySearch.StatusSeverity == NoticeSeverity.None, "first visit explains what to do in the empty table");
+        await emptySearch.ExecuteSearchCommand.ExecuteAsync(null);
+        check(emptySearch.ShowEmptyState && emptySearch.EmptyStateText.Contains("一致する") && emptySearch.HasLastSearch && emptySearch.StatusSeverity == NoticeSeverity.None, "no match is an empty state with a clear action, not a notice");
+
+        SearchCriteria? departmentCriteria = null;
+        var byDepartment = new SearchPageViewModel((criteria, _) => { departmentCriteria = criteria; return Task.FromResult(new List<SearchResultData>()); },
+            methods: () => Task.FromResult(new List<ExamMethodData> { new("A", "一般") }),
+            departments: () => Task.FromResult(new List<DepartmentData> { new(1, "情1", "情報工学科1年"), new(2, "情2", "情報工学科2年"), new(3, "建1", "建築工学科1年"), new(4, "他", "") }),
+            years: () => Task.FromResult(new List<int> { 2025, 2026 }));
+        await byDepartment.LoadConditionsAsync();
+        check(byDepartment.YearOptions.SequenceEqual(new[] { "すべて", "2026", "2025" }) && byDepartment.SelectedYearOption == "すべて", "years list newest first after すべて");
+        check(byDepartment.ExamMethodOptions[0] == SearchPageViewModel.AllMethods && byDepartment.SelectedExamMethodOption == SearchPageViewModel.AllMethods, "methods start with すべて");
+        check(byDepartment.DepartmentNameOptions.SequenceEqual(new[] { "すべて", "情報工学科", "建築工学科", DashboardDataProvider.Unassigned }), "departments derived from class names, 未設定 last");
+        byDepartment.SelectedClassOption = byDepartment.ClassOptions.Single(x => x.Id == 3);
+        byDepartment.SelectedDepartmentNameOption = "情報工学科";
+        check(byDepartment.ClassOptions.Select(x => x.Id).SequenceEqual(new sbyte[] { SearchPageViewModel.AllClasses.Id, 1, 2 }) && byDepartment.DepartmentComboBoxSelectedItem == null, "department narrows classes and drops one outside it");
+        byDepartment.SelectedYear = "2019";
+        check(byDepartment.YearOptions.Contains("2019") && byDepartment.SelectedYearOption == "2019", "a year set from a chart is selectable even if not listed");
+        await byDepartment.ExecuteSearchCommand.ExecuteAsync(null);
+        check(departmentCriteria is { Gakka: "情報工学科", GakkaClasses: "1,2", Year: 2019 } && byDepartment.LastSearchSummary.Contains("学科：情報工学科"), "department searches its classes");
+        byDepartment.SelectedYearOption = "すべて";
+        check(byDepartment.SelectedYear == null && byDepartment.IsSearchDirty && byDepartment.DirtyMessage.Contains("学科：情報工学科"), "changed conditions name the conditions behind the table");
+        byDepartment.SelectedYearOption = null!;
+        check(byDepartment.SelectedYear == null, "a null from a refreshing selector is ignored");
+        byDepartment.SelectedDepartmentNameOption = DashboardDataProvider.Unassigned;
+        await byDepartment.ExecuteSearchCommand.ExecuteAsync(null);
+        check(departmentCriteria is { Gakka: "未設定", GakkaClasses: "4" }, "未設定 covers classes without a department name");
 
         int methodCalls = 0;
         TaskCompletionSource<List<ExamMethodData>> methodCompletion = new();
-        var lookups = new SearchPageViewModel(methods: () => { methodCalls++; return methodCompletion.Task; }, departments: () => Task.FromResult(new List<DepartmentData>()));
+        var lookups = new SearchPageViewModel(methods: () => { methodCalls++; return methodCompletion.Task; }, departments: () => Task.FromResult(new List<DepartmentData>()), years: () => Task.FromResult(new List<int>()));
         var first = lookups.LoadExamMethodComboBoxItems();
         var second = lookups.LoadExamMethodComboBoxItems();
         methodCompletion.SetResult([new("A", "一般"), new("B", "推薦")]);
@@ -91,9 +119,9 @@ internal static class ReviewChecks
         await emptyLookups.LoadExamMethodComboBoxItems();
         await emptyLookups.LoadExamMethodComboBoxItems();
         check(emptyCalls == 1, "empty lookup results are cached");
-        var failingLookups = new SearchPageViewModel(methods: () => Task.FromException<List<ExamMethodData>>(new IOException()), departments: () => Task.FromResult(new List<DepartmentData>()));
+        var failingLookups = new SearchPageViewModel(methods: () => Task.FromException<List<ExamMethodData>>(new IOException()), departments: () => Task.FromResult(new List<DepartmentData>()), years: () => Task.FromResult(new List<int>()));
         await failingLookups.LoadConditionsCommand.ExecuteAsync(null);
-        check(!failingLookups.IsLoadingConditions && failingLookups.ConditionStatusText.Contains("再読み込み") && failingLookups.StatusText.Contains("条件を指定"), "lookup errors do not overwrite search status");
+        check(!failingLookups.IsLoadingConditions && failingLookups.ConditionStatusText.Contains("再読み込み") && failingLookups.HasConditionError && failingLookups.StatusText.Contains("条件を指定"), "lookup errors do not overwrite search status");
 
         string directory = Path.Combine(Path.GetTempPath(), "kaken-review-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
@@ -133,6 +161,8 @@ internal static class ReviewChecks
             check(settings.CurrentApplicationTheme == ApplicationTheme.Unknown && UserPreferences.LoadTheme(preferences) == ApplicationTheme.Unknown, "system theme remains a user preference without recursion");
             settings.DatabasePort = "0";
             check(!await settings.SaveDatabaseAsync("") && settings.DatabaseStatusText.Contains("65535"), "database settings reject invalid port before connecting");
+            check(settings.DatabaseNoticeSeverity == NoticeSeverity.Error && settings.DatabaseNoticeTitle == "保存できませんでした" && settings.ConnectionState != ConnectionStatus.Testing, "invalid settings raise an error notice without testing");
+            check(settings.ConnectionStateText.Length > 0 && settings.ThemeStatusText.Length == 0 && !settings.HasThemeError, "connection state has a one-word badge text");
             ApplicationThemeManager.Apply(ApplicationTheme.Light);
         }
         finally { Directory.Delete(directory, recursive: true); }
