@@ -23,5 +23,13 @@ namespace ShinroKensakuDesktop.Views.Pages
 				DatabasePassword.Password = string.Empty;
 			}
 		}
+
+		private void OpenReport_Click ( object sender, RoutedEventArgs e )
+		{
+			if ( DataContext is SettingsPageViewModel viewModel )
+			{
+				ExternalLink.Open ( viewModel.ReportUri );
+			}
+		}
 	}
 }

@@ -163,6 +163,9 @@ internal static class ReviewUiChecks
             var settingsPage = (SettingsPage)provider.Pages[typeof(SettingsPage)];
             check(settingsPage.FindName("DatabasePassword") is Wpf.Ui.Controls.PasswordBox password && password.Password.Length == 0 && password.PlaceholderText.Contains("空欄"), "settings never repopulates password and states the blank rule in place");
             check(Children<System.Windows.Controls.TextBlock>(settingsPage).All(x => x.Text != "Test"), "settings contains application guidance instead of placeholder text");
+            check(settingsPage.FindName("ReportLinkBox") is Wpf.Ui.Controls.TextBox { PlaceholderText: var hint } && hint.StartsWith("https://")
+                && searchPage.FindName("ReportButton") is FrameworkElement reportButton && System.Windows.Automation.AutomationProperties.GetName(reportButton) == "受験報告書をブラウザで開く",
+                "report link is set in settings and opened from the search page");
             if (render) Render(window, "settings-light");
             navigation.Navigate(typeof(AnalyticsPage));
             await Task.Delay(400);

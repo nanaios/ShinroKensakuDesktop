@@ -169,6 +169,25 @@
                 </StackPanel>
             </ui:CardExpander>
 
+            <ui:TextBlock Text="受験報告書" Style="{StaticResource GroupHeading}" Margin="0,16,0,8" />
+            <ui:CardControl Icon="{ui:SymbolIcon FolderLink24}" Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Text="受験報告書のリンク" Style="{StaticResource CardHeaderTitle}" />
+                        <ui:TextBlock Text="検索画面の「受験報告書」ボタンで開くフォルダー"
+                                      Style="{StaticResource CardHeaderNote}" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:TextBox x:Name="ReportLinkBox" Width="340" Text="{Binding ReportLink}"
+                                PlaceholderText="https://drive.google.com/…" AutomationProperties.Name="受験報告書のリンク" />
+                    <ui:Button Icon="{ui:SymbolIcon Open16}" Content="開く" Margin="8,0,0,0" Click="OpenReport_Click"
+                               IsEnabled="{Binding HasReportUri}" ToolTip="リンクをブラウザで開いて確かめる" />
+                </StackPanel>
+            </ui:CardControl>
+            <controls:NoticeBar Title="{Binding ReportLinkError}" Margin="0,0,0,8"
+                                Severity="{Binding HasReportLinkError, Converter={StaticResource BoolToSeverity}, ConverterParameter=Error}" />
+
             <ui:TextBlock Text="このアプリについて" Style="{StaticResource GroupHeading}" Margin="0,16,0,8" />
             <ui:CardExpander Icon="{ui:SymbolIcon Info24}">
                 <ui:CardExpander.Header>

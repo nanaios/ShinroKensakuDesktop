@@ -1,3 +1,4 @@
+using ShinroKensakuDesktop.Models;
 using ShinroKensakuDesktop.ViewModels.Pages;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,6 +61,24 @@ namespace ShinroKensakuDesktop.Views.Pages
 
 			menu.IsOpen = true;
 		}
+
+		/* The link is registered in the settings; with none yet, the button takes the user there. */
+		private void OpenReports_Click ( object sender, RoutedEventArgs e )
+		{
+			Uri? link = UserPreferences.ParseReportLink ( UserPreferences.LoadReportLink ( ) );
+			if ( link == null )
+			{
+				OpenSettings_Click ( sender, e );
+				return;
+			}
+
+			ExternalLink.Open ( link );
+		}
+
+		private void ReportButton_ToolTipOpening ( object sender, ToolTipEventArgs e ) =>
+			ReportButton.ToolTip = UserPreferences.ParseReportLink ( UserPreferences.LoadReportLink ( ) ) == null
+				? "リンクが未登録です。押すと設定を開きます"
+				: "受験報告書をブラウザで開く";
 
 		private void OpenSettings_Click ( object sender, RoutedEventArgs e )
 		{

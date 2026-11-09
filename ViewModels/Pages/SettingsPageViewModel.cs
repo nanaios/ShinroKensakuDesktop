@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using MySql.Data.MySqlClient;
 using ShinroKensakuDesktop.Models;
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using Wpf.Ui.Appearance;
@@ -32,8 +33,52 @@ namespace ShinroKensakuDesktop.ViewModels.Pages
 		{
 			this.preferencesPath = preferencesPath;
 			CurrentApplicationTheme = UserPreferences.LoadTheme ( preferencesPath );
+			ReportLink = UserPreferences.LoadReportLink ( preferencesPath ) ?? "";
 			initializing = false;
 			LoadDatabaseFields ( );
+		}
+
+		/* The folder the 受験報告書 button opens; saved when the field is left, only if it is an https address. */
+		[ ObservableProperty ] public partial string ReportLink { get; set; } = "";
+		[ ObservableProperty ] public partial string ReportLinkError { get; set; } = "";
+		public bool HasReportLinkError => ReportLinkError.Length > 0;
+		public Uri? ReportUri => HasReportLinkError ? null : UserPreferences.ParseReportLink ( ReportLink );
+		public bool HasReportUri => ReportUri != null;
+
+		partial void OnReportLinkChanged ( string value )
+		{
+			if ( initializing )
+			{
+				return;
+			}
+
+			string text = value.Trim ( );
+			if ( text.Length > 0 && UserPreferences.ParseReportLink ( text ) == null )
+			{
+				ReportLinkError = "https:// から始まるリンクを入力してください。";
+			}
+			else
+			{
+				try
+				{
+					UserPreferences.SaveReportLink ( text.Length == 0 ? null : text, preferencesPath );
+					ReportLinkError = "";
+				}
+				catch ( Exception ex ) when ( ex is IOException or UnauthorizedAccessException )
+				{
+					ReportLinkError = "リンクを保存できませんでした。保存先の権限を確認してください。";
+				}
+			}
+
+			OnPropertyChanged ( nameof(ReportUri) );
+			OnPropertyChanged ( nameof(HasReportUri) );
+		}
+
+		partial void OnReportLinkErrorChanged ( string value )
+		{
+			OnPropertyChanged ( nameof(HasReportLinkError) );
+			OnPropertyChanged ( nameof(ReportUri) );
+			OnPropertyChanged ( nameof(HasReportUri) );
 		}
 
 		[ ObservableProperty ]

@@ -159,6 +159,23 @@ internal static class ReviewChecks
             check(ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark && UserPreferences.LoadTheme(preferences) == ApplicationTheme.Dark, "selected theme applies and persists");
             settings.CurrentApplicationTheme = ApplicationTheme.Unknown;
             check(settings.CurrentApplicationTheme == ApplicationTheme.Unknown && UserPreferences.LoadTheme(preferences) == ApplicationTheme.Unknown, "system theme remains a user preference without recursion");
+            const string reports = "https://drive.google.com/drive/folders/review-only";
+            check(UserPreferences.ParseReportLink(" " + reports + " ")?.AbsoluteUri == reports
+                && new[] { "http://drive.google.com/x", "file:///C:/Windows/System32/calc.exe", "C:\\Windows\\notepad.exe", "javascript:alert(1)", "https://", "drive.google.com", " " }
+                    .All(x => UserPreferences.ParseReportLink(x) == null), "report link accepts only https addresses");
+            check(!ShinroKensakuDesktop.Views.ExternalLink.Open(null) && !ShinroKensakuDesktop.Views.ExternalLink.Open(new Uri("http://example.com/")), "only https links are handed to the browser");
+            check(settings.ReportLink == "" && !settings.HasReportUri, "report link starts unregistered");
+            settings.ReportLink = "file:///C:/Windows/System32/calc.exe";
+            check(settings.HasReportLinkError && !settings.HasReportUri && UserPreferences.LoadReportLink(preferences) == null, "unsafe report link is refused and not saved");
+            settings.ReportLink = reports;
+            check(!settings.HasReportLinkError && settings.HasReportUri && UserPreferences.LoadReportLink(preferences) == reports, "report link saved when valid");
+            settings.CurrentApplicationTheme = ApplicationTheme.Dark;
+            check(UserPreferences.LoadReportLink(preferences) == reports && UserPreferences.LoadTheme(preferences) == ApplicationTheme.Dark, "theme and report link are saved without erasing each other");
+            using (var reopened = new SettingsPageViewModel(preferences))
+                check(reopened.ReportLink == reports && reopened.HasReportUri, "report link restored on the next start");
+            settings.ReportLink = "";
+            check(UserPreferences.LoadReportLink(preferences) == null && !settings.HasReportUri && !settings.HasReportLinkError, "clearing the field removes the link");
+            settings.CurrentApplicationTheme = ApplicationTheme.Unknown;
             settings.DatabasePort = "0";
             check(!await settings.SaveDatabaseAsync("") && settings.DatabaseStatusText.Contains("65535"), "database settings reject invalid port before connecting");
             check(settings.DatabaseNoticeSeverity == NoticeSeverity.Error && settings.DatabaseNoticeTitle == "保存できませんでした" && settings.ConnectionState != ConnectionStatus.Testing, "invalid settings raise an error notice without testing");
