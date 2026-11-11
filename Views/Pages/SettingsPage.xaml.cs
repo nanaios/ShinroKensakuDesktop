@@ -13,15 +13,6 @@ namespace ShinroKensakuDesktop.Views.Pages
 		{
 			DataContext = viewModel;
 			InitializeComponent ( );
-			/* Leaving the page locks the settings again, and locking drops a typed password. */
-			Unloaded += ( _, _ ) => viewModel.IsAdvancedMode = false;
-			viewModel.PropertyChanged += ( _, e ) =>
-			{
-				if ( e.PropertyName == nameof(SettingsPageViewModel.IsAdvancedMode) && !viewModel.IsAdvancedMode )
-				{
-					DatabasePassword.Password = string.Empty;
-				}
-			};
 		}
 
 		private async void SaveDatabase_Click ( object sender, RoutedEventArgs e )

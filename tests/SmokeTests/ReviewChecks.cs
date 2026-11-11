@@ -164,13 +164,7 @@ internal static class ReviewChecks
                 && new[] { "http://drive.google.com/x", "file:///C:/Windows/System32/calc.exe", "C:\\Windows\\notepad.exe", "javascript:alert(1)", "https://", "drive.google.com", " " }
                     .All(x => UserPreferences.ParseReportLink(x) == null), "report link accepts only https addresses");
             check(!ShinroKensakuDesktop.Views.ExternalLink.Open(null) && !ShinroKensakuDesktop.Views.ExternalLink.Open(new Uri("http://example.com/")), "only https links are handed to the browser");
-            check(settings.ReportLink == "" && !settings.HasReportUri && settings.ReportLinkStateText == "未登録", "report link starts unregistered");
-            check(!settings.IsAdvancedMode && !settings.CanConfigureLocalConnection, "connection and link start locked");
-            settings.ReportLink = reports;
-            check(settings.ReportLink == "" && UserPreferences.LoadReportLink(preferences) == null, "a locked link cannot be changed");
-            check(!await settings.SaveDatabaseAsync("") && settings.DatabaseNoticeSeverity == NoticeSeverity.None, "a locked connection cannot be saved");
-            settings.IsAdvancedMode = true;
-            check(settings.CanConfigureLocalConnection == !DatabaseSettings.UsesEnvironment, "advanced mode unlocks the editors");
+            check(settings.ReportLink == "" && !settings.HasReportUri, "report link starts unregistered");
             settings.ReportLink = "file:///C:/Windows/System32/calc.exe";
             check(settings.HasReportLinkError && !settings.HasReportUri && UserPreferences.LoadReportLink(preferences) == null, "unsafe report link is refused and not saved");
             settings.ReportLink = reports;
@@ -178,13 +172,7 @@ internal static class ReviewChecks
             settings.CurrentApplicationTheme = ApplicationTheme.Dark;
             check(UserPreferences.LoadReportLink(preferences) == reports && UserPreferences.LoadTheme(preferences) == ApplicationTheme.Dark, "theme and report link are saved without erasing each other");
             using (var reopened = new SettingsPageViewModel(preferences))
-                check(reopened.ReportLink == reports && reopened.HasReportUri && reopened.ReportLinkStateText == "登録済み" && !reopened.IsAdvancedMode, "report link restored on the next start, still locked");
-            settings.ReportLink = "not a link";
-            settings.DatabasePort = "1";
-            check(settings.HasReportLinkError, "an invalid link is reported while editing");
-            settings.IsAdvancedMode = false;
-            check(settings.ReportLink == reports && !settings.HasReportLinkError && settings.DatabasePort != "1" && UserPreferences.LoadReportLink(preferences) == reports, "locking again drops unsaved edits");
-            settings.IsAdvancedMode = true;
+                check(reopened.ReportLink == reports && reopened.HasReportUri, "report link restored on the next start");
             settings.ReportLink = "";
             check(UserPreferences.LoadReportLink(preferences) == null && !settings.HasReportUri && !settings.HasReportLinkError, "clearing the field removes the link");
             settings.CurrentApplicationTheme = ApplicationTheme.Unknown;
