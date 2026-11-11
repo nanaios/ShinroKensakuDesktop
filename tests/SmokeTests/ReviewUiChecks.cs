@@ -104,8 +104,9 @@ internal static class ReviewUiChecks
         var searchPage = new SearchPage(search);
         var analyticsPage = new AnalyticsPage(analytics);
         var comparisonPage = new ComparisonPage(analytics);
+        var dashboardPage = new DashBoardPage(dashboard);
         provider.Page = searchPage;
-        provider.Pages[typeof(DashBoardPage)] = new DashBoardPage(dashboard);
+        provider.Pages[typeof(DashBoardPage)] = dashboardPage;
         provider.Pages[typeof(AnalyticsPage)] = analyticsPage;
         provider.Pages[typeof(ComparisonPage)] = comparisonPage;
         provider.Pages[typeof(SettingsPage)] = new SettingsPage(settings);
@@ -164,8 +165,9 @@ internal static class ReviewUiChecks
             check(settingsPage.FindName("DatabasePassword") is Wpf.Ui.Controls.PasswordBox password && password.Password.Length == 0 && password.PlaceholderText.Contains("空欄"), "settings never repopulates password and states the blank rule in place");
             check(Children<System.Windows.Controls.TextBlock>(settingsPage).All(x => x.Text != "Test"), "settings contains application guidance instead of placeholder text");
             check(settingsPage.FindName("ReportLinkBox") is Wpf.Ui.Controls.TextBox { PlaceholderText: var hint } && hint.StartsWith("https://")
-                && searchPage.FindName("ReportButton") is FrameworkElement reportButton && System.Windows.Automation.AutomationProperties.GetName(reportButton) == "受験報告書をブラウザで開く",
-                "report link is set in settings and opened from the search page");
+                && dashboardPage.FindName("ReportButton") is FrameworkElement reportButton && System.Windows.Automation.AutomationProperties.GetName(reportButton) == "受験報告書をブラウザで開く"
+                && searchPage.FindName("ReportButton") == null,
+                "report link is set in settings and opened from the dashboard header");
             var connectionForm = (FrameworkElement)settingsPage.FindName("ConnectionForm");
             var reportBox = (FrameworkElement)settingsPage.FindName("ReportLinkBox");
             check(!settings.IsAdvancedMode && connectionForm.Visibility != Visibility.Visible && reportBox.Visibility != Visibility.Visible, "settings open read-only");
@@ -186,7 +188,7 @@ internal static class ReviewUiChecks
             if (render) Render(window, "analytics-light");
             var charts = Children<ShinroKensakuDesktop.Views.Controls.SeriesChartView>(analyticsPage).ToList();
             check(charts.Count == 2 && !charts[0].IsDark, "real main window hosts all charts");
-            var tips = new System.Windows.Controls.Page[] { (System.Windows.Controls.Page)provider.Pages[typeof(DashBoardPage)], analyticsPage, comparisonPage, searchPage, settingsPage }
+            var tips = new System.Windows.Controls.Page[] { dashboardPage, analyticsPage, comparisonPage, searchPage, settingsPage }
                 .SelectMany(Children<ShinroKensakuDesktop.Views.Controls.InfoTip>).ToList();
             check(tips.Count <= 3 && tips.All(x => x.Text.Length > 0 && x.ToolTip is System.Windows.Controls.ToolTip { Content: System.Windows.Controls.TextBlock text } && text.Text == x.Text
                 && System.Windows.Automation.AutomationProperties.GetName(x).EndsWith("の説明") && x.FocusVisualStyle != null), "only optional definitions stay behind info tips, named and focusable");
