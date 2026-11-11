@@ -202,7 +202,7 @@
                 <ui:CardControl.Header>
                     <StackPanel>
                         <ui:TextBlock Text="受験報告書のリンク" Style="{StaticResource CardHeaderTitle}" />
-                        <ui:TextBlock Text="ダッシュボード画面の「受験報告書」ボタンで開くフォルダー"
+                        <ui:TextBlock Text="検索画面の「受験報告書」ボタンで開くフォルダー"
                                       Style="{StaticResource CardHeaderNote}" />
                     </StackPanel>
                 </ui:CardControl.Header>
