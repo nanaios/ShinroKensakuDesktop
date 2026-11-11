@@ -24,11 +24,14 @@ namespace ShinroKensakuDesktop.Views.Pages
 			}
 		}
 
-		private void OpenReport_Click ( object sender, RoutedEventArgs e )
+		private async void OpenReport_Click ( object sender, RoutedEventArgs e )
 		{
-			if ( DataContext is SettingsPageViewModel viewModel )
+			if ( DataContext is SettingsPageViewModel { ReportUri: { } link } && !await ExternalLink.OpenAsync ( link ) )
 			{
-				ExternalLink.Open ( viewModel.ReportUri );
+				MessageBox.Show ( ExternalLink.CopyToClipboard ( link )
+						? "ブラウザを開けませんでした。リンクをコピーしたので、ブラウザに貼り付けてください。"
+						: "ブラウザを開けませんでした。",
+					"受験報告書", MessageBoxButton.OK, MessageBoxImage.Warning );
 			}
 		}
 	}

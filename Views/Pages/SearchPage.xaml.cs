@@ -63,7 +63,7 @@ namespace ShinroKensakuDesktop.Views.Pages
 		}
 
 		/* The link is registered in the settings; with none yet, the button takes the user there. */
-		private void OpenReports_Click ( object sender, RoutedEventArgs e )
+		private async void OpenReports_Click ( object sender, RoutedEventArgs e )
 		{
 			Uri? link = UserPreferences.ParseReportLink ( UserPreferences.LoadReportLink ( ) );
 			if ( link == null )
@@ -72,7 +72,12 @@ namespace ShinroKensakuDesktop.Views.Pages
 				return;
 			}
 
-			ExternalLink.Open ( link );
+			if ( !await ExternalLink.OpenAsync ( link ) )
+			{
+				snackbar.Show ( "ブラウザを開けませんでした",
+					ExternalLink.CopyToClipboard ( link ) ? "リンクをコピーしたので、ブラウザに貼り付けてください" : "設定でリンクを確認してください",
+					ControlAppearance.Caution, new SymbolIcon ( SymbolRegular.Warning24 ), TimeSpan.FromSeconds ( 8 ) );
+			}
 		}
 
 		private void ReportButton_ToolTipOpening ( object sender, ToolTipEventArgs e ) =>
